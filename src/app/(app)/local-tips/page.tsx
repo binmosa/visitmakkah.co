@@ -1,18 +1,16 @@
-import BackgroundSection from '@/components/BackgroundSection'
-import SectionHero from '@/components/SectionHero'
-import SectionSliderPosts from '@/components/SectionSliderPosts'
-import { getAllPosts } from '@/data/posts'
-import rightImg from '@/images/hero-right-2.png'
-import React from 'react'
+import HubContentPlaceholder from '@/components/HubContentPlaceholder'
+import { Metadata } from 'next'
 
-const Page = async () => {
-    const posts = await getAllPosts()
-
-    return (
-        <div className="space-y-16 lg:space-y-24">
-            data container here to show the selected menu item output here
-        </div>
-    )
+export const metadata: Metadata = {
+    title: 'Local Tips',
+    description: 'Insider knowledge for navigating Makkah like a local - seasonal hacks, crowd tips, and hidden routes.',
 }
 
-export default Page
+export default function Page() {
+    return (
+        <HubContentPlaceholder
+            title="Local Tips"
+            message="Get insider knowledge on seasonal hacks, Ramadan advice, Hajj crowd patterns, and secret routes known only to locals."
+        />
+    )
+}

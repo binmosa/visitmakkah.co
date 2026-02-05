@@ -1,6 +1,7 @@
 import '@/styles/tailwind.css'
 import { Metadata } from 'next'
 import { Inter, Noto_Sans_Arabic, Plus_Jakarta_Sans } from 'next/font/google'
+import Script from 'next/script'
 import ThemeProvider from './theme-provider'
 
 // Body font
@@ -50,6 +51,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${inter.variable} ${plusJakartaSans.variable} ${notoSansArabic.variable}`}
     >
       <body className="font-body bg-white text-base text-neutral-900 dark:bg-neutral-900 dark:text-neutral-200">
+        {/* OpenAI ChatKit Script */}
+        <Script
+          src="https://cdn.platform.openai.com/deployments/chatkit/chatkit.js"
+          strategy="afterInteractive"
+        />
         <ThemeProvider>
           <div>{children}</div>
         </ThemeProvider>

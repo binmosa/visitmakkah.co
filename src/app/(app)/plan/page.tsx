@@ -1,22 +1,16 @@
-import BackgroundSection from '@/components/BackgroundSection'
-import SectionHero from '@/components/SectionHero'
-import SectionSliderPosts from '@/components/SectionSliderPosts'
-import { getAllPosts } from '@/data/posts'
-import rightImg from '@/images/hero-right.png'
-import React from 'react'
+import HubContentPlaceholder from '@/components/HubContentPlaceholder'
+import { Metadata } from 'next'
 
-const Page = async () => {
-    const posts = await getAllPosts()
-
-    return (
-        <div className="space-y-16 lg:space-y-24">
-
-
-            <div className="relative py-16">
-                data container here to show the selected menu item output here
-            </div>
-        </div>
-    )
+export const metadata: Metadata = {
+    title: 'Plan Your Journey',
+    description: 'Plan your Hajj or Umrah journey with AI-powered tools for timeline, visa, packing, and transport.',
 }
 
-export default Page
+export default function Page() {
+    return (
+        <HubContentPlaceholder
+            title="Plan Your Journey"
+            message="Use the AI assistant to create your personalized travel timeline, check visa requirements, build a packing list, or plan your transport."
+        />
+    )
+}

@@ -1,22 +1,16 @@
-import BackgroundSection from '@/components/BackgroundSection'
-import SectionHero from '@/components/SectionHero'
-import SectionSliderPosts from '@/components/SectionSliderPosts'
-import { getAllPosts } from '@/data/posts'
-import rightImg from '@/images/hero-right-2.png' // Using a different image if available, or fallback
-import React from 'react'
+import HubContentPlaceholder from '@/components/HubContentPlaceholder'
+import { Metadata } from 'next'
 
-const Page = async () => {
-    const posts = await getAllPosts()
-
-    return (
-        <div className="space-y-16 lg:space-y-24">
-
-            <div className="relative py-16">
-                <BackgroundSection />
-                data container here to show the selected menu item output here
-            </div>
-        </div>
-    )
+export const metadata: Metadata = {
+    title: 'Your Journey',
+    description: 'Complete guides for Hajj, Umrah, rituals, and spiritual preparation.',
 }
 
-export default Page
+export default function Page() {
+    return (
+        <HubContentPlaceholder
+            title="Your Spiritual Journey"
+            message="Get comprehensive guidance on Hajj and Umrah rituals, spiritual preparation, and step-by-step instructions from our AI guide."
+        />
+    )
+}
