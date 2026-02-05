@@ -6,41 +6,122 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --color-primary-50: rgb(238, 242, 255);
-  --color-primary-100: rgb(224, 231, 255);
-  --color-primary-200: rgb(199, 210, 254);
-  --color-primary-300: rgb(165, 180, 252);
-  --color-primary-400: rgb(129, 140, 248);
-  --color-primary-500: rgb(99, 102, 241);
-  --color-primary-600: rgb(79, 70, 229);
-  --color-primary-700: rgb(67, 56, 202);
-  --color-primary-800: rgb(55, 48, 163);
-  --color-primary-900: rgb(49, 46, 129);
+  /* Typography - Font Families */
+  --font-family-heading: var(--font-plus-jakarta-sans), system-ui, sans-serif;
+  --font-family-body: var(--font-inter), system-ui, sans-serif;
+  --font-family-arabic: var(--font-noto-sans-arabic), Arial, sans-serif;
 
-  --color-secondary-50: rgb(240, 253, 250);
-  --color-secondary-100: rgb(204, 251, 241);
-  --color-secondary-200: rgb(153, 246, 228);
-  --color-secondary-300: rgb(153, 246, 228);
-  --color-secondary-400: rgb(45, 212, 191);
-  --color-secondary-500: rgb(20, 184, 166);
-  --color-secondary-600: rgb(13, 148, 136);
-  --color-secondary-700: rgb(15, 118, 110);
-  --color-secondary-800: rgb(17, 94, 89);
-  --color-secondary-900: rgb(19, 78, 74);
+  /* Primary Colors — Deep Teal (Trust, spirituality, calm) */
+  --color-primary-50: #f0fdfa;
+  /* Backgrounds, hover states */
+  --color-primary-100: #ccfbf1;
+  /* Light accents */
+  --color-primary-200: #99f6e4;
+  --color-primary-300: #5eead4;
+  --color-primary-400: #2dd4bf;
+  --color-primary-500: #14b8a6;
+  /* Primary buttons, links */
+  --color-primary-600: #0d9488;
+  /* Primary hover */
+  --color-primary-700: #0f766e;
+  /* Active states */
+  --color-primary-800: #115e59;
+  --color-primary-900: #134e4a;
+  /* Dark text on light */
 
-  --color-neutral-50: rgb(249, 250, 251);
-  --color-neutral-100: rgb(243, 244, 246);
-  --color-neutral-200: rgb(229, 231, 235);
-  --color-neutral-300: rgb(209, 213, 219);
-  --color-neutral-400: rgb(156, 163, 175);
-  --color-neutral-500: rgb(107, 114, 128);
-  --color-neutral-600: rgb(75, 85, 99);
-  --color-neutral-700: rgb(55, 65, 81);
-  --color-neutral-800: rgb(31, 41, 55);
-  --color-neutral-900: rgb(17, 24, 39);
+  /* Secondary Colors — Warm Gold (Sacred, premium, traditional) */
+  --color-secondary-50: #fffbeb;
+  /* Highlight backgrounds */
+  --color-secondary-100: #fef3c7;
+  /* Badges, tags */
+  --color-secondary-200: #fde68a;
+  --color-secondary-300: #fcd34d;
+  --color-secondary-400: #fbbf24;
+  --color-secondary-500: #f59e0b;
+  /* Secondary buttons, icons */
+  --color-secondary-600: #d97706;
+  /* Secondary hover */
+  --color-secondary-700: #b45309;
+  /* Accent text */
+  --color-secondary-800: #92400e;
+  --color-secondary-900: #78350f;
+
+  /* Neutral Colors — Warm Grays (Readable, warm feel) */
+  --color-neutral-50: #fafaf9;
+  /* Page background */
+  --color-neutral-100: #f5f5f4;
+  /* Cards, sections */
+  --color-neutral-200: #e7e5e4;
+  --color-neutral-300: #d6d3d1;
+  --color-neutral-400: #a8a29e;
+  --color-neutral-500: #78716c;
+  /* Secondary text */
+  --color-neutral-600: #57534e;
+  --color-neutral-700: #44403c;
+  --color-neutral-800: #292524;
+  /* Body text */
+  --color-neutral-900: #1c1917;
+  /* Headings */
+
+  /* Accent Color — Soft Rose (Warmth, welcome) */
+  --color-accent-50: #fff1f2;
+  --color-accent-100: #ffe4e6;
+  --color-accent-200: #fecdd3;
+  --color-accent-300: #fda4af;
+  --color-accent-400: #fb7185;
+  --color-accent-500: #f43f5e;
+  /* Alerts, special highlights */
+  --color-accent-600: #e11d48;
+  --color-accent-700: #be123c;
+  --color-accent-800: #9f1239;
+  --color-accent-900: #881337;
+
+  /* Semantic Colors */
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #3b82f6;
+}
+
+/* Font utility classes */
+@utility font-heading {
+  font-family: var(--font-family-heading);
+}
+
+@utility font-body {
+  font-family: var(--font-family-body);
+}
+
+@utility font-arabic {
+  font-family: var(--font-family-arabic);
 }
 
 @layer base {
+
+  /* Apply heading font to all heading elements */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-family-heading);
+  }
+
+  /* RTL Arabic typography support */
+  [dir="rtl"] {
+    font-family: var(--font-family-arabic);
+  }
+
+  [dir="rtl"] h1,
+  [dir="rtl"] h2,
+  [dir="rtl"] h3,
+  [dir="rtl"] h4,
+  [dir="rtl"] h5,
+  [dir="rtl"] h6 {
+    font-family: var(--font-family-arabic);
+  }
+
   *,
   ::after,
   ::before,
@@ -52,6 +133,7 @@
   button.gm-control-active.gm-fullscreen-control {
     border-radius: var(--radius-xl) !important;
   }
+
   [type='button'] {
     -webkit-appearance: none !important;
   }
@@ -68,6 +150,7 @@
 @utility container {
   margin-inline: auto;
   padding-inline: 1rem;
+
   @media screen and (min-width: 1536px) {
     padding-inline: 8rem;
   }
@@ -81,13 +164,16 @@
 @utility embla {
   overflow: hidden;
 }
+
 @utility embla-overflow-unset {
   overflow: unset;
 }
+
 @utility embla__container {
   display: flex;
   touch-action: pan-y pinch-zoom;
 }
+
 @utility embla__slide {
   flex-shrink: 0;
   flex-grow: 0;
@@ -96,8 +182,11 @@
 
 /* // CUSTOM STYLES */
 @utility hidden-scrollbar {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+
+  /* Firefox */
   &::-webkit-scrollbar {
     display: none;
   }
@@ -116,7 +205,7 @@
 /* // POST CARD COMMENT BTN */
 .nc-PostCardCommentBtn,
 .nc-PostCardLikeAction,
-.nc-CommentCardLikeReply > button {
+.nc-CommentCardLikeReply>button {
   &:hover {
     span {
       color: inherit;
@@ -128,6 +217,7 @@
 @utility origin-100 {
   transform-origin: 100% 50% 0px;
 }
+
 @utility origin-50 {
   transform-origin: 50% 50% 0px;
 }
@@ -150,14 +240,17 @@
 @utility nc-animation-spin {
   animation: myspin 20s linear infinite;
   animation-play-state: paused;
+
   &.playing {
     animation-play-state: running;
   }
 }
+
 @keyframes myspin {
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -168,6 +261,7 @@
 }
 
 @utility section-rounded-none {
+
   *[class*='rounded'],
   *[class*='nc-box'] {
     border-radius: 0 !important;
@@ -175,6 +269,7 @@
 }
 
 @utility section-rounded-md {
+
   *[class*='rounded'],
   *[class*='nc-box'] {
     border-radius: var(--radius-md) !important;
@@ -189,7 +284,7 @@
 }
 
 .menuIsNew_lv1 {
-  > a::before {
+  >a::before {
     content: 'New!';
     position: absolute;
     top: -2px;
@@ -204,8 +299,9 @@
     font-weight: normal;
   }
 }
+
 .menuIsNew {
-  > a::after {
+  >a::after {
     content: 'New!';
     display: inline-block;
     padding: 0 5px;
@@ -220,7 +316,7 @@
 
 .nc-PostCardCommentBtn,
 .nc-PostCardLikeAction,
-.nc-CommentCardLikeReply > button {
+.nc-CommentCardLikeReply>button {
   &:hover {
     span {
       color: inherit;
@@ -234,6 +330,7 @@
     animation-duration: 300ms;
     animation-timing-function: ease-in-out;
   }
+
   .nc-CardLarge1__right {
     animation-name: CardLarge1ExampleRight;
     animation-duration: 500ms;
@@ -246,16 +343,19 @@
     transform: scale(1.05) translateY(20px);
     opacity: 0;
   }
+
   to {
     transform: scale(1) translateY(0px);
     opacity: 1;
   }
 }
+
 @keyframes CardLarge1ExampleLeft {
   from {
     transform: translateY(20px);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;
@@ -271,12 +371,14 @@
 /* // MENU MEGAMENU */
 @utility menu-item {
   @apply flex;
+
   &:hover {
-    > .sub-menu {
+    >.sub-menu {
       @apply block;
     }
   }
 }
+
 @utility sub-menu {
   @apply hidden;
 }

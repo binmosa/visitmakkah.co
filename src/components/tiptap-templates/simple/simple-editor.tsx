@@ -342,7 +342,7 @@ export function SimpleEditor() {
               <span className="text-nowrap">Exit editor</span>
             </Button>
             <span className="me-2 hidden font-light text-neutral-500 sm:block dark:text-neutral-400">/</span>
-            <Logo size="size-6" className="hidden! sm:block!" />
+            <Logo variant="icon" size="h-6 w-6" className="hidden! sm:block!" />
           </div>
 
           <div className="ml-auto flex items-center gap-2">

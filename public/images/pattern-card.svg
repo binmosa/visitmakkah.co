@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid slice">
+  <!-- visitMakkah Brand Pattern - Card/Tile Pattern -->
+  <!-- Compact decorative pattern for cards and small containers -->
+  <defs>
+    <!-- Compact diamond grid -->
+    <pattern id="cardDiamond" x="0" y="0" width="30" height="30" patternUnits="userSpaceOnUse">
+      <rect width="30" height="30" fill="transparent"/>
+      <path d="M0,15 L15,0 M0,15 L15,30 M15,0 L30,15 M15,30 L30,15" 
+            stroke="#134e4a" stroke-width="0.8" fill="none" opacity="0.1"/>
+    </pattern>
+    
+    <!-- Small accent dots -->
+    <pattern id="cardDots" x="0" y="0" width="30" height="30" patternUnits="userSpaceOnUse">
+      <rect width="30" height="30" fill="transparent"/>
+      <circle cx="15" cy="15" r="2" fill="#f59e0b" opacity="0.2"/>
+    </pattern>
+    
+    <!-- Fade to transparent at edges -->
+    <radialGradient id="cardFade" cx="50%" cy="50%" r="60%" fx="50%" fy="50%">
+      <stop offset="0%" style="stop-color:#fafaf9;stop-opacity:0"/>
+      <stop offset="100%" style="stop-color:#fafaf9;stop-opacity:0.8"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Base -->
+  <rect width="200" height="200" fill="#fafaf9"/>
+  
+  <!-- Pattern layers -->
+  <rect width="200" height="200" fill="url(#cardDiamond)"/>
+  <rect width="200" height="200" fill="url(#cardDots)"/>
+  
+  <!-- Corner accents -->
+  <circle cx="10" cy="10" r="4" fill="#14b8a6" opacity="0.15"/>
+  <circle cx="190" cy="10" r="4" fill="#14b8a6" opacity="0.15"/>
+  <circle cx="10" cy="190" r="4" fill="#14b8a6" opacity="0.15"/>
+  <circle cx="190" cy="190" r="4" fill="#14b8a6" opacity="0.15"/>
+  
+  <!-- Subtle edge fade -->
+  <rect width="200" height="200" fill="url(#cardFade)"/>
+</svg>

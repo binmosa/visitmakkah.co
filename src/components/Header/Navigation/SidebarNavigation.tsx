@@ -1,7 +1,6 @@
 'use client'
 
 import { TNavigationItem } from '@/data/navigation'
-import ButtonPrimary from '@/shared/ButtonPrimary'
 import { Divider } from '@/shared/divider'
 import { Link } from '@/shared/link'
 import SocialsList from '@/shared/SocialsList'
@@ -113,16 +112,8 @@ const SidebarNavigation: React.FC<Props> = ({ data }) => {
       <ul className="flex flex-col gap-y-1 px-2 py-6">{data?.map(_renderItem)}</ul>
       <Divider className="mb-6" />
 
-      {/* FOR OUR DEMO */}
-      <div className="flex items-center justify-between gap-x-2.5 py-6">
-        <ButtonPrimary
-          href="https://themeforest.net/item/ncmaz-blog-news-magazine-nextjs-template/44412092"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Buy this template
-        </ButtonPrimary>
-
+      {/* Dark mode toggle */}
+      <div className="flex items-center justify-end gap-x-2.5 py-6">
         <SwitchDarkMode />
       </div>
     </div>

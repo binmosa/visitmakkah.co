@@ -61,9 +61,8 @@ export function Aside({
               <div className="flex h-full flex-col px-4 md:px-8">
                 {showHeading ? (
                   <header
-                    className={`flex h-16 flex-shrink-0 items-center border-b border-neutral-900/10 md:h-20 ${
-                      hasHeading ? 'justify-between' : 'justify-end'
-                    }`}
+                    className={`flex h-16 flex-shrink-0 items-center border-b border-neutral-900/10 md:h-20 ${hasHeading ? 'justify-between' : 'justify-end'
+                      }`}
                   >
                     {hasHeading && (
                       <>
@@ -72,7 +71,7 @@ export function Aside({
                             <span className="text-2xl font-medium">{heading}</span>
                           </DialogTitle>
                         )}
-                        {logoOnHeading && <Logo size="size-10" />}
+                        {logoOnHeading && <Logo variant="icon" />}
                       </>
                     )}
 

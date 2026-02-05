@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000">
+  <!-- visitMakkah Brand Pattern - Base Pattern -->
+  <!-- Colors: Deep Teal (Primary) #134e4a, #0d9488 | Warm Gold (Secondary) #f59e0b -->
+  <defs>
+    <!-- Diamond grid pattern with primary teal -->
+    <pattern id="diamondGrid" x="0" y="0" width="50" height="50" patternUnits="userSpaceOnUse">
+      <rect width="50" height="50" fill="#fafaf9"/>
+      <path d="M0,25 L25,0 M0,25 L25,50 M25,0 L50,25 M25,50 L50,25" stroke="#134e4a" stroke-width="1.5" fill="none" opacity="0.3"/>
+    </pattern>
+
+    <!-- Lattice with gold accent dots -->
+    <pattern id="latticeDot" x="0" y="0" width="50" height="50" patternUnits="userSpaceOnUse">
+      <rect width="50" height="50" fill="#fafaf9"/>
+      <path d="M0,25 L25,0 M0,25 L25,50 M25,0 L50,25 M25,50 L50,25" stroke="#0d9488" stroke-width="1" fill="none" opacity="0.25"/>
+      <circle cx="25" cy="25" r="3" fill="#f59e0b" opacity="0.6"/>
+    </pattern>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1000" height="1000" fill="#fafaf9"/>
+
+  <!-- Outer frame - diamond grid -->
+  <rect x="0" y="0" width="1000" height="150" fill="url(#diamondGrid)"/>
+  <rect x="0" y="850" width="1000" height="150" fill="url(#diamondGrid)"/>
+  <rect x="0" y="150" width="150" height="700" fill="url(#diamondGrid)"/>
+  <rect x="850" y="150" width="150" height="700" fill="url(#diamondGrid)"/>
+
+  <!-- Inner frame - lattice with dots -->
+  <rect x="150" y="150" width="700" height="100" fill="url(#latticeDot)"/>
+  <rect x="150" y="750" width="700" height="100" fill="url(#latticeDot)"/>
+  <rect x="150" y="250" width="100" height="500" fill="url(#latticeDot)"/>
+  <rect x="750" y="250" width="100" height="500" fill="url(#latticeDot)"/>
+</svg>

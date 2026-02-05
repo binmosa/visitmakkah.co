@@ -1,0 +1,12 @@
+<svg width="200" height="50" viewBox="0 0 200 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g id="vm-icon-white">
+        <path d="M25 6C14.5066 6 6 14.5066 6 25V42H12V25C12 17.8203 17.8203 12 25 12C32.1797 12 38 17.8203 38 25V42H44V25C44 14.5066 35.4934 6 25 6Z" fill="#ffffff"/>
+        <rect x="16" y="22" width="18" height="20" rx="1" fill="#ffffff"/>
+        <rect x="16" y="27" width="18" height="4" fill="transparent"/> 
+    </g>
+    
+    <g id="vm-text-white" font-family="'Plus Jakarta Sans', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+        <text x="58" y="32" font-size="14" font-weight="500" fill="#ffffff" letter-spacing="0.5" opacity="0.9">visit</text>
+        <text x="88" y="32" font-size="20" font-weight="800" fill="#ffffff" letter-spacing="-0.5">Makkah</text>
+    </g>
+</svg>

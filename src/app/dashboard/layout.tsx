@@ -44,7 +44,7 @@ export default function Layout({ children }: { children: ReactNode }) {
             <div className="flex h-20 justify-between">
               <div className="flex">
                 <div className="flex shrink-0 items-center">
-                  <Logo size="size-10" />
+                  <Logo variant="icon" />
                 </div>
                 <div className="hidden sm:-my-px sm:ms-6 sm:flex sm:gap-x-8">
                   {navigation.map((item) => (
