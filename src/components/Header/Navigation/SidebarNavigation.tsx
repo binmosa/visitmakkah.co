@@ -4,7 +4,6 @@ import { TNavigationItem } from '@/data/navigation'
 import { Divider } from '@/shared/divider'
 import { Link } from '@/shared/link'
 import SocialsList from '@/shared/SocialsList'
-import SwitchDarkMode from '@/shared/SwitchDarkMode'
 import { Disclosure, DisclosureButton, DisclosurePanel, useClose } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/24/solid'
 import { Search01Icon } from '@hugeicons/core-free-icons'
@@ -112,10 +111,6 @@ const SidebarNavigation: React.FC<Props> = ({ data }) => {
       <ul className="flex flex-col gap-y-1 px-2 py-6">{data?.map(_renderItem)}</ul>
       <Divider className="mb-6" />
 
-      {/* Dark mode toggle */}
-      <div className="flex items-center justify-end gap-x-2.5 py-6">
-        <SwitchDarkMode />
-      </div>
     </div>
   )
 }

@@ -2,6 +2,7 @@ import { getNavigation } from '@/data/navigation'
 import { getAllPosts } from '@/data/posts'
 import { Button } from '@/shared/Button'
 import Logo from '@/shared/Logo'
+import SwitchDarkMode from '@/shared/SwitchDarkMode'
 import { PlusIcon } from '@heroicons/react/24/outline'
 import clsx from 'clsx'
 import { FC } from 'react'
@@ -44,7 +45,8 @@ const Header2: FC<Props> = async ({ bottomBorder, className }) => {
           <NotifyDropdown className="me-3" />
           <AvatarDropdown />
           <div className="ms-2 flex lg:hidden">
-            <HamburgerBtnMenu />
+            <SwitchDarkMode className="bg-neutral-100 dark:bg-neutral-800" />
+            <HamburgerBtnMenu className="ms-2" />
           </div>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import { FaMap, FaMosque, FaBed, FaRobot, FaLightbulb } from 'react-icons/fa6'
+
 
 export async function getNavigation(): Promise<TNavigationItem[]> {
   return [
@@ -7,7 +7,7 @@ export async function getNavigation(): Promise<TNavigationItem[]> {
       href: '/plan',
       name: 'Plan',
       type: 'dropdown',
-      icon: FaMap,
+      icon: 'FaMap',
       children: [
         { id: '1-1', href: '/plan/timeline-builder', name: 'Timeline Builder' },
         { id: '1-2', href: '/plan/visa-steps', name: 'Visa Steps' },
@@ -20,7 +20,7 @@ export async function getNavigation(): Promise<TNavigationItem[]> {
       href: '/grand-mosque',
       name: 'Grand Mosque',
       type: 'dropdown',
-      icon: FaMosque,
+      icon: 'FaMosque',
       children: [
         { id: '2-1', href: '/grand-mosque/entrances', name: 'Entrances' },
         { id: '2-2', href: '/grand-mosque/congestion', name: 'Congestion' },
@@ -33,10 +33,10 @@ export async function getNavigation(): Promise<TNavigationItem[]> {
       href: '/stay-and-food',
       name: 'Stay & Food',
       type: 'dropdown',
-      icon: FaBed,
+      icon: 'FaBed',
       children: [
-        { id: '3-1', href: '/stay-and-food/hotels', name: 'Hotels (Gate Pref)' },
-        { id: '3-2', href: '/stay-and-food/restaurants', name: 'Restaurants (Crowd Times)' },
+        { id: '3-1', href: '/stay-and-food/hotels', name: 'Hotels By Mosque Gate' },
+        { id: '3-2', href: '/stay-and-food/restaurants', name: 'Restaurants' },
         { id: '3-3', href: '/stay-and-food/women-friendly', name: 'Women-friendly Areas' },
         { id: '3-4', href: '/stay-and-food/late-night', name: 'Late-night Options' },
       ],
@@ -46,7 +46,7 @@ export async function getNavigation(): Promise<TNavigationItem[]> {
       href: '/smart-tools',
       name: 'Smart Tools',
       type: 'dropdown',
-      icon: FaRobot,
+      icon: 'FaRobot',
       children: [
         { id: '4-1', href: '/smart-tools/trip-planner', name: 'Trip Planner' },
         { id: '4-2', href: '/smart-tools/budget-tool', name: 'Budget Tool' },
@@ -59,7 +59,7 @@ export async function getNavigation(): Promise<TNavigationItem[]> {
       href: '/local-tips',
       name: 'Local Tips',
       type: 'dropdown',
-      icon: FaLightbulb,
+      icon: 'FaLightbulb',
       children: [
         { id: '5-1', href: '/local-tips/seasonal-hacks', name: 'Seasonal Hacks' },
         { id: '5-2', href: '/local-tips/ramadan-advice', name: 'Ramadan Advice' },
@@ -86,7 +86,7 @@ export type TNavigationItem = Partial<{
   type?: 'dropdown' | 'mega-menu'
   isNew?: boolean
   children?: TNavigationItem[]
-  icon?: React.ComponentType<{ className?: string }>
+  icon?: string
 }>
 
 export const getLanguages = async () => {
