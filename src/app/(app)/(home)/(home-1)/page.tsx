@@ -72,13 +72,14 @@ Crowd Level
 Weather
 Tawaf Recommendation
 */}
-        <SectionGridCategoryBox
-          categoryCardType="card2"
-          categories={categories.slice(0, 10)}
-          heading="Live Status Panel"
-          subHeading="real-time info updates"
-        />
 
+
+        <SectionSliderNewCategories
+          heading="2 Live Status Panel"
+          categoryCardType="card5"
+          subHeading="get real-time info updates"
+          categories={categories.filter((_, i) => i < 10)}
+        />
 
         {/* 3. Start With Your Situation 
 Tiles:
