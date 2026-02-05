@@ -8,7 +8,7 @@ import { useClose } from '@headlessui/react'
 import { Search01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import clsx from 'clsx'
-import { redirect } from 'next/navigation'
+import { redirect, usePathname } from 'next/navigation'
 import React from 'react'
 
 interface Props {
@@ -17,13 +17,25 @@ interface Props {
 
 const SidebarNavigation: React.FC<Props> = ({ data }) => {
   const handleClose = useClose()
+  const pathname = usePathname()
+
+  const isMenuItemActive = (menu: TNavigationItem) => {
+    if (!menu.href || menu.href === '#') return false
+    return pathname === menu.href || pathname.startsWith(menu.href + '/')
+  }
 
   const _renderItem = (menu: TNavigationItem, index: number) => {
+    const isActive = isMenuItemActive(menu)
     return (
       <li key={index} className="text-neutral-900 dark:text-white border-b border-neutral-100 dark:border-neutral-800 last:border-0">
         <Link
           href={menu.href || '#'}
-          className="flex w-full cursor-pointer rounded-lg px-3 py-3 text-start text-sm font-semibold tracking-wide uppercase hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+          className={clsx(
+            "flex w-full cursor-pointer rounded-lg px-3 py-3 text-start text-sm font-semibold tracking-wide uppercase transition-colors",
+            isActive
+              ? "bg-primary-50 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400"
+              : "hover:bg-neutral-100 dark:hover:bg-neutral-800"
+          )}
           onClick={handleClose}
         >
           {menu.name}

@@ -17,15 +17,15 @@ export async function getNavigation(): Promise<TNavigationItem[]> {
     },
     {
       id: '2',
-      href: '/grand-mosque',
-      name: 'Grand Mosque',
+      href: '/your-journey',
+      name: 'Your Journey',
       type: 'dropdown',
-      icon: 'FaMosque',
+      icon: 'FaKaaba',
       children: [
-        { id: '2-1', href: '/grand-mosque/entrances', name: 'Entrances' },
-        { id: '2-2', href: '/grand-mosque/congestion', name: 'Congestion' },
-        { id: '2-3', href: '/grand-mosque/quiet-zones', name: 'Quiet Zones' },
-        { id: '2-4', href: '/grand-mosque/accessibility', name: 'Accessibility' },
+        { id: '2-1', href: '/your-journey/hajj', name: 'Hajj' },
+        { id: '2-2', href: '/your-journey/umrah', name: 'Umrah' },
+        { id: '2-3', href: '/your-journey/rituals', name: 'Rituals' },
+        { id: '2-4', href: '/your-journey/spiritual', name: 'Spiritual' },
       ],
     },
     {

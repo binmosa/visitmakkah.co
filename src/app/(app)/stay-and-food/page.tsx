@@ -12,7 +12,7 @@ const Page = async () => {
         <div className="space-y-16 lg:space-y-24">
 
             <div className="relative py-16">
-                <BackgroundSection />
+
                 data container here to show the selected menu item output here
             </div>
         </div>
