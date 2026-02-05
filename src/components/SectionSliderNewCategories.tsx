@@ -48,7 +48,7 @@ const SectionSliderNewCategories: FC<Props> = ({
       case 'card3':
         return <CardCategory3 key={index} category={item} />
       case 'card4':
-        return <CardCategory4 key={index} badge={topIndex} category={item} />
+        return <CardCategory4 key={index} badge={topIndex} category={item} href={(item as any).href} />
       case 'card5':
         return <CardCategory5 key={index} category={item} />
       default:

@@ -9,9 +9,11 @@ interface Props {
   className?: string
   category: TCategory
   badge?: string
+  href?: string
+  countLabel?: string
 }
 
-const CardCategory2: FC<Props> = ({ className, category, badge }) => {
+const CardCategory2: FC<Props> = ({ className, category, badge, href, countLabel }) => {
   const { count, name, handle, thumbnail } = category
   return (
     <div
@@ -35,8 +37,12 @@ const CardCategory2: FC<Props> = ({ className, category, badge }) => {
       />
       <div className="mt-3">
         <h2 className={`text-base font-semibold`}>{name}</h2>
-        <Link className="absolute inset-0" href={`/category/${handle}`} />
-        <span className={`mt-1 block text-sm text-neutral-500 dark:text-neutral-400`}>{count} articles</span>
+        <Link className="absolute inset-0" href={href || `/category/${handle}`} />
+        {(count !== undefined || countLabel) && (
+          <span className={`mt-1 block text-sm text-neutral-500 dark:text-neutral-400`}>
+            {countLabel || `${count} articles`}
+          </span>
+        )}
       </div>
     </div>
   )

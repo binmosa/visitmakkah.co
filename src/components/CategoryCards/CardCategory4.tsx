@@ -8,9 +8,10 @@ interface Props {
   className?: string
   category: TCategory
   badge?: string
+  href?: string
 }
 
-const CardCategory4: FC<Props> = ({ className = '', category, badge }) => {
+const CardCategory4: FC<Props> = ({ className = '', category, badge, href }) => {
   const { count, name, handle, thumbnail, color } = category
   const getColorClass = () => {
     switch (color) {
@@ -62,7 +63,7 @@ const CardCategory4: FC<Props> = ({ className = '', category, badge }) => {
         </div>
       </div>
 
-      <Link href={`/category/${handle}`} className="absolute inset-0">
+      <Link href={href || `/category/${handle}`} className="absolute inset-0">
         <span className="sr-only">{name}</span>
       </Link>
     </div>

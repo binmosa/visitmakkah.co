@@ -14,8 +14,9 @@ interface Props {
 const CardCategory5: FC<Props> = ({ className = '', category }) => {
   const { count, name, handle, thumbnail } = category
 
+  // @ts-ignore
   return (
-    <Link href={`/category/${handle}`} className={`card-category-5 group relative block ${className}`}>
+    <Link href={category.href || `/category/${handle}`} className={`card-category-5 group relative block ${className}`}>
       <div className="relative aspect-square w-full shrink-0">
         <Image
           fill
