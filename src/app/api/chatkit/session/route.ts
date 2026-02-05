@@ -1,73 +1,88 @@
 import { NextRequest, NextResponse } from 'next/server'
-import OpenAI from 'openai'
 
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-})
-
-// Agent IDs mapped to context - you'll replace these with your actual agent IDs from Agent Builder
-const AGENT_IDS: Record<string, string> = {
+// Workflow IDs mapped to context - replace with your actual workflow IDs from Agent Builder
+const WORKFLOW_IDS: Record<string, string> = {
     // Your Journey
-    'hajj': process.env.AGENT_ID_HAJJ || '',
-    'umrah': process.env.AGENT_ID_UMRAH || '',
-    'rituals': process.env.AGENT_ID_RITUALS || '',
-    'spiritual': process.env.AGENT_ID_SPIRITUAL || '',
+    'hajj': process.env.WORKFLOW_ID_HAJJ || process.env.WORKFLOW_ID_DEFAULT || '',
+    'umrah': process.env.WORKFLOW_ID_UMRAH || process.env.WORKFLOW_ID_DEFAULT || '',
+    'rituals': process.env.WORKFLOW_ID_RITUALS || process.env.WORKFLOW_ID_DEFAULT || '',
+    'spiritual': process.env.WORKFLOW_ID_SPIRITUAL || process.env.WORKFLOW_ID_DEFAULT || '',
+    'your-journey': process.env.WORKFLOW_ID_JOURNEY || process.env.WORKFLOW_ID_DEFAULT || '',
+
     // Plan
-    'plan': process.env.AGENT_ID_PLAN || '',
-    'timeline-builder': process.env.AGENT_ID_PLAN || '',
-    'visa-steps': process.env.AGENT_ID_PLAN || '',
-    'packing': process.env.AGENT_ID_PLAN || '',
-    'transport': process.env.AGENT_ID_PLAN || '',
+    'plan': process.env.WORKFLOW_ID_PLAN || process.env.WORKFLOW_ID_DEFAULT || '',
+    'timeline-builder': process.env.WORKFLOW_ID_PLAN || process.env.WORKFLOW_ID_DEFAULT || '',
+    'visa-steps': process.env.WORKFLOW_ID_PLAN || process.env.WORKFLOW_ID_DEFAULT || '',
+    'packing': process.env.WORKFLOW_ID_PLAN || process.env.WORKFLOW_ID_DEFAULT || '',
+    'transport': process.env.WORKFLOW_ID_PLAN || process.env.WORKFLOW_ID_DEFAULT || '',
+
     // Stay & Food
-    'stay-and-food': process.env.AGENT_ID_STAY_FOOD || '',
-    'hotels': process.env.AGENT_ID_STAY_FOOD || '',
-    'restaurants': process.env.AGENT_ID_STAY_FOOD || '',
-    'women-friendly': process.env.AGENT_ID_STAY_FOOD || '',
-    'late-night': process.env.AGENT_ID_STAY_FOOD || '',
+    'stay-and-food': process.env.WORKFLOW_ID_STAY_FOOD || process.env.WORKFLOW_ID_DEFAULT || '',
+    'hotels': process.env.WORKFLOW_ID_STAY_FOOD || process.env.WORKFLOW_ID_DEFAULT || '',
+    'restaurants': process.env.WORKFLOW_ID_STAY_FOOD || process.env.WORKFLOW_ID_DEFAULT || '',
+    'women-friendly': process.env.WORKFLOW_ID_STAY_FOOD || process.env.WORKFLOW_ID_DEFAULT || '',
+    'late-night': process.env.WORKFLOW_ID_STAY_FOOD || process.env.WORKFLOW_ID_DEFAULT || '',
+
     // Smart Tools
-    'smart-tools': process.env.AGENT_ID_TOOLS || '',
-    'trip-planner': process.env.AGENT_ID_TOOLS || '',
-    'budget-tool': process.env.AGENT_ID_TOOLS || '',
-    'packing-list': process.env.AGENT_ID_TOOLS || '',
-    'distance-calculator': process.env.AGENT_ID_TOOLS || '',
+    'smart-tools': process.env.WORKFLOW_ID_TOOLS || process.env.WORKFLOW_ID_DEFAULT || '',
+    'trip-planner': process.env.WORKFLOW_ID_TOOLS || process.env.WORKFLOW_ID_DEFAULT || '',
+    'budget-tool': process.env.WORKFLOW_ID_TOOLS || process.env.WORKFLOW_ID_DEFAULT || '',
+    'packing-list': process.env.WORKFLOW_ID_TOOLS || process.env.WORKFLOW_ID_DEFAULT || '',
+    'distance-calculator': process.env.WORKFLOW_ID_TOOLS || process.env.WORKFLOW_ID_DEFAULT || '',
+
     // Local Tips
-    'local-tips': process.env.AGENT_ID_TIPS || '',
-    'seasonal-hacks': process.env.AGENT_ID_TIPS || '',
-    'ramadan-advice': process.env.AGENT_ID_TIPS || '',
-    'hajj-crowd-flow': process.env.AGENT_ID_TIPS || '',
-    'insider-routes': process.env.AGENT_ID_TIPS || '',
+    'local-tips': process.env.WORKFLOW_ID_TIPS || process.env.WORKFLOW_ID_DEFAULT || '',
+    'seasonal-hacks': process.env.WORKFLOW_ID_TIPS || process.env.WORKFLOW_ID_DEFAULT || '',
+    'ramadan-advice': process.env.WORKFLOW_ID_TIPS || process.env.WORKFLOW_ID_DEFAULT || '',
+    'hajj-crowd-flow': process.env.WORKFLOW_ID_TIPS || process.env.WORKFLOW_ID_DEFAULT || '',
+    'insider-routes': process.env.WORKFLOW_ID_TIPS || process.env.WORKFLOW_ID_DEFAULT || '',
+
     // Default fallback
-    'default': process.env.AGENT_ID_DEFAULT || '',
+    'default': process.env.WORKFLOW_ID_DEFAULT || '',
 }
 
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json()
-        const { context, userProfile } = body
+        const { context, userId } = body
 
-        // Get the appropriate agent ID based on context
-        const agentId = AGENT_IDS[context] || AGENT_IDS['default']
+        // Get the appropriate workflow ID based on context
+        const workflowId = WORKFLOW_IDS[context] || WORKFLOW_IDS['default']
 
-        if (!agentId) {
+        if (!workflowId) {
             return NextResponse.json(
-                { error: 'No agent configured for this context' },
+                { error: 'No workflow configured. Please set WORKFLOW_ID_DEFAULT in environment variables.' },
                 { status: 400 }
             )
         }
 
-        // Create a ChatKit session with the appropriate agent
-        // @ts-expect-error - chatkit is a new API
-        const session = await openai.chatkit.sessions.create({
-            agent_id: agentId,
-            // Pass user context to personalize the conversation
-            metadata: {
-                user_profile: userProfile,
-                context: context,
+        // Create ChatKit session using OpenAI API
+        const response = await fetch('https://api.openai.com/v1/chatkit/sessions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'OpenAI-Beta': 'chatkit_beta=v1',
+                'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
             },
+            body: JSON.stringify({
+                workflow: { id: workflowId },
+                user: userId || `user_${Date.now()}`,
+            }),
         })
 
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}))
+            console.error('ChatKit session error:', errorData)
+            return NextResponse.json(
+                { error: 'Failed to create ChatKit session', details: errorData },
+                { status: response.status }
+            )
+        }
+
+        const data = await response.json()
+
         return NextResponse.json({
-            client_secret: session.client_secret,
+            client_secret: data.client_secret,
         })
     } catch (error) {
         console.error('Error creating ChatKit session:', error)
