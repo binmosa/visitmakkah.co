@@ -25,7 +25,7 @@
 **Framework**: Next.js 15 (App Router)  
 **Styling**: Tailwind CSS 4 with custom theme  
 **Fonts**: Plus Jakarta Sans (headings), Inter (body), Noto Sans Arabic  
-**Features**: Dark mode, RTL support, Audio player, Multiple layouts
+**Features**: Dark mode, RTL support, Audio player, Multiple layouts, **Shadcn UI Integrated**
 
 ---
 
@@ -361,6 +361,21 @@ Located in `src/shared/`:
 | `SocialsList1.tsx` | Social media links |
 | `Heading.tsx` | Section heading |
 
+### Shadcn UI (Prioritized)
+
+> **RULE**: Always prioritize using Shadcn UI components for new features or when replacing existing UI elements.
+
+- **Location**: `src/components/ui/`
+- **Styling**: Fully integrated with project theme (Deep Teal & Warm Gold).
+- **Usage**:
+  ```tsx
+  import { Button } from "@/components/ui/button"
+  <Button>Click me</Button>
+  ```
+- **Available Components**:
+  - Button (`src/components/ui/button.tsx`)
+  - *Add new Shadcn components as needed*
+
 ---
 
 ## Styling System
@@ -525,6 +540,7 @@ When restructuring this template:
 5. **Section components are modular** - Mix and match to build pages
 6. **Theme uses Tailwind CSS 4** - Custom properties in `@theme` block
 7. **All headers support dark mode** - Uses `.dark` class on `<html>`
+8. **Prioritize Shadcn UI** - Use components from `src/components/ui/` for all new UI development. Maintain existing design patterns (colors, fonts) when adding new Shadcn components.
 
 ---
 

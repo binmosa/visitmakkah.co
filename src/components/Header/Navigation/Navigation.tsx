@@ -9,12 +9,13 @@ import { FC } from 'react'
 const Lv1MenuItem = ({ menuItem }: { menuItem: TNavigationItem }) => {
   return (
     <Link
-      className="flex items-center self-center rounded-full px-4 py-2.5 text-sm font-medium whitespace-nowrap text-neutral-700 hover:bg-neutral-100 hover:text-neutral-900 lg:text-[15px] xl:px-5 dark:text-neutral-300 dark:hover:bg-neutral-800 dark:hover:text-neutral-200"
+      className="group flex items-center self-center rounded-full px-4 py-2.5 text-sm font-medium whitespace-nowrap text-neutral-700 hover:bg-neutral-100 hover:text-primary-600 lg:text-[15px] xl:px-5 dark:text-neutral-300 dark:hover:bg-neutral-800 dark:hover:text-primary-500"
       href={menuItem.href || '#'}
     >
+      {menuItem.icon && <menuItem.icon className="me-2.5 text-xl flex-shrink-0 text-neutral-500 group-hover:text-primary-600 dark:text-neutral-400 dark:group-hover:text-primary-500" />}
       {menuItem.name}
       {menuItem.children?.length && (
-        <ChevronDownIcon className="ms-1 -me-1 size-4 text-neutral-400" aria-hidden="true" />
+        <ChevronDownIcon className="ms-1 -me-1 size-4 text-neutral-400 group-hover:text-primary-600 dark:group-hover:text-primary-500" aria-hidden="true" />
       )}
     </Link>
   )

@@ -1,243 +1,70 @@
+import { FaMap, FaMosque, FaBed, FaRobot, FaLightbulb } from 'react-icons/fa6'
+
 export async function getNavigation(): Promise<TNavigationItem[]> {
   return [
     {
       id: '1',
-      href: '/',
-      name: 'Home',
+      href: '/plan',
+      name: 'Plan',
       type: 'dropdown',
+      icon: FaMap,
       children: [
-        {
-          id: '1-0',
-          href: '/',
-          name: 'Home demo 1',
-        },
-        {
-          id: '1-1',
-          href: '/home-2',
-          name: 'Home demo 2',
-        },
-        {
-          id: '1-2',
-          href: '/home-3',
-          name: 'Home demo 3 ',
-        },
-        {
-          id: '1-3',
-          href: '/home-4',
-          name: 'Home demo 4 ',
-        },
-        {
-          id: '1-4',
-          href: '/home-5',
-          name: 'Home demo 5',
-        },
-        {
-          id: '1-5',
-          href: '/home-3',
-          name: 'Header style 2',
-        },
+        { id: '1-1', href: '/plan/timeline-builder', name: 'Timeline Builder' },
+        { id: '1-2', href: '/plan/visa-steps', name: 'Visa Steps' },
+        { id: '1-3', href: '/plan/packing', name: 'Packing' },
+        { id: '1-4', href: '/plan/transport', name: 'Transport' },
       ],
     },
     {
       id: '2',
-      href: '/search?s=technology',
-      name: 'Search',
-    },
-    {
-      id: '4',
-      href: '/category/travel',
-      name: 'Travel',
-    },
-    {
-      id: '5',
-      href: '/',
-      name: 'Templates',
-      type: 'mega-menu',
+      href: '/grand-mosque',
+      name: 'Grand Mosque',
+      type: 'dropdown',
+      icon: FaMosque,
       children: [
-        {
-          id: '1',
-          href: '#',
-          name: 'Home pages',
-          children: [
-            {
-              id: '1-0',
-              href: '/',
-              name: 'Home 1',
-            },
-            {
-              id: '1-1',
-              href: '/home-2',
-              name: 'Home 2',
-            },
-            {
-              id: '1-2',
-              href: '/home-3',
-              name: 'Home 3 ',
-            },
-            {
-              id: '1-3',
-              href: '/home-4',
-              name: 'Home 4 ',
-            },
-            {
-              id: '1-4',
-              href: '/home-5',
-              name: 'Home 5',
-            },
-            {
-              id: '1-5',
-              href: '/home-3',
-              name: 'Header style 2',
-            },
-            {
-              id: '1-6',
-              href: '#',
-              name: 'Coming soon',
-            },
-          ],
-        },
-        {
-          id: '2',
-          href: '#',
-          name: 'Archive pages',
-          children: [
-            {
-              id: '2-0',
-              href: '/category/technology',
-              name: 'Category',
-            },
-            {
-              id: '2-1',
-              href: '/tag/food',
-              name: 'Tag page',
-            },
-            {
-              id: '2-2',
-              href: '/author/john-doe',
-              name: 'Author page',
-            },
-            {
-              id: '2-3',
-              href: '/search?s=technology',
-              name: 'Search page',
-            },
-            {
-              id: '2-4',
-              href: '/search-2?s=technology',
-              name: 'Search page 2',
-            },
-            {
-              id: '2-5',
-              href: '/search-2?s=john&tab=authors',
-              name: 'Search author',
-            },
-            {
-              id: '2-6',
-              href: '/search-2?s=technology&tab=categories',
-              name: 'Search categories',
-            },
-          ],
-        },
-        {
-          id: '3',
-          href: '#',
-          name: 'Single pages',
-          children: [
-            {
-              id: '3-0',
-              href: '/post/page-style-3/future-of-remote-work-2025',
-              name: 'Single type 1',
-            },
-            {
-              id: '3-1',
-              href: '/post/jazz-night-live-miles-davis-tribute',
-              name: 'Single audio',
-            },
-            {
-              id: '3-2',
-              href: '/post/wildlife-wonders-hidden-life-of-rainforests',
-              name: 'Single video',
-            },
-            {
-              id: '3-3',
-              href: '/post/girls-in-ocean-science-conference-a-first-at-maritime-museum',
-              name: 'Single gallery',
-            },
-            {
-              id: '3-4',
-              href: '/post/page-style-2/future-of-remote-work-2025',
-              name: 'Single type 2',
-            },
-            {
-              id: '3-5',
-              href: '/post/future-of-remote-work-2025',
-              name: 'Single type 3',
-            },
-            {
-              id: '3-6',
-              href: '#',
-              name: 'Coming soon',
-            },
-          ],
-        },
-        {
-          id: '4',
-          href: '/#',
-          name: 'Other pages',
-          type: 'dropdown',
-          children: [
-            { id: '4-1', href: '/contact', name: 'Contact' },
-            { id: '4-2', href: '/login', name: 'Login/signup' },
-            { id: '4-3', href: '/search', name: 'Search' },
-            { id: '4-4', href: '/submission', name: '+ Submission' },
-            { id: '4-5', href: '/dashboard/posts', name: 'Dashboard' },
-            { id: '4-6', href: '/author/john-doe', name: 'Account' },
-            { id: '4-7', href: '/about', name: 'About us' },
-          ],
-        },
+        { id: '2-1', href: '/grand-mosque/entrances', name: 'Entrances' },
+        { id: '2-2', href: '/grand-mosque/congestion', name: 'Congestion' },
+        { id: '2-3', href: '/grand-mosque/quiet-zones', name: 'Quiet Zones' },
+        { id: '2-4', href: '/grand-mosque/accessibility', name: 'Accessibility' },
       ],
     },
     {
-      id: '6',
-      href: '/',
-      name: 'Explore',
+      id: '3',
+      href: '/stay-and-food',
+      name: 'Stay & Food',
       type: 'dropdown',
+      icon: FaBed,
       children: [
-        {
-          id: '1',
-          href: '/category/technology',
-          name: 'Category page',
-        },
-        {
-          id: '2',
-          href: '/author/john-doe',
-          name: 'Author page',
-        },
-        {
-          id: '3',
-          href: '/search?s=technology',
-          name: 'Search page',
-        },
-        {
-          id: '4',
-          href: '/search-2?s=technology',
-          name: 'Search page 2',
-        },
-        {
-          id: '5',
-          href: '/submission',
-          name: '+ Submission',
-        },
-        {
-          id: '6',
-          href: '/post/page-style-3/future-of-remote-work-2025',
-          name: 'Single page',
-        },
-        {
-          id: '7',
-          href: '/login',
-          name: 'Login/Signup',
-        },
+        { id: '3-1', href: '/stay-and-food/hotels', name: 'Hotels (Gate Pref)' },
+        { id: '3-2', href: '/stay-and-food/restaurants', name: 'Restaurants (Crowd Times)' },
+        { id: '3-3', href: '/stay-and-food/women-friendly', name: 'Women-friendly Areas' },
+        { id: '3-4', href: '/stay-and-food/late-night', name: 'Late-night Options' },
+      ],
+    },
+    {
+      id: '4',
+      href: '/smart-tools',
+      name: 'Smart Tools',
+      type: 'dropdown',
+      icon: FaRobot,
+      children: [
+        { id: '4-1', href: '/smart-tools/trip-planner', name: 'Trip Planner' },
+        { id: '4-2', href: '/smart-tools/budget-tool', name: 'Budget Tool' },
+        { id: '4-3', href: '/smart-tools/packing-list', name: 'Packing List' },
+        { id: '4-4', href: '/smart-tools/distance-calculator', name: 'Distance Calculator' },
+      ],
+    },
+    {
+      id: '5',
+      href: '/local-tips',
+      name: 'Local Tips',
+      type: 'dropdown',
+      icon: FaLightbulb,
+      children: [
+        { id: '5-1', href: '/local-tips/seasonal-hacks', name: 'Seasonal Hacks' },
+        { id: '5-2', href: '/local-tips/ramadan-advice', name: 'Ramadan Advice' },
+        { id: '5-3', href: '/local-tips/hajj-crowd-flow', name: 'Hajj Crowd Flow' },
+        { id: '5-4', href: '/local-tips/insider-routes', name: 'Insider Routes' },
       ],
     },
   ]
@@ -259,6 +86,7 @@ export type TNavigationItem = Partial<{
   type?: 'dropdown' | 'mega-menu'
   isNew?: boolean
   children?: TNavigationItem[]
+  icon?: React.ComponentType<{ className?: string }>
 }>
 
 export const getLanguages = async () => {

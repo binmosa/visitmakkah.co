@@ -32,10 +32,7 @@ const Header2: FC<Props> = async ({ bottomBorder, className }) => {
       <div className="container flex h-20 justify-between">
         <div className="flex flex-1 items-center gap-x-4 sm:gap-x-5 lg:gap-x-7">
           <Logo />
-          <div className="h-8 border-l"></div>
-          <div className="-ms-1.5">
-            <SearchModal type="type1" />
-          </div>
+
         </div>
 
         <div className="mx-4 hidden flex-2 justify-center lg:flex">
@@ -43,12 +40,7 @@ const Header2: FC<Props> = async ({ bottomBorder, className }) => {
         </div>
 
         <div className="flex flex-1 items-center justify-end gap-x-0.5">
-          <div className="hidden sm:block">
-            <Button className="h-10 px-3!" href={'/submission'} plain>
-              <PlusIcon className="size-5!" />
-              Create
-            </Button>
-          </div>
+
           <NotifyDropdown className="me-3" />
           <AvatarDropdown />
           <div className="ms-2 flex lg:hidden">

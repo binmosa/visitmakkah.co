@@ -81,6 +81,41 @@
   --color-warning: #f59e0b;
   --color-error: #ef4444;
   --color-info: #3b82f6;
+
+  /* --- SHADCN UI MAPPING STARTS HERE --- */
+  /* Using Deep Teal (Primary-600) for Shadcn Primary */
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+
+  /* Primary = Deep Teal (#0d9488) -> HSL approx 175 84% 32% */
+  --primary: 175 84% 32%;
+  --primary-foreground: 210 40% 98%;
+
+  /* Secondary = Warm Gold (#f59e0b) -> HSL approx 38 92% 50% */
+  --secondary: 38 92% 50%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+
+  --muted: 210 40% 96.1%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+
+  --accent: 210 40% 96.1%;
+  --accent-foreground: 222.2 47.4% 11.2%;
+
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 175 84% 32%;
+
+  --radius: 0.5rem;
+  /* --- SHADCN UI MAPPING ENDS HERE --- */
 }
 
 /* Font utility classes */
