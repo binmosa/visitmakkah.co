@@ -3,6 +3,7 @@
 import { useUserJourney } from '@/context/UserJourneyContext'
 import { Settings02Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
+import SharePlanButton from '@/components/SharePlan/SharePlanButton'
 
 export default function JourneyStatusWidget() {
     const { user, journeyStageLabel, resetUser } = useUserJourney()
@@ -52,17 +53,23 @@ export default function JourneyStatusWidget() {
                     {journeyStageLabel} {getTravelGroupLabel() && `• ${getTravelGroupLabel()}`}
                 </p>
             </div>
-            <button
-                onClick={() => {
-                    if (confirm('Reset your journey preferences? This will clear all saved data.')) {
-                        resetUser()
-                    }
-                }}
-                className="rounded-lg p-2 text-neutral-400 transition-colors hover:bg-neutral-100 hover:text-neutral-600 dark:hover:bg-neutral-800 dark:hover:text-neutral-300"
-                title="Settings"
-            >
-                <HugeiconsIcon icon={Settings02Icon} className="size-5" />
-            </button>
+            <div className="flex items-center gap-1">
+                {/* Share Plan Button */}
+                <SharePlanButton variant="icon" />
+
+                {/* Settings/Reset Button */}
+                <button
+                    onClick={() => {
+                        if (confirm('Reset your journey preferences? This will clear all saved data.')) {
+                            resetUser()
+                        }
+                    }}
+                    className="rounded-lg p-2 text-neutral-400 transition-colors hover:bg-neutral-100 hover:text-neutral-600 dark:hover:bg-neutral-800 dark:hover:text-neutral-300"
+                    title="Settings"
+                >
+                    <HugeiconsIcon icon={Settings02Icon} className="size-5" />
+                </button>
+            </div>
         </div>
     )
 }
