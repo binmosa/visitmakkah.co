@@ -98,8 +98,8 @@ export default function ProactiveAIWidget() {
     if (!currentSuggestion) return null
 
     return (
-        <div className="rounded-2xl border border-primary-200 bg-gradient-to-br from-primary-50 via-white to-secondary-50 p-5 dark:border-primary-800 dark:from-primary-900/30 dark:via-neutral-900 dark:to-secondary-900/20">
-            <div className="mb-4 flex items-start gap-3">
+        <div className="relative overflow-hidden rounded-2xl border border-primary-200 bg-gradient-to-br from-primary-50 via-white to-secondary-50 p-5 dark:border-primary-800 dark:from-primary-900/30 dark:via-neutral-900 dark:to-secondary-900/20">
+            <div className="relative z-10 mb-4 flex items-start gap-3">
                 <div className="rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 p-2.5 shadow-lg shadow-primary-500/20">
                     <HugeiconsIcon icon={SparklesIcon} className="size-5 text-white" />
                 </div>
@@ -112,7 +112,7 @@ export default function ProactiveAIWidget() {
                     </p>
                 </div>
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div className="relative z-10 flex flex-wrap gap-2">
                 {currentSuggestion.actions.map((action, index) => (
                     action.href ? (
                         <a
@@ -138,6 +138,16 @@ export default function ProactiveAIWidget() {
                     )
                 ))}
             </div>
+            {/* Islamic pattern overlay */}
+            <div
+                className="pointer-events-none absolute inset-0 z-0"
+                style={{
+                    backgroundImage: 'url(/images/islamic-pattern.png)',
+                    backgroundPosition: 'left top',
+                    backgroundRepeat: 'repeat-y',
+                    backgroundSize: 'auto 300px',
+                }}
+            />
         </div>
     )
 }

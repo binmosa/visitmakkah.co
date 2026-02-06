@@ -25,18 +25,18 @@ const Card11: FC<Props> = ({ className, post, hiddenAuthor = false, ratio = 'asp
 
   return (
     <div
-      className={clsx('group post-card-11 relative flex flex-col rounded-3xl bg-white dark:bg-white/5', className)}
+      className={clsx('islamic-pattern-bg group post-card-11 relative flex flex-col overflow-hidden rounded-3xl bg-white dark:bg-white/5', className)}
       onMouseEnter={() => setIsHover(true)}
       onMouseLeave={() => setIsHover(false)}
     >
-      <div className={clsx('relative w-full shrink-0 overflow-hidden rounded-t-3xl', ratio)}>
+      <div className={clsx('relative z-10 w-full shrink-0 overflow-hidden rounded-t-3xl', ratio)}>
         <PostFeaturedMedia post={post} isHover={isHover} />
       </div>
-      <div className="absolute inset-x-3 top-3">
+      <div className="absolute inset-x-3 top-3 z-10">
         <CategoryBadgeList categories={categories} />
       </div>
 
-      <div className="flex grow flex-col gap-y-3 rounded-b-3xl border p-4">
+      <div className="relative z-10 flex grow flex-col gap-y-3 rounded-b-3xl border p-4">
         {!hiddenAuthor ? <PostCardMeta meta={post} /> : <span className="text-xs text-neutral-500">{date}</span>}
         <h3 className="nc-card-title block text-base font-semibold text-neutral-900 dark:text-neutral-100">
           <Link href={`/post/${post.handle}`} className="line-clamp-2" title={title}>

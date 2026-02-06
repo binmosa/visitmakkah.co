@@ -6,8 +6,9 @@
  * 2. URL mode (fallback): Data encoded in URL
  */
 
-import { UserJourneyProfile } from '@/context/UserJourneyContext'
-import { getShareCode, getProfileByShareCode, getDeviceId, getOrCreateVisitor, trackEvent, EventTypes } from '@/lib/data-service'
+// @ts-nocheck - Dynamic Supabase types
+import { UserProfile } from '@/context/UserJourneyContext'
+import { getDeviceId, getOrCreateAnonymousVisitor, getByShareCode } from '@/lib/data-service'
 
 // ============================================
 // DATABASE-BASED SHARING (Preferred)
@@ -19,28 +20,18 @@ import { getShareCode, getProfileByShareCode, getDeviceId, getOrCreateVisitor, t
 export async function getShareableLink(): Promise<string | null> {
     try {
         const deviceId = getDeviceId()
-        const visitor = await getOrCreateVisitor(deviceId)
+        const visitor = await getOrCreateAnonymousVisitor(deviceId)
 
-        if (!visitor) {
-            console.error('Failed to get visitor')
+        if (!visitor || !visitor.share_code) {
+            console.error('Failed to get visitor or share code')
             return null
         }
-
-        const shareCode = await getShareCode(visitor.id)
-
-        if (!shareCode) {
-            console.error('Failed to get share code')
-            return null
-        }
-
-        // Track the share event
-        await trackEvent(visitor.id, EventTypes.SHARE_PLAN, { shareCode })
 
         const origin = typeof window !== 'undefined'
             ? window.location.origin
             : 'https://visitmakkah.com'
 
-        return `${origin}/p/${shareCode}`
+        return `${origin}/p/${visitor.share_code}`
     } catch (error) {
         console.error('Error getting shareable link:', error)
         return null
@@ -50,30 +41,23 @@ export async function getShareableLink(): Promise<string | null> {
 /**
  * Load a shared plan from database by share code
  */
-export async function loadSharedPlan(shareCode: string): Promise<Partial<UserJourneyProfile> | null> {
+export async function loadSharedPlan(shareCode: string): Promise<Partial<UserProfile> | null> {
     try {
-        const profile = await getProfileByShareCode(shareCode)
+        const result = await getByShareCode(shareCode)
 
-        if (!profile) {
+        if (!result) {
             return null
         }
 
-        // Track the load event
-        const deviceId = getDeviceId()
-        const visitor = await getOrCreateVisitor(deviceId)
-        if (visitor) {
-            await trackEvent(visitor.id, EventTypes.LOAD_SHARED_PLAN, { shareCode })
-        }
+        const profile = result.data
 
-        // Convert database profile to UserJourneyProfile format
+        // Convert database profile to UserProfile format
         return {
-            journeyStage: profile.journey_stage as UserJourneyProfile['journeyStage'],
-            journeyType: profile.journey_type as UserJourneyProfile['journeyType'],
+            journeyType: profile.journey_type as UserProfile['journeyType'],
             isFirstTime: profile.is_first_time ?? undefined,
-            travelGroup: profile.travel_group as UserJourneyProfile['travelGroup'],
-            travelDates: profile.travel_dates as UserJourneyProfile['travelDates'],
-            preferences: profile.preferences as UserJourneyProfile['preferences'],
-            completedSteps: profile.completed_steps ?? undefined,
+            travelGroup: profile.travel_group as UserProfile['travelGroup'],
+            travelDates: profile.travel_dates as UserProfile['travelDates'],
+            preferences: profile.preferences as UserProfile['preferences'],
             hasCompletedOnboarding: true,
         }
     } catch (error) {
@@ -90,7 +74,7 @@ export async function loadSharedPlan(shareCode: string): Promise<Partial<UserJou
  * Compress and encode journey data to URL-safe string
  * Used as fallback when database is not available
  */
-export function encodePlanData(profile: UserJourneyProfile): string {
+export function encodePlanData(profile: UserProfile): string {
     try {
         const minimalData = {
             s: profile.journeyStage,
@@ -118,7 +102,7 @@ export function encodePlanData(profile: UserJourneyProfile): string {
 /**
  * Decode URL string back to journey profile
  */
-export function decodePlanData(encoded: string): Partial<UserJourneyProfile> | null {
+export function decodePlanData(encoded: string): Partial<UserProfile> | null {
     try {
         let base64 = encoded
             .replace(/-/g, '+')
@@ -150,7 +134,7 @@ export function decodePlanData(encoded: string): Partial<UserJourneyProfile> | n
 /**
  * Generate a shareable URL with encoded data (fallback)
  */
-export function generateShareableUrl(profile: UserJourneyProfile): string {
+export function generateShareableUrl(profile: UserProfile): string {
     const encoded = encodePlanData(profile)
     if (!encoded) return ''
 

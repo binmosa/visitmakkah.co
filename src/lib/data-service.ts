@@ -1,26 +1,63 @@
 /**
- * Data Service
- * Handles all database operations for analytics and user data collection
+ * Data Service - Gold Data Collection
+ * Focus: Chat topics, messages, popular questions for AI training
+ * Analytics: Handled by Google Analytics (not here)
  */
 
-import { supabase } from './supabase'
-import { UserJourneyProfile } from '@/context/UserJourneyContext'
+// @ts-nocheck - Supabase doesn't have types for custom tables
+import { supabase, isSupabaseConfigured } from './supabase'
 
 // ============================================
-// VISITOR MANAGEMENT
+// TYPES
+// ============================================
+
+interface AnonymousVisitor {
+    id: string
+    device_id: string
+    share_code: string
+    journey_type?: string
+    is_first_time?: boolean
+    travel_group?: string
+    travel_dates?: unknown
+    preferences?: unknown
+    last_seen?: string
+    created_at?: string
+}
+
+interface ChatTopic {
+    id: string
+    profile_id?: string
+    anonymous_id?: string
+    context: string
+    context_label?: string
+    created_at?: string
+    ended_at?: string
+}
+
+interface ChatMessage {
+    id: string
+    topic_id: string
+    role: 'user' | 'assistant'
+    content: string
+    context?: string
+    created_at?: string
+}
+
+// ============================================
+// ANONYMOUS VISITOR MANAGEMENT
 // ============================================
 
 /**
- * Get or create a visitor record based on device ID
+ * Get or create anonymous visitor (for non-logged-in users)
  */
-export async function getOrCreateVisitor(deviceId: string, metadata?: {
-    userAgent?: string
-    country?: string
-    language?: string
-}) {
-    // Try to find existing visitor
+export async function getOrCreateAnonymousVisitor(deviceId: string): Promise<AnonymousVisitor | null> {
+    if (!isSupabaseConfigured || !supabase) {
+        return null
+    }
+
+    // Try to find existing
     const { data: existing } = await supabase
-        .from('visitors')
+        .from('anonymous_visitors')
         .select('*')
         .eq('device_id', deviceId)
         .single()
@@ -28,192 +65,158 @@ export async function getOrCreateVisitor(deviceId: string, metadata?: {
     if (existing) {
         // Update last_seen
         await supabase
-            .from('visitors')
+            .from('anonymous_visitors')
             .update({ last_seen: new Date().toISOString() })
             .eq('id', existing.id)
         return existing
     }
 
-    // Create new visitor
+    // Create new
     const { data: newVisitor, error } = await supabase
-        .from('visitors')
+        .from('anonymous_visitors')
         .insert({
             device_id: deviceId,
-            user_agent: metadata?.userAgent,
-            country: metadata?.country,
-            language: metadata?.language,
+            share_code: generateShareCode(),
         })
         .select()
         .single()
 
     if (error) {
-        console.error('Error creating visitor:', error)
+        console.error('Error creating anonymous visitor:', error)
         return null
     }
 
     return newVisitor
 }
 
-// ============================================
-// JOURNEY PROFILE MANAGEMENT
-// ============================================
-
 /**
- * Save or update a user's journey profile
+ * Update anonymous visitor's journey preferences
  */
-export async function saveJourneyProfile(
-    visitorId: string,
-    profile: Partial<UserJourneyProfile>
-) {
-    // Check if profile exists
-    const { data: existing } = await supabase
-        .from('journey_profiles')
-        .select('id, share_code')
-        .eq('visitor_id', visitorId)
-        .single()
-
-    const profileData = {
-        visitor_id: visitorId,
-        journey_stage: profile.journeyStage,
-        journey_type: profile.journeyType,
-        is_first_time: profile.isFirstTime,
-        travel_group: profile.travelGroup,
-        travel_dates: profile.travelDates,
-        preferences: profile.preferences,
-        completed_steps: profile.completedSteps,
-        updated_at: new Date().toISOString(),
+export async function updateAnonymousVisitor(deviceId: string, data: {
+    journey_type?: string
+    is_first_time?: boolean
+    travel_group?: string
+    travel_dates?: unknown
+    preferences?: unknown
+}) {
+    if (!isSupabaseConfigured || !supabase) {
+        return null
     }
 
-    if (existing) {
-        // Update existing profile
-        const { data, error } = await supabase
-            .from('journey_profiles')
-            .update(profileData)
-            .eq('id', existing.id)
-            .select()
-            .single()
-
-        if (error) {
-            console.error('Error updating profile:', error)
-            return null
-        }
-        return data
-    }
-
-    // Create new profile with share code
-    const shareCode = generateShareCode()
-    const { data, error } = await supabase
-        .from('journey_profiles')
-        .insert({
-            ...profileData,
-            share_code: shareCode,
+    const { data: updated, error } = await supabase
+        .from('anonymous_visitors')
+        .update({
+            ...data,
+            last_seen: new Date().toISOString(),
         })
+        .eq('device_id', deviceId)
         .select()
         .single()
 
     if (error) {
-        console.error('Error creating profile:', error)
+        console.error('Error updating anonymous visitor:', error)
         return null
     }
 
-    return data
-}
-
-/**
- * Get a journey profile by share code (for shareable links)
- */
-export async function getProfileByShareCode(shareCode: string) {
-    const { data, error } = await supabase
-        .from('journey_profiles')
-        .select('*')
-        .eq('share_code', shareCode)
-        .single()
-
-    if (error) {
-        console.error('Error fetching profile by share code:', error)
-        return null
-    }
-
-    return data
-}
-
-/**
- * Get share code for a visitor's profile
- */
-export async function getShareCode(visitorId: string): Promise<string | null> {
-    const { data, error } = await supabase
-        .from('journey_profiles')
-        .select('share_code')
-        .eq('visitor_id', visitorId)
-        .single()
-
-    if (error || !data?.share_code) {
-        // Generate one if it doesn't exist
-        const shareCode = generateShareCode()
-        await supabase
-            .from('journey_profiles')
-            .update({ share_code: shareCode })
-            .eq('visitor_id', visitorId)
-        return shareCode
-    }
-
-    return data.share_code
+    return updated
 }
 
 // ============================================
-// CHAT SESSION & MESSAGE TRACKING
+// CHAT TOPIC TRACKING (GOLD DATA)
 // ============================================
 
 /**
- * Create a new chat session
+ * Create a chat topic when user starts a conversation
  */
-export async function createChatSession(
-    visitorId: string,
-    context: string,
+export async function createChatTopic(data: {
+    profileId?: string
+    anonymousId?: string
+    context: string
     contextLabel?: string
-) {
-    const { data, error } = await supabase
-        .from('chat_sessions')
+}): Promise<ChatTopic | null> {
+    if (!isSupabaseConfigured || !supabase) {
+        return null
+    }
+
+    const { data: topic, error } = await supabase
+        .from('chat_topics')
         .insert({
-            visitor_id: visitorId,
-            context,
-            context_label: contextLabel,
+            profile_id: data.profileId,
+            anonymous_id: data.anonymousId,
+            context: data.context,
+            context_label: data.contextLabel,
         })
         .select()
         .single()
 
     if (error) {
-        console.error('Error creating chat session:', error)
+        console.error('Error creating chat topic:', error)
         return null
     }
 
-    return data
+    return topic
 }
 
 /**
- * Save a chat message
+ * End a chat topic (when user leaves)
  */
-export async function saveChatMessage(
-    sessionId: string,
-    visitorId: string,
-    role: 'user' | 'assistant',
-    content: string,
-    context?: string,
-    metadata?: {
-        tokensUsed?: number
-        responseTimeMs?: number
+export async function endChatTopic(topicId: string) {
+    if (!isSupabaseConfigured || !supabase) {
+        return
     }
-) {
-    const { data, error } = await supabase
+
+    await supabase
+        .from('chat_topics')
+        .update({ ended_at: new Date().toISOString() })
+        .eq('id', topicId)
+}
+
+/**
+ * Rate a chat topic (user feedback)
+ */
+export async function rateChatTopic(topicId: string, rating: {
+    userRating?: number
+    wasHelpful?: boolean
+    feedbackText?: string
+}) {
+    if (!isSupabaseConfigured || !supabase) {
+        return
+    }
+
+    await supabase
+        .from('chat_topics')
+        .update({
+            user_rating: rating.userRating,
+            was_helpful: rating.wasHelpful,
+            feedback_text: rating.feedbackText,
+        })
+        .eq('id', topicId)
+}
+
+// ============================================
+// CHAT MESSAGE TRACKING (GOLD DATA)
+// ============================================
+
+/**
+ * Save a chat message (for AI training)
+ */
+export async function saveChatMessage(data: {
+    topicId: string
+    role: 'user' | 'assistant'
+    content: string
+    context?: string
+}) {
+    if (!isSupabaseConfigured || !supabase) {
+        return null
+    }
+
+    const { data: message, error } = await supabase
         .from('chat_messages')
         .insert({
-            session_id: sessionId,
-            visitor_id: visitorId,
-            role,
-            content,
-            context,
-            tokens_used: metadata?.tokensUsed,
-            response_time_ms: metadata?.responseTimeMs,
+            topic_id: data.topicId,
+            role: data.role,
+            content: data.content,
+            context: data.context,
         })
         .select()
         .single()
@@ -223,129 +226,142 @@ export async function saveChatMessage(
         return null
     }
 
-    // Track popular questions
-    if (role === 'user') {
-        await trackPopularQuestion(content, context || 'general')
+    // Track popular questions (user messages only)
+    if (data.role === 'user') {
+        await trackPopularQuestion(data.content, data.context || 'general')
+    }
+
+    return message
+}
+
+/**
+ * Rate a message (thumbs up/down)
+ */
+export async function rateMessage(messageId: string, thumbsUp: boolean) {
+    if (!isSupabaseConfigured || !supabase) {
+        return
+    }
+
+    await supabase
+        .from('chat_messages')
+        .update({ thumbs_up: thumbsUp })
+        .eq('id', messageId)
+}
+
+// ============================================
+// POPULAR QUESTIONS TRACKING (GOLD DATA)
+// ============================================
+
+/**
+ * Track a question for aggregation
+ */
+async function trackPopularQuestion(question: string, context: string) {
+    if (!isSupabaseConfigured || !supabase) {
+        return
+    }
+
+    // Normalize
+    const normalized = question.toLowerCase().trim()
+
+    // Skip very short or very long
+    if (normalized.length < 10 || normalized.length > 200) {
+        return
+    }
+
+    // Upsert: increment if exists, insert if not
+    const { data: existing } = await supabase
+        .from('popular_questions')
+        .select('id, ask_count')
+        .eq('question', normalized)
+        .eq('context', context)
+        .single()
+
+    if (existing) {
+        await supabase
+            .from('popular_questions')
+            .update({
+                ask_count: existing.ask_count + 1,
+                last_asked: new Date().toISOString(),
+            })
+            .eq('id', existing.id)
+    } else {
+        await supabase
+            .from('popular_questions')
+            .insert({
+                question: normalized,
+                context,
+                ask_count: 1,
+            })
+    }
+}
+
+/**
+ * Get featured/popular questions for a context
+ */
+export async function getPopularQuestions(context: string, limit = 5) {
+    if (!isSupabaseConfigured || !supabase) {
+        return []
+    }
+
+    const { data, error } = await supabase
+        .from('popular_questions')
+        .select('question, ask_count, is_featured')
+        .eq('context', context)
+        .order('is_featured', { ascending: false })
+        .order('ask_count', { ascending: false })
+        .limit(limit)
+
+    if (error) {
+        console.error('Error fetching popular questions:', error)
+        return []
     }
 
     return data
 }
 
-/**
- * End a chat session
- */
-export async function endChatSession(sessionId: string) {
-    const { error } = await supabase
-        .from('chat_sessions')
-        .update({ ended_at: new Date().toISOString() })
-        .eq('id', sessionId)
+// ============================================
+// SHAREABLE LINKS
+// ============================================
 
-    if (error) {
-        console.error('Error ending chat session:', error)
+/**
+ * Get profile by share code
+ */
+export async function getByShareCode(shareCode: string) {
+    if (!isSupabaseConfigured || !supabase) {
+        return null
     }
+
+    // Try profiles first (logged-in users)
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('share_code', shareCode)
+        .single()
+
+    if (profile) {
+        return { type: 'profile' as const, data: profile }
+    }
+
+    // Try anonymous visitors
+    const { data: visitor } = await supabase
+        .from('anonymous_visitors')
+        .select('*')
+        .eq('share_code', shareCode)
+        .single()
+
+    if (visitor) {
+        return { type: 'anonymous' as const, data: visitor }
+    }
+
+    return null
 }
 
 // ============================================
-// ANALYTICS EVENT TRACKING
+// UTILITIES
 // ============================================
 
 /**
- * Track an analytics event
- */
-export async function trackEvent(
-    visitorId: string,
-    eventType: string,
-    eventData?: Record<string, unknown>,
-    pagePath?: string,
-    referrer?: string
-) {
-    const { error } = await supabase
-        .from('analytics_events')
-        .insert({
-            visitor_id: visitorId,
-            event_type: eventType,
-            event_data: eventData,
-            page_path: pagePath,
-            referrer: referrer,
-        })
-
-    if (error) {
-        console.error('Error tracking event:', error)
-    }
-}
-
-// Common event types
-export const EventTypes = {
-    PAGE_VIEW: 'page_view',
-    ONBOARDING_START: 'onboarding_start',
-    ONBOARDING_COMPLETE: 'onboarding_complete',
-    ONBOARDING_STEP: 'onboarding_step',
-    CHAT_START: 'chat_start',
-    CHAT_MESSAGE: 'chat_message',
-    SHARE_PLAN: 'share_plan',
-    LOAD_SHARED_PLAN: 'load_shared_plan',
-    NAV_CLICK: 'nav_click',
-    SUGGESTED_QUESTION_CLICK: 'suggested_question_click',
-} as const
-
-// ============================================
-// POPULAR QUESTIONS TRACKING
-// ============================================
-
-/**
- * Track a question for popular questions aggregation
- */
-async function trackPopularQuestion(question: string, context: string) {
-    // Normalize the question (lowercase, trim)
-    const normalizedQuestion = question.toLowerCase().trim()
-
-    // Skip very short or very long questions
-    if (normalizedQuestion.length < 10 || normalizedQuestion.length > 200) {
-        return
-    }
-
-    // Upsert: increment count if exists, insert if not
-    const { error } = await supabase.rpc('upsert_popular_question', {
-        p_question: normalizedQuestion,
-        p_context: context,
-    })
-
-    // If the RPC doesn't exist, fall back to manual upsert
-    if (error) {
-        // Try to update existing
-        const { data: existing } = await supabase
-            .from('popular_questions')
-            .select('id, ask_count')
-            .eq('question', normalizedQuestion)
-            .eq('context', context)
-            .single()
-
-        if (existing) {
-            await supabase
-                .from('popular_questions')
-                .update({
-                    ask_count: existing.ask_count + 1,
-                    last_asked: new Date().toISOString(),
-                })
-                .eq('id', existing.id)
-        } else {
-            await supabase
-                .from('popular_questions')
-                .insert({
-                    question: normalizedQuestion,
-                    context,
-                    ask_count: 1,
-                })
-        }
-    }
-}
-
-// ============================================
-// UTILITY FUNCTIONS
-// ============================================
-
-/**
- * Generate a random share code
+ * Generate random share code
  */
 function generateShareCode(): string {
     const chars = 'abcdefghijklmnopqrstuvwxyz0123456789'

@@ -17,7 +17,7 @@ const WidgetHeading: FC<Props> = ({ className, viewAll, title }) => {
   return (
     <div
       className={clsx(
-        'widget-heading flex items-center gap-2.5 border-b border-neutral-200 p-4 xl:px-5 dark:border-neutral-700',
+        'widget-heading relative z-10 flex items-center gap-2.5 border-b border-neutral-200 p-4 xl:px-5 dark:border-neutral-700',
         className
       )}
     >

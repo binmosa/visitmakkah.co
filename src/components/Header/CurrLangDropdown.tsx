@@ -32,8 +32,10 @@ const Currencies = ({ currencies }: { currencies: Awaited<ReturnType<typeof getC
             item.active ? 'bg-neutral-100 dark:bg-neutral-700' : 'opacity-80'
           )}
         >
-          <div dangerouslySetInnerHTML={{ __html: item.icon }} />
-          <p className="ms-2 text-sm font-medium">{item.name}</p>
+          <div>
+            <p className="text-sm font-medium">{item.name}</p>
+            <p className="text-xs text-neutral-500 dark:text-neutral-400">{item.description}</p>
+          </div>
         </CloseButton>
       ))}
     </div>

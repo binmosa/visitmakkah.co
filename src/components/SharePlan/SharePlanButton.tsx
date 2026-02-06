@@ -75,7 +75,7 @@ export default function SharePlanButton({
     }
 
     // Check if user has completed onboarding
-    if (!user.hasCompletedOnboarding) {
+    if (!user.completedOnboarding) {
         return null
     }
 

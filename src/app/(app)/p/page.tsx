@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useUserJourney } from '@/context/UserJourneyContext'
 import { decodePlanData } from '@/utils/shareable-plan'
@@ -11,7 +11,7 @@ import {
     AlertCircleIcon,
 } from '@hugeicons/core-free-icons'
 
-export default function SharedPlanPage() {
+function SharedPlanContent() {
     const searchParams = useSearchParams()
     const router = useRouter()
     const { updateUser } = useUserJourney()
@@ -110,5 +110,29 @@ export default function SharedPlanPage() {
                 )}
             </div>
         </div>
+    )
+}
+
+function LoadingFallback() {
+    return (
+        <div className="flex min-h-[60vh] items-center justify-center p-4">
+            <div className="w-full max-w-md rounded-2xl border border-neutral-200 bg-white p-8 text-center dark:border-neutral-700 dark:bg-neutral-900">
+                <HugeiconsIcon
+                    icon={Loading03Icon}
+                    className="mx-auto size-12 animate-spin text-primary-500"
+                />
+                <h2 className="mt-4 text-xl font-semibold text-neutral-900 dark:text-white">
+                    Loading...
+                </h2>
+            </div>
+        </div>
+    )
+}
+
+export default function SharedPlanPage() {
+    return (
+        <Suspense fallback={<LoadingFallback />}>
+            <SharedPlanContent />
+        </Suspense>
     )
 }

@@ -1,252 +1,435 @@
+// Navigation Structure - AI-First with Journey Stages
+// Optimized for action-driven, context-aware pilgrimage platform
 
+export type JourneyStage = 'planning' | 'booked' | 'in_makkah' | 'returned'
 
-export async function getNavigation(): Promise<TNavigationItem[]> {
-  return [
-    {
-      id: '1',
-      href: '/plan',
-      name: 'Plan',
-      type: 'dropdown',
-      icon: 'FaMap',
-      children: [
-        { id: '1-1', href: '/plan/timeline-builder', name: 'Timeline Builder' },
-        { id: '1-2', href: '/plan/visa-steps', name: 'Visa Steps' },
-        { id: '1-3', href: '/plan/packing', name: 'Packing' },
-        { id: '1-4', href: '/plan/transport', name: 'Transport' },
-      ],
-    },
-    {
-      id: '2',
-      href: '/your-journey',
-      name: 'Your Journey',
-      type: 'dropdown',
-      icon: 'FaKaaba',
-      children: [
-        { id: '2-1', href: '/your-journey/hajj', name: 'Hajj' },
-        { id: '2-2', href: '/your-journey/umrah', name: 'Umrah' },
-        { id: '2-3', href: '/your-journey/rituals', name: 'Rituals' },
-        { id: '2-4', href: '/your-journey/spiritual', name: 'Spiritual' },
-      ],
-    },
-    {
-      id: '3',
-      href: '/stay-and-food',
-      name: 'Stay & Food',
-      type: 'dropdown',
-      icon: 'FaBed',
-      children: [
-        { id: '3-1', href: '/stay-and-food/hotels', name: 'Hotels By Mosque Gate' },
-        { id: '3-2', href: '/stay-and-food/restaurants', name: 'Restaurants' },
-        { id: '3-3', href: '/stay-and-food/women-friendly', name: 'Women-friendly Areas' },
-        { id: '3-4', href: '/stay-and-food/late-night', name: 'Late-night Options' },
-      ],
-    },
-    {
-      id: '4',
-      href: '/smart-tools',
-      name: 'Smart Tools',
-      type: 'dropdown',
-      icon: 'FaRobot',
-      children: [
-        { id: '4-1', href: '/smart-tools/trip-planner', name: 'Trip Planner' },
-        { id: '4-2', href: '/smart-tools/budget-tool', name: 'Budget Tool' },
-        { id: '4-3', href: '/smart-tools/packing-list', name: 'Packing List' },
-        { id: '4-4', href: '/smart-tools/distance-calculator', name: 'Distance Calculator' },
-      ],
-    },
-    {
-      id: '5',
-      href: '/local-tips',
-      name: 'Local Tips',
-      type: 'dropdown',
-      icon: 'FaLightbulb',
-      children: [
-        { id: '5-1', href: '/local-tips/seasonal-hacks', name: 'Seasonal Hacks' },
-        { id: '5-2', href: '/local-tips/ramadan-advice', name: 'Ramadan Advice' },
-        { id: '5-3', href: '/local-tips/hajj-crowd-flow', name: 'Hajj Crowd Flow' },
-        { id: '5-4', href: '/local-tips/insider-routes', name: 'Insider Routes' },
-      ],
-    },
-  ]
-}
-
-export async function getNavMegaMenu(): Promise<TNavigationItem> {
-  const navigation = await getNavigation()
-
-  // Find the mega menu item in the navigation array
-  // for demo purposes, we assume the mega menu is the one with name 'Templates'
-  return navigation.find((item) => item.type === 'mega-menu' && item.name === 'Templates') || {}
-}
-
-// ============ TYPE =============
-export type TNavigationItem = Partial<{
+export type TNavigationItem = {
   id: string
   href: string
   name: string
+  description?: string
   type?: 'dropdown' | 'mega-menu'
   isNew?: boolean
   children?: TNavigationItem[]
   icon?: string
-}>
+  // Context-awareness: which journey stages this item is most relevant for
+  relevantStages?: JourneyStage[]
+  // Priority for display (higher = more prominent)
+  priority?: number
+  // Action verb for AI suggestions
+  actionVerb?: string
+}
 
+// Main navigation structure - 4 core categories
+export async function getNavigation(): Promise<TNavigationItem[]> {
+  return [
+    {
+      id: 'prepare',
+      href: '/prepare',
+      name: 'Prepare',
+      description: 'Plan your journey before you go',
+      type: 'dropdown',
+      icon: 'FaClipboardList',
+      relevantStages: ['planning', 'booked'],
+      priority: 1,
+      actionVerb: 'prepare for',
+      children: [
+        {
+          id: 'prepare-itinerary',
+          href: '/prepare/build-itinerary',
+          name: 'Build My Itinerary',
+          description: 'AI-powered trip planner',
+          icon: 'FaRoute',
+          actionVerb: 'create',
+        },
+        {
+          id: 'prepare-visa',
+          href: '/prepare/get-visa',
+          name: 'Get My Visa',
+          description: 'Step-by-step visa guide',
+          icon: 'FaPassport',
+          actionVerb: 'apply for',
+        },
+        {
+          id: 'prepare-packing',
+          href: '/prepare/pack-my-bag',
+          name: 'Pack My Bag',
+          description: 'Smart packing checklist',
+          icon: 'FaSuitcase',
+          actionVerb: 'pack',
+        },
+        {
+          id: 'prepare-budget',
+          href: '/prepare/calculate-budget',
+          name: 'Calculate Budget',
+          description: 'Estimate your costs',
+          icon: 'FaCalculator',
+          actionVerb: 'calculate',
+        },
+      ],
+    },
+    {
+      id: 'learn',
+      href: '/learn',
+      name: 'Learn',
+      description: 'Rituals, guides & spiritual preparation',
+      type: 'dropdown',
+      icon: 'FaBookOpen',
+      relevantStages: ['planning', 'booked', 'in_makkah'],
+      priority: 2,
+      actionVerb: 'learn about',
+      children: [
+        {
+          id: 'learn-umrah',
+          href: '/learn/umrah-guide',
+          name: 'Umrah Guide',
+          description: 'Complete Umrah walkthrough',
+          icon: 'FaKaaba',
+          actionVerb: 'perform',
+        },
+        {
+          id: 'learn-hajj',
+          href: '/learn/hajj-guide',
+          name: 'Hajj Guide',
+          description: 'Day-by-day Hajj guide',
+          icon: 'FaMosque',
+          actionVerb: 'perform',
+        },
+        {
+          id: 'learn-rituals',
+          href: '/learn/step-by-step',
+          name: 'Step-by-Step Rituals',
+          description: 'Tawaf, Sai, and more',
+          icon: 'FaListOl',
+          actionVerb: 'follow',
+        },
+        {
+          id: 'learn-duas',
+          href: '/learn/duas-prayers',
+          name: 'Duas & Prayers',
+          description: 'Essential supplications',
+          icon: 'FaPrayingHands',
+          actionVerb: 'recite',
+        },
+      ],
+    },
+    {
+      id: 'explore',
+      href: '/explore',
+      name: 'Explore',
+      description: 'Find places & navigate Makkah',
+      type: 'dropdown',
+      icon: 'FaMapMarkedAlt',
+      relevantStages: ['booked', 'in_makkah'],
+      priority: 3,
+      actionVerb: 'find',
+      children: [
+        {
+          id: 'explore-hotels',
+          href: '/explore/find-hotels',
+          name: 'Find Hotels',
+          description: 'By gate, price & amenities',
+          icon: 'FaHotel',
+          actionVerb: 'book',
+        },
+        {
+          id: 'explore-food',
+          href: '/explore/find-food',
+          name: 'Find Food',
+          description: 'Restaurants & cafes nearby',
+          icon: 'FaUtensils',
+          actionVerb: 'eat at',
+        },
+        {
+          id: 'explore-crowds',
+          href: '/explore/check-crowds',
+          name: 'Check Crowds',
+          description: 'Best times for Tawaf',
+          icon: 'FaUsers',
+          actionVerb: 'avoid',
+        },
+        {
+          id: 'explore-navigate',
+          href: '/explore/navigate',
+          name: 'Navigate to Haram',
+          description: 'Gates, routes & shortcuts',
+          icon: 'FaCompass',
+          actionVerb: 'navigate to',
+        },
+      ],
+    },
+    {
+      id: 'tips',
+      href: '/tips',
+      name: 'Tips',
+      description: 'Insider knowledge & local advice',
+      type: 'dropdown',
+      icon: 'FaLightbulb',
+      relevantStages: ['planning', 'booked', 'in_makkah'],
+      priority: 4,
+      actionVerb: 'get tips about',
+      children: [
+        {
+          id: 'tips-first-timers',
+          href: '/tips/first-timers',
+          name: 'First-Timer Guide',
+          description: 'Essential tips for beginners',
+          icon: 'FaStar',
+          actionVerb: 'read',
+        },
+        {
+          id: 'tips-women',
+          href: '/tips/for-women',
+          name: 'For Women',
+          description: 'Women-specific guidance',
+          icon: 'FaFemale',
+          actionVerb: 'read',
+        },
+        {
+          id: 'tips-ramadan',
+          href: '/tips/ramadan',
+          name: 'Ramadan Visit',
+          description: 'Special Ramadan advice',
+          icon: 'FaMoon',
+          actionVerb: 'prepare for',
+        },
+        {
+          id: 'tips-shortcuts',
+          href: '/tips/shortcuts',
+          name: 'Secret Shortcuts',
+          description: 'Insider routes & hacks',
+          icon: 'FaMapSigns',
+          actionVerb: 'discover',
+        },
+      ],
+    },
+  ]
+}
+
+// Get navigation items for a specific category
+export async function getNavItemsByCategory(categoryId: string): Promise<TNavigationItem[]> {
+  const navigation = await getNavigation()
+  const category = navigation.find((item) => item.id === categoryId)
+  return category?.children || []
+}
+
+// Get context-aware navigation (prioritized based on journey stage)
+export async function getContextAwareNavigation(journeyStage: JourneyStage): Promise<TNavigationItem[]> {
+  const navigation = await getNavigation()
+
+  // Sort by relevance to current journey stage
+  return navigation.sort((a, b) => {
+    const aRelevant = a.relevantStages?.includes(journeyStage) ? 1 : 0
+    const bRelevant = b.relevantStages?.includes(journeyStage) ? 1 : 0
+
+    if (aRelevant !== bRelevant) {
+      return bRelevant - aRelevant // Relevant items first
+    }
+
+    return (a.priority || 99) - (b.priority || 99) // Then by priority
+  })
+}
+
+// Get suggested actions based on journey stage
+export function getSuggestedActions(journeyStage: JourneyStage): { label: string; href: string; description: string }[] {
+  const suggestions: Record<JourneyStage, { label: string; href: string; description: string }[]> = {
+    planning: [
+      { label: 'Build My Itinerary', href: '/prepare/build-itinerary', description: 'Let AI create your perfect trip plan' },
+      { label: 'Learn Umrah Steps', href: '/learn/umrah-guide', description: 'Understand the rituals before you go' },
+      { label: 'Calculate Budget', href: '/prepare/calculate-budget', description: 'Know how much you need' },
+    ],
+    booked: [
+      { label: 'Pack My Bag', href: '/prepare/pack-my-bag', description: 'Don\'t forget anything important' },
+      { label: 'Get My Visa', href: '/prepare/get-visa', description: 'Complete your documentation' },
+      { label: 'Learn the Rituals', href: '/learn/step-by-step', description: 'Practice before you arrive' },
+    ],
+    in_makkah: [
+      { label: 'Check Crowds', href: '/explore/check-crowds', description: 'Best time for Tawaf now' },
+      { label: 'Find Food', href: '/explore/find-food', description: 'Restaurants open near you' },
+      { label: 'Navigate to Haram', href: '/explore/navigate', description: 'Fastest route from your hotel' },
+    ],
+    returned: [
+      { label: 'Share My Journey', href: '/my-journey/share', description: 'Create a shareable memory' },
+      { label: 'Leave a Tip', href: '/tips/contribute', description: 'Help future pilgrims' },
+      { label: 'Plan Next Visit', href: '/prepare/build-itinerary', description: 'Start planning again' },
+    ],
+  }
+
+  return suggestions[journeyStage] || suggestions.planning
+}
+
+// AI Guide suggested questions by context
+export function getAISuggestions(context: string, journeyStage?: JourneyStage): string[] {
+  const contextSuggestions: Record<string, string[]> = {
+    // Prepare section
+    'prepare': [
+      'Help me plan my trip',
+      'What documents do I need?',
+      'Create a packing list for me',
+      'How much will my trip cost?',
+    ],
+    'build-itinerary': [
+      'Create a 7-day Umrah itinerary',
+      'Best itinerary for family with kids',
+      'How many days do I need?',
+      'When should I visit Madinah?',
+    ],
+    'get-visa': [
+      'What visa do I need for Umrah?',
+      'How long does visa processing take?',
+      'What documents are required?',
+      'Can I get visa on arrival?',
+    ],
+    'pack-my-bag': [
+      'What should I pack for Umrah?',
+      'Ihram clothing requirements',
+      'What medications should I bring?',
+      'Electronics and adapters needed',
+    ],
+    'calculate-budget': [
+      'How much does Umrah cost?',
+      'Budget breakdown for 10 days',
+      'How to save money on my trip',
+      'Currency exchange tips',
+    ],
+
+    // Learn section
+    'learn': [
+      'Explain Umrah step by step',
+      'What are the 5 days of Hajj?',
+      'How to perform Tawaf correctly?',
+      'Most important duas to memorize',
+    ],
+    'umrah-guide': [
+      'Walk me through Umrah',
+      'How long does Umrah take?',
+      'What invalidates Umrah?',
+      'Best time to perform Umrah?',
+    ],
+    'hajj-guide': [
+      'Explain the days of Hajj',
+      'What happens on Arafat day?',
+      'Difference between Hajj types',
+      'How to prepare for Hajj?',
+    ],
+    'step-by-step': [
+      'How to do Tawaf properly?',
+      'Explain Sai between Safa and Marwa',
+      'Rules of Ihram',
+      'What breaks my Ihram?',
+    ],
+    'duas-prayers': [
+      'Duas for Tawaf',
+      'What to say at Safa and Marwa?',
+      'Duas for entering Masjid al-Haram',
+      'Best times for dua acceptance',
+    ],
+
+    // Explore section
+    'explore': [
+      'Hotels near King Fahd Gate',
+      'Best restaurants for families',
+      'When is Haram least crowded?',
+      'How to get to King Abdul Aziz Gate?',
+    ],
+    'find-hotels': [
+      'Hotels with Haram view',
+      'Budget hotels near Haram',
+      'Best area to stay in Makkah',
+      'Hotels good for elderly',
+    ],
+    'find-food': [
+      'Restaurants open after Fajr',
+      'Best biryani near Haram',
+      'Where to eat at 3am?',
+      'Family-friendly restaurants',
+    ],
+    'check-crowds': [
+      'Best time for Tawaf today?',
+      'How crowded is it now?',
+      'Least crowded days of the week',
+      'Tips to avoid rush hours',
+    ],
+    'navigate': [
+      'Shortest route to King Fahd Gate',
+      'How to find Gate 79?',
+      'Walking time from my hotel',
+      'Best gate for wheelchair access',
+    ],
+
+    // Tips section
+    'tips': [
+      'Top tips for first-timers',
+      'What should I know before going?',
+      'Common mistakes to avoid',
+      'Best advice from experienced pilgrims',
+    ],
+    'first-timers': [
+      'What I wish I knew before Umrah',
+      'Biggest mistakes first-timers make',
+      'How to prepare mentally',
+      'What surprised me most',
+    ],
+    'for-women': [
+      'Tips for women traveling alone',
+      'Where is the women\'s prayer area?',
+      'What to wear as a woman',
+      'Women-friendly services in Makkah',
+    ],
+    'ramadan': [
+      'Umrah during Ramadan tips',
+      'Where to have Iftar near Haram?',
+      'How crowded is Ramadan?',
+      'Last 10 nights guide',
+    ],
+    'shortcuts': [
+      'Secret entrances to Haram',
+      'Fastest routes to avoid crowds',
+      'Local tips only residents know',
+      'Hidden gems in Makkah',
+    ],
+  }
+
+  // Get context-specific suggestions
+  let suggestions = contextSuggestions[context] || contextSuggestions['prepare']
+
+  // Add journey-stage specific suggestions
+  if (journeyStage === 'in_makkah') {
+    suggestions = [
+      'What should I do right now?',
+      ...suggestions.slice(0, 3),
+    ]
+  }
+
+  return suggestions
+}
+
+// Legacy support - get navigation in old format
+export async function getNavMegaMenu(): Promise<TNavigationItem> {
+  const navigation = await getNavigation()
+  return navigation.find((item) => item.type === 'mega-menu') || ({} as TNavigationItem)
+}
+
+// Language options
 export const getLanguages = async () => {
   return [
-    {
-      id: 'English',
-      name: 'English',
-      description: 'United State',
-      href: '#',
-      active: true,
-    },
-    {
-      id: 'Vietnamese',
-      name: 'Vietnamese',
-      description: 'Vietnamese',
-      href: '#',
-    },
-    {
-      id: 'Francais',
-      name: 'Francais',
-      description: 'Belgique',
-      href: '#',
-    },
-    {
-      id: 'Francais',
-      name: 'Francais',
-      description: 'Canada',
-      href: '#',
-    },
-    {
-      id: 'Francais',
-      name: 'Francais',
-      description: 'Belgique',
-      href: '#',
-    },
-    {
-      id: 'Francais',
-      name: 'Francais',
-      description: 'Canada',
-      href: '#',
-    },
-  ]
-}
-export const getCurrencies = async () => {
-  return [
-    {
-      id: 'EUR',
-      name: 'EUR',
-      href: '#',
-      icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" color="currentColor" fill="none">
-    <path d="M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z" stroke="currentColor" strokeWidth="1.5"></path>
-    <path d="M15 14.4923C14.5216 15.3957 13.6512 16 12.6568 16C11.147 16 9.92308 14.6071 9.92308 12.8889V11.1111C9.92308 9.39289 11.147 8 12.6568 8C13.6512 8 14.5216 8.60426 15 9.50774M9 12H12.9231" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"></path>
-</svg>`,
-      active: true,
-    },
-    {
-      id: 'USD',
-      name: 'USD',
-      href: '#',
-      icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" color="currentColor" fill="none">
-    <path d="M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z" stroke="currentColor" strokeWidth="1.5"></path>
-    <path d="M14.7102 10.0611C14.6111 9.29844 13.7354 8.06622 12.1608 8.06619C10.3312 8.06616 9.56136 9.07946 9.40515 9.58611C9.16145 10.2638 9.21019 11.6571 11.3547 11.809C14.0354 11.999 15.1093 12.3154 14.9727 13.956C14.836 15.5965 13.3417 15.951 12.1608 15.9129C10.9798 15.875 9.04764 15.3325 8.97266 13.8733M11.9734 6.99805V8.06982M11.9734 15.9031V16.998" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"></path>
-</svg>`,
-    },
-    {
-      id: 'GBF',
-      name: 'GBF',
-      href: '#',
-      icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" color="currentColor" fill="none">
-    <path d="M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z" stroke="currentColor" strokeWidth="1.5" />
-    <path d="M9 12H13.2M9 12V9.2963C9 8.82489 9 8.58919 9.14645 8.44274C9.29289 8.2963 9.5286 8.2963 10 8.2963H13.2C14.1941 8.2963 15 9.1254 15 10.1481C15 11.1709 14.1941 12 13.2 12M9 12V14.7037C9 15.1751 9 15.4108 9.14645 15.5572C9.29289 15.7037 9.5286 15.7037 10 15.7037H13.2C14.1941 15.7037 15 14.8746 15 13.8518C15 12.8291 14.1941 12 13.2 12M10.4938 8.2963V7M10.4938 17V15.7037M12.8982 8.2963V7M12.8982 17V15.7037" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-</svg>`,
-    },
-    {
-      id: 'SAR',
-      name: 'SAR',
-      href: '#',
-      icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" color="currentColor" fill="none">
-    <path d="M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z" stroke="currentColor" strokeWidth="1.5"></path>
-    <path d="M14.7102 10.0611C14.6111 9.29844 13.7354 8.06622 12.1608 8.06619C10.3312 8.06616 9.56136 9.07946 9.40515 9.58611C9.16145 10.2638 9.21019 11.6571 11.3547 11.809C14.0354 11.999 15.1093 12.3154 14.9727 13.956C14.836 15.5965 13.3417 15.951 12.1608 15.9129C10.9798 15.875 9.04764 15.3325 8.97266 13.8733M11.9734 6.99805V8.06982M11.9734 15.9031V16.998" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"></path>
-</svg>`,
-    },
-    {
-      id: 'QAR',
-      name: 'QAR',
-      href: '#',
-      icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" color="currentColor" fill="none">
-    <path d="M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z" stroke="currentColor" strokeWidth="1.5" />
-    <path d="M9 7.5C9.2 8.41667 10.08 10.5 12 11.5M12 11.5C13.92 10.5 14.8 8.41667 15 7.5M12 11.5V16.5M14.5 13.5H9.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-</svg>`,
-    },
-    {
-      id: 'BAD',
-      name: 'BAD',
-      href: '#',
-      icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" color="currentColor" fill="none">
-    <path d="M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z" stroke="currentColor" strokeWidth="1.5"></path>
-    <path d="M9 7.5C9.2 8.41667 10.08 10.5 12 11.5M12 11.5C13.92 10.5 14.8 8.41667 15 7.5M12 11.5V16.5M14.5 13.5H9.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"></path>
-</svg>`,
-    },
+    { id: 'English', name: 'English', description: 'United States', href: '#', active: true },
+    { id: 'Arabic', name: 'العربية', description: 'Arabic', href: '#' },
+    { id: 'Urdu', name: 'اردو', description: 'Urdu', href: '#' },
+    { id: 'Indonesian', name: 'Bahasa', description: 'Indonesian', href: '#' },
+    { id: 'Turkish', name: 'Türkçe', description: 'Turkish', href: '#' },
+    { id: 'French', name: 'Français', description: 'French', href: '#' },
   ]
 }
 
-export const getHeaderDropdownCategories = async () => {
+// Currency options
+export const getCurrencies = async () => {
   return [
-    {
-      name: 'Women',
-      handle: 'all',
-      description: 'New items in 2025',
-      icon: `<svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M12 16C15.866 16 19 12.866 19 9C19 5.13401 15.866 2 12 2C8.13401 2 5 5.13401 5 9C5 12.866 8.13401 16 12 16Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M12 16V22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M15 19H9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-    `,
-    },
-    {
-      name: 'Man',
-      handle: 'page-style-2/all',
-      description: 'Perfect for gentlemen',
-      icon: `<svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M10.25 21.5C14.5302 21.5 18 18.0302 18 13.75C18 9.46979 14.5302 6 10.25 6C5.96979 6 2.5 9.46979 2.5 13.75C2.5 18.0302 5.96979 21.5 10.25 21.5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M21.5 2.5L16 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M15 2.5H21.5V9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-    `,
-    },
-    {
-      name: 'Sports',
-      handle: 'page-style-2/all',
-      description: 'The needs of sports ',
-      icon: `<svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M17.1801 18C19.5801 18 20.1801 16.65 20.1801 15V9C20.1801 7.35 19.5801 6 17.1801 6C14.7801 6 14.1801 7.35 14.1801 9V15C14.1801 16.65 14.7801 18 17.1801 18Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M6.81995 18C4.41995 18 3.81995 16.65 3.81995 15V9C3.81995 7.35 4.41995 6 6.81995 6C9.21995 6 9.81995 7.35 9.81995 9V15C9.81995 16.65 9.21995 18 6.81995 18Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M9.81995 12H14.1799" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M22.5 14.5V9.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M1.5 14.5V9.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg> 
-     `,
-    },
-    {
-      name: 'Beauty',
-      handle: 'shoes',
-      description: 'Luxury and nobility',
-      icon: `<svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M16.7 18.98H7.30002C6.88002 18.98 6.41002 18.65 6.27002 18.25L2.13002 6.66999C1.54002 5.00999 2.23002 4.49999 3.65002 5.51999L7.55002 8.30999C8.20002 8.75999 8.94002 8.52999 9.22002 7.79999L10.98 3.10999C11.54 1.60999 12.47 1.60999 13.03 3.10999L14.79 7.79999C15.07 8.52999 15.81 8.75999 16.45 8.30999L20.11 5.69999C21.67 4.57999 22.42 5.14999 21.78 6.95999L17.74 18.27C17.59 18.65 17.12 18.98 16.7 18.98Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M6.5 22H17.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M9.5 14H14.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-     `,
-    },
-    {
-      name: 'Jewelry',
-      handle: 'page-style-2/all',
-      description: 'Diamond always popular',
-      icon: `<svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M10.7998 3.40005L7.19982 7.70005C7.09982 7.90005 6.99982 8.20005 6.89982 8.40005L5.19982 17C5.09982 17.6 5.39982 18.3 5.89982 18.6L11.1998 21.6C11.5998 21.8 12.2998 21.8 12.6998 21.6L17.9998 18.6C18.4998 18.3 18.7998 17.6 18.6998 17L16.9998 8.40005C16.9998 8.20005 16.7998 7.90005 16.6998 7.70005L13.0998 3.40005C12.4998 2.60005 11.4998 2.60005 10.7998 3.40005Z" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M16.8002 8.5L12.5002 20.7C12.3002 21.1 11.7002 21.1 11.6002 20.7L7.2002 8.5" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-     `,
-    },
+    { id: 'SAR', name: 'SAR', description: 'Saudi Riyal', href: '#', active: true },
+    { id: 'USD', name: 'USD', description: 'US Dollar', href: '#' },
+    { id: 'EUR', name: 'EUR', description: 'Euro', href: '#' },
+    { id: 'GBP', name: 'GBP', description: 'British Pound', href: '#' },
+    { id: 'AED', name: 'AED', description: 'UAE Dirham', href: '#' },
+    { id: 'MYR', name: 'MYR', description: 'Malaysian Ringgit', href: '#' },
   ]
 }

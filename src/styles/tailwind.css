@@ -417,3 +417,46 @@
 @utility sub-menu {
   @apply hidden;
 }
+
+/* Islamic Pattern Backgrounds */
+@utility islamic-pattern-bg {
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url('/images/islamic-pattern.png');
+    background-position: left center;
+    background-repeat: no-repeat;
+    background-size: auto 100%;
+    opacity: 0.08;
+    pointer-events: none;
+    z-index: 0;
+  }
+}
+
+@utility islamic-pattern-page {
+  position: relative;
+
+  &::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 100%;
+    background-image: url('/images/islamic-pattern.png');
+    background-position: left top;
+    background-repeat: repeat-y;
+    background-size: auto 400px;
+    opacity: 0.05;
+    pointer-events: none;
+    z-index: 0;
+  }
+}
+
+.dark .islamic-pattern-bg::before,
+.dark .islamic-pattern-page::before {
+  opacity: 0.08;
+}

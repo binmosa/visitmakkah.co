@@ -11,7 +11,7 @@ import React from 'react'
 
 export const getIcon = (iconName?: string): React.ComponentType<{ className?: string }> | undefined => {
     const IconWrapper = ({ icon, className }: { icon: any; className?: string }) => (
-        <HugeiconsIcon icon={icon} className={className} variant="twotone" />
+        <HugeiconsIcon icon={icon} className={className} />
     )
 
     switch (iconName) {

@@ -9,7 +9,9 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     <UserJourneyProvider>
       <DataCollectionProvider>
         <AudioProvider>
-          <Aside.Provider>{children}</Aside.Provider>
+          <div className="islamic-pattern-page min-h-screen">
+            <Aside.Provider>{children}</Aside.Provider>
+          </div>
           <div className="fixed inset-x-0 bottom-0 z-20">
             <AudioPlayer />
           </div>

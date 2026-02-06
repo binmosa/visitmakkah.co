@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" preserveAspectRatio="xMinYMid slice">
+  <defs>
+    <!-- Gradient fade from left to right -->
+    <linearGradient id="fadeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#c9a86c" stop-opacity="0.4"/>
+      <stop offset="50%" stop-color="#c9a86c" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#c9a86c" stop-opacity="0"/>
+    </linearGradient>
+
+    <!-- 8-pointed star pattern tile -->
+    <pattern id="islamicPattern" x="0" y="0" width="80" height="80" patternUnits="userSpaceOnUse">
+      <g fill="none" stroke="url(#fadeGradient)" stroke-width="1">
+        <!-- Central 8-pointed star -->
+        <polygon points="40,10 46,26 62,26 50,36 54,52 40,44 26,52 30,36 18,26 34,26"/>
+
+        <!-- Connecting lines forming the geometric pattern -->
+        <line x1="40" y1="10" x2="40" y2="0"/>
+        <line x1="62" y1="26" x2="80" y2="26"/>
+        <line x1="54" y1="52" x2="66" y2="66"/>
+        <line x1="26" y1="52" x2="14" y2="66"/>
+        <line x1="18" y1="26" x2="0" y2="26"/>
+
+        <!-- Corner elements -->
+        <line x1="0" y1="0" x2="14" y2="14"/>
+        <line x1="80" y1="0" x2="66" y2="14"/>
+        <line x1="0" y1="80" x2="14" y2="66"/>
+        <line x1="80" y1="80" x2="66" y2="66"/>
+
+        <!-- Additional geometric details -->
+        <line x1="40" y1="80" x2="40" y2="70"/>
+        <line x1="46" y1="26" x2="54" y2="18"/>
+        <line x1="34" y1="26" x2="26" y2="18"/>
+        <line x1="50" y1="36" x2="60" y2="40"/>
+        <line x1="30" y1="36" x2="20" y2="40"/>
+        <line x1="54" y1="52" x2="54" y2="62"/>
+        <line x1="26" y1="52" x2="26" y2="62"/>
+      </g>
+    </pattern>
+
+    <!-- Complex star for overlay -->
+    <pattern id="starOverlay" x="0" y="0" width="120" height="120" patternUnits="userSpaceOnUse">
+      <g fill="none" stroke="url(#fadeGradient)" stroke-width="0.8">
+        <!-- Large 8-pointed star -->
+        <path d="M60,5 L68,35 L98,35 L74,55 L82,85 L60,68 L38,85 L46,55 L22,35 L52,35 Z"/>
+
+        <!-- Inner details -->
+        <circle cx="60" cy="55" r="12" stroke-width="0.6"/>
+        <circle cx="60" cy="55" r="6" stroke-width="0.5"/>
+
+        <!-- Radiating lines -->
+        <line x1="60" y1="5" x2="60" y2="0"/>
+        <line x1="98" y1="35" x2="105" y2="32"/>
+        <line x1="82" y1="85" x2="88" y2="92"/>
+        <line x1="38" y1="85" x2="32" y2="92"/>
+        <line x1="22" y1="35" x2="15" y2="32"/>
+
+        <!-- Corner connections -->
+        <path d="M0,0 Q30,30 60,5" stroke-width="0.5"/>
+        <path d="M120,0 Q90,30 60,5" stroke-width="0.5"/>
+        <path d="M0,120 Q30,90 38,85" stroke-width="0.5"/>
+        <path d="M120,120 Q90,90 82,85" stroke-width="0.5"/>
+      </g>
+    </pattern>
+
+    <!-- Gradient mask for fade effect -->
+    <linearGradient id="maskGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="white" stop-opacity="1"/>
+      <stop offset="60%" stop-color="white" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="white" stop-opacity="0"/>
+    </linearGradient>
+
+    <mask id="fadeMask">
+      <rect width="100%" height="100%" fill="url(#maskGradient)"/>
+    </mask>
+  </defs>
+
+  <!-- Background patterns with fade mask -->
+  <g mask="url(#fadeMask)">
+    <rect width="100%" height="100%" fill="url(#islamicPattern)"/>
+    <rect width="100%" height="100%" fill="url(#starOverlay)" transform="translate(20, 20)"/>
+  </g>
+</svg>

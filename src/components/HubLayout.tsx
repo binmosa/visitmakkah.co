@@ -2,16 +2,36 @@
 
 import HubNavMenu from '@/components/HubNavSlider'
 import AIChatPanel from '@/components/AIPanel/AIChatPanel'
-import { TNavigationItem } from '@/data/navigation'
+import { TNavigationItem, getAISuggestions } from '@/data/navigation'
+import { useUserJourney } from '@/context/UserJourneyContext'
 import { usePathname } from 'next/navigation'
 import React, { ReactNode, useState, useEffect } from 'react'
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
-    Calendar03Icon,
+    // Prepare icons
+    ClipboardIcon,
+    Route01Icon,
+    Passport01Icon,
+    Backpack03Icon,
+    Calculator01Icon,
+    // Learn icons
+    BookOpen01Icon,
+    Kaaba02Icon,
     Mosque01Icon,
+    CheckListIcon,
+    PrayerRugIcon,
+    // Explore icons
+    MapsIcon,
     Building03Icon,
-    Settings03Icon,
+    Restaurant01Icon,
+    UserGroup03Icon,
+    CompassIcon,
+    // Tips icons
     Idea01Icon,
+    StarIcon,
+    UserLove01Icon,
+    Moon02Icon,
+    Location01Icon,
 } from '@hugeicons/core-free-icons'
 
 interface HubLayoutProps {
@@ -21,178 +41,39 @@ interface HubLayoutProps {
     navItems: TNavigationItem[]
     aiContext?: string
     aiSuggestedQuestions?: string[]
+    categoryId?: string
 }
 
 // Icons for each main category
-const categoryIcons: Record<string, typeof Calendar03Icon> = {
-    'plan': Calendar03Icon,
-    'your-journey': Mosque01Icon,
-    'stay-and-food': Building03Icon,
-    'smart-tools': Settings03Icon,
-    'local-tips': Idea01Icon,
+const categoryIcons: Record<string, typeof ClipboardIcon> = {
+    'prepare': ClipboardIcon,
+    'learn': BookOpen01Icon,
+    'explore': MapsIcon,
+    'tips': Idea01Icon,
 }
 
-// Get suggested questions based on context (supports both category and sub-topic)
-const getDefaultSuggestions = (context: string): string[] => {
-    const suggestions: Record<string, string[]> = {
-        // Main categories
-        'your-journey': [
-            'What are the steps for Umrah?',
-            'How many days do I need for Hajj?',
-            'Explain Tawaf step by step',
-            'Best time to perform rituals?',
-        ],
-        'plan': [
-            'Help me create a timeline',
-            'What visa do I need?',
-            'What should I pack?',
-            'How to get from Jeddah to Makkah?',
-        ],
-        'stay-and-food': [
-            'Hotels near King Fahd Gate',
-            'Best restaurants for families',
-            'Late night food options',
-            'Women-friendly areas',
-        ],
-        'smart-tools': [
-            'Help me plan my trip',
-            'Calculate my budget',
-            'Create a packing list',
-            'Distance to key locations',
-        ],
-        'local-tips': [
-            'Best time to avoid crowds',
-            'Tips for Ramadan visit',
-            'Insider routes to Haram',
-            'Seasonal weather advice',
-        ],
-        // Sub-topics - Your Journey
-        'hajj': [
-            'What are the 5 days of Hajj?',
-            'What is required before Hajj?',
-            'Explain Arafat day',
-            'What to do at Mina?',
-        ],
-        'umrah': [
-            'Step-by-step Umrah guide',
-            'How long does Umrah take?',
-            'Best time for Umrah?',
-            'Umrah for first-timers',
-        ],
-        'rituals': [
-            'How to perform Tawaf?',
-            "Explain Sa'i between Safa and Marwa",
-            'What duas to recite?',
-            'Rules of Ihram',
-        ],
-        'spiritual': [
-            'Duas for Tawaf',
-            'How to prepare spiritually?',
-            'Best places for reflection',
-            'Recommended reading',
-        ],
-        // Sub-topics - Plan
-        'timeline-builder': [
-            'Create a 7-day Umrah plan',
-            'Best itinerary for families',
-            'How many days in Makkah?',
-            'When to visit Madinah?',
-        ],
-        'visa-steps': [
-            'Saudi visa requirements',
-            'How to apply for Umrah visa?',
-            'Visa processing time?',
-            'Required documents',
-        ],
-        'packing': [
-            'Essential packing list',
-            'What to wear for Ihram?',
-            'Electronics to bring',
-            'Medications to pack',
-        ],
-        'transport': [
-            'Jeddah to Makkah options',
-            'Getting around Makkah',
-            'Taxi vs bus vs train',
-            'Airport transfer tips',
-        ],
-        // Sub-topics - Stay & Food
-        'hotels': [
-            'Hotels near King Fahd Gate',
-            'Budget-friendly options',
-            'Hotels with Haram view',
-            'Family-friendly hotels',
-        ],
-        'restaurants': [
-            'Best biryani in Makkah',
-            'Halal fast food options',
-            'Restaurants near Haram',
-            'Where to eat after Fajr?',
-        ],
-        'women-friendly': [
-            'Women-only prayer areas',
-            'Safe areas for women',
-            'Women-friendly cafes',
-            'Tips for solo women',
-        ],
-        'late-night': [
-            'Restaurants open after Isha',
-            '24-hour food options',
-            'Late night cafes',
-            'Where to eat at 3am?',
-        ],
-        // Sub-topics - Smart Tools
-        'trip-planner': [
-            'Plan my Umrah trip',
-            'Create daily schedule',
-            'Optimize my itinerary',
-            'Time management tips',
-        ],
-        'budget-tool': [
-            'Estimate trip cost',
-            'Budget breakdown',
-            'Money saving tips',
-            'Currency exchange advice',
-        ],
-        'packing-list': [
-            'Generate packing list',
-            'Ihram essentials',
-            'What NOT to bring',
-            'Carry-on vs checked bag',
-        ],
-        'distance-calculator': [
-            'Hotel to Haram distance',
-            'Walking times to gates',
-            'Makkah to Madinah',
-            'Key landmarks distances',
-        ],
-        // Sub-topics - Local Tips
-        'seasonal-hacks': [
-            'Summer visit tips',
-            'Winter in Makkah',
-            'Best months to visit',
-            'Weather preparation',
-        ],
-        'ramadan-advice': [
-            'Umrah during Ramadan',
-            'Iftar near Haram',
-            'Tarawih prayer tips',
-            'Last 10 nights guide',
-        ],
-        'hajj-crowd-flow': [
-            'Best Tawaf times',
-            'Avoiding peak crowds',
-            'Crowd patterns by day',
-            'Less crowded gates',
-        ],
-        'insider-routes': [
-            'Shortcuts to Haram',
-            'Secret entrances',
-            'Fast walking routes',
-            'Avoiding construction',
-        ],
-    }
-    return suggestions[context] || suggestions['your-journey']
+// Icons for sub-items
+const subItemIcons: Record<string, typeof ClipboardIcon> = {
+    // Prepare
+    'build-itinerary': Route01Icon,
+    'get-visa': Passport01Icon,
+    'pack-my-bag': Backpack03Icon,
+    'calculate-budget': Calculator01Icon,
+    // Learn
+    'umrah-guide': Kaaba02Icon,
+    'hajj-guide': Mosque01Icon,
+    'step-by-step': CheckListIcon,
+    'duas-prayers': PrayerRugIcon,
+    // Explore
+    'find-hotels': Building03Icon,
+    'find-food': Restaurant01Icon,
+    'check-crowds': UserGroup03Icon,
+    'navigate': CompassIcon,
+    // Tips
+    'first-timers': StarIcon,
+    'for-women': UserLove01Icon,
+    'ramadan': Moon02Icon,
+    'shortcuts': Location01Icon,
 }
 
 const HubLayout = ({
@@ -202,15 +83,17 @@ const HubLayout = ({
     navItems,
     aiContext,
     aiSuggestedQuestions,
+    categoryId,
 }: HubLayoutProps) => {
     const pathname = usePathname()
+    const { user } = useUserJourney()
     const [activeItemId, setActiveItemId] = useState<string | null>(null)
     const [activeItem, setActiveItem] = useState<TNavigationItem | null>(null)
 
     // Determine context from pathname
-    const contextFromPath = pathname.split('/')[1] || 'your-journey'
+    const contextFromPath = pathname.split('/')[1] || 'prepare'
     const context = aiContext || contextFromPath
-    const CategoryIcon = categoryIcons[context] || Mosque01Icon
+    const CategoryIcon = categoryIcons[context] || ClipboardIcon
 
     // Find active item based on current pathname
     useEffect(() => {
@@ -236,13 +119,29 @@ const HubLayout = ({
         }
     }
 
-    const suggestedQuestions = aiSuggestedQuestions || getDefaultSuggestions(context)
+    // Get the sub-topic key from the active item's href
+    const subTopic = activeItem?.href?.split('/').pop() || ''
+
+    // Get context-aware suggestions based on journey stage
+    const journeyStage = user?.journeyStage || 'planning'
+    const suggestedQuestions = aiSuggestedQuestions || getAISuggestions(subTopic || context, journeyStage)
+
+    // Get the appropriate icon for the active item
+    const getActiveItemIcon = () => {
+        if (activeItem?.href) {
+            const key = activeItem.href.split('/').pop() || ''
+            return subItemIcons[key] || CategoryIcon
+        }
+        return CategoryIcon
+    }
+
+    const ActiveItemIcon = getActiveItemIcon()
 
     return (
         <div className="container py-6 sm:py-8 lg:py-12">
-            {/* Header Card - Consistent with Dashboard */}
+            {/* Header Card - With Journey Stage Context */}
             <div className="mb-6 sm:mb-8">
-                <div className="flex items-center gap-3">
+                <div className="relative z-10 flex items-center gap-3">
                     <div className="rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 p-3 shadow-lg shadow-primary-500/20">
                         <HugeiconsIcon icon={CategoryIcon} className="size-6 text-white" />
                     </div>
@@ -257,18 +156,42 @@ const HubLayout = ({
                         )}
                     </div>
                 </div>
+
+                {/* Journey Stage Indicator */}
+                {journeyStage && (
+                    <div className="mt-3 flex items-center gap-2">
+                        <span className="text-xs text-neutral-400 dark:text-neutral-500">Your stage:</span>
+                        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                            journeyStage === 'in_makkah'
+                                ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                                : journeyStage === 'booked'
+                                ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+                                : journeyStage === 'returned'
+                                ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400'
+                                : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
+                        }`}>
+                            {journeyStage === 'planning' && 'Planning'}
+                            {journeyStage === 'booked' && 'Booked & Preparing'}
+                            {journeyStage === 'in_makkah' && 'In Makkah Now'}
+                            {journeyStage === 'returned' && 'Returned'}
+                        </span>
+                    </div>
+                )}
             </div>
 
             {/* Nav Menu Card */}
-            <div className="mb-6 rounded-2xl border border-neutral-200 bg-white p-4 sm:p-5 dark:border-neutral-700 dark:bg-neutral-900">
-                <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
-                    Select a topic
+            <div className="islamic-pattern-bg mb-6 overflow-hidden rounded-2xl border border-neutral-200 bg-white p-4 sm:p-5 dark:border-neutral-700 dark:bg-neutral-900">
+                <p className="relative z-10 mb-3 text-xs font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
+                    What do you want to do?
                 </p>
-                <HubNavMenu
-                    items={navItems || []}
-                    activeId={activeItemId}
-                    onItemClick={handleItemClick}
-                />
+                <div className="relative z-10">
+                    <HubNavMenu
+                        items={navItems || []}
+                        activeId={activeItemId}
+                        onItemClick={handleItemClick}
+                        categoryId={categoryId}
+                    />
+                </div>
             </div>
 
             {/* Main Content Area - Responsive Layout */}
@@ -278,8 +201,8 @@ const HubLayout = ({
                     <div className="lg:sticky lg:top-24">
                         <div className="h-[450px] sm:h-[500px] lg:h-[600px]">
                             <AIChatPanel
-                                key={activeItemId || context} // Force re-render when topic changes
-                                context={activeItem?.href?.split('/').pop() || context}
+                                key={activeItemId || context}
+                                context={subTopic || context}
                                 contextLabel={activeItem?.name || title}
                                 placeholder={`Ask about ${activeItem?.name || title}...`}
                                 suggestedQuestions={suggestedQuestions}
@@ -292,14 +215,14 @@ const HubLayout = ({
                 <div className="lg:col-span-3">
                     <div
                         id="hub-content-area"
-                        className="scroll-mt-16 rounded-2xl border border-neutral-200 bg-white p-4 sm:p-6 dark:border-neutral-700 dark:bg-neutral-900"
+                        className="islamic-pattern-bg scroll-mt-16 overflow-hidden rounded-2xl border border-neutral-200 bg-white p-4 sm:p-6 dark:border-neutral-700 dark:bg-neutral-900"
                     >
                         {/* Dynamic content header */}
                         {activeItem && (
-                            <div className="mb-5 flex items-center gap-3 border-b border-neutral-200 pb-5 dark:border-neutral-700">
+                            <div className="relative z-10 mb-5 flex items-center gap-3 border-b border-neutral-200 pb-5 dark:border-neutral-700">
                                 <div className="rounded-lg bg-primary-100 p-2 dark:bg-primary-900/30">
                                     <HugeiconsIcon
-                                        icon={CategoryIcon}
+                                        icon={ActiveItemIcon}
                                         className="size-5 text-primary-600 dark:text-primary-400"
                                     />
                                 </div>
@@ -308,19 +231,19 @@ const HubLayout = ({
                                         {activeItem.name}
                                     </h2>
                                     <p className="text-sm text-neutral-500 dark:text-neutral-400">
-                                        Ask the AI guide or explore below
+                                        {activeItem.description || 'Ask the AI guide or explore below'}
                                     </p>
                                 </div>
                             </div>
                         )}
 
                         {/* Children content (widgets, etc.) */}
-                        <div className="min-h-[200px]">
+                        <div className="relative z-10 min-h-[200px]">
                             {children || (
                                 <div className="flex h-[200px] items-center justify-center text-center">
                                     <div>
                                         <p className="text-neutral-500 dark:text-neutral-400">
-                                            Select a topic above or ask the AI assistant
+                                            Select an action above or ask the AI assistant
                                         </p>
                                         <p className="mt-1 text-sm text-neutral-400 dark:text-neutral-500">
                                             Content will appear here

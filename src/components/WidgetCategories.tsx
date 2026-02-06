@@ -11,9 +11,9 @@ interface Props {
 
 const WidgetCategories: FC<Props> = ({ className = 'bg-neutral-100 dark:bg-neutral-800', categories }) => {
   return (
-    <div className={clsx('widget-categories overflow-hidden rounded-3xl', className)}>
+    <div className={clsx('islamic-pattern-bg widget-categories overflow-hidden rounded-3xl', className)}>
       <WidgetHeading title="Suggested categories" viewAll={{ label: 'View all', href: '/#' }} />
-      <div className="flow-root">
+      <div className="relative z-10 flow-root">
         <div className="flex flex-col divide-y divide-neutral-200 dark:divide-neutral-700">
           {categories?.map((category) => (
             <CardCategory1

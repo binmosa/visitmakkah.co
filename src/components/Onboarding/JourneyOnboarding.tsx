@@ -449,9 +449,21 @@ export default function JourneyOnboarding() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
                         transition={{ duration: 0.2 }}
-                        className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-xl sm:p-8 dark:border-neutral-700 dark:bg-neutral-900"
+                        className="relative overflow-hidden rounded-2xl border border-neutral-200 bg-white p-6 shadow-xl sm:p-8 dark:border-neutral-700 dark:bg-neutral-900"
                     >
-                        {renderStep()}
+                        <div className="relative z-10">
+                            {renderStep()}
+                        </div>
+                        {/* Islamic pattern overlay */}
+                        <div
+                            className="pointer-events-none absolute inset-0 z-0"
+                            style={{
+                                backgroundImage: 'url(/images/islamic-pattern.png)',
+                                backgroundPosition: 'left top',
+                                backgroundRepeat: 'repeat-y',
+                                backgroundSize: 'auto 300px',
+                            }}
+                        />
                     </motion.div>
                 </AnimatePresence>
             </div>

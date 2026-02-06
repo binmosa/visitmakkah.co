@@ -1,158 +1,76 @@
 'use client'
 
 import { useEffect, useRef, useCallback } from 'react'
-import { usePathname } from 'next/navigation'
-import { useUserJourney } from '@/context/UserJourneyContext'
-import {
-    getOrCreateVisitor,
-    saveJourneyProfile,
-    trackEvent,
-    EventTypes,
-    getDeviceId,
-} from '@/lib/data-service'
+import { getOrCreateAnonymousVisitor, getDeviceId, createChatTopic, saveChatMessage, endChatTopic } from '@/lib/data-service'
+import { getCurrentUser } from '@/lib/auth'
 
 /**
- * Hook for automatic data collection and analytics
- * Place this in your root layout or app provider
+ * Hook for chat data collection (gold data for AI training)
+ * Use this in chat components to track topics and messages
  */
-export function useDataCollection() {
-    const pathname = usePathname()
-    const { user } = useUserJourney()
-    const visitorIdRef = useRef<string | null>(null)
-    const hasTrackedPageView = useRef<string | null>(null)
-    const lastSavedProfile = useRef<string>('')
+export function useChatDataCollection(context: string, contextLabel?: string) {
+    const topicIdRef = useRef<string | null>(null)
+    const anonymousIdRef = useRef<string | null>(null)
+    const profileIdRef = useRef<string | null>(null)
+    const initialized = useRef(false)
 
-    // Initialize visitor on mount
+    // Initialize on mount
     useEffect(() => {
-        const initVisitor = async () => {
-            const deviceId = getDeviceId()
-            const visitor = await getOrCreateVisitor(deviceId, {
-                userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : undefined,
-                language: typeof navigator !== 'undefined' ? navigator.language : undefined,
-            })
+        if (initialized.current) return
+        initialized.current = true
 
-            if (visitor) {
-                visitorIdRef.current = visitor.id
-            }
-        }
+        const init = async () => {
+            // Check if user is logged in
+            const user = await getCurrentUser()
 
-        initVisitor()
-    }, [])
-
-    // Track page views
-    useEffect(() => {
-        if (!visitorIdRef.current || hasTrackedPageView.current === pathname) {
-            return
-        }
-
-        hasTrackedPageView.current = pathname
-        trackEvent(
-            visitorIdRef.current,
-            EventTypes.PAGE_VIEW,
-            { path: pathname },
-            pathname,
-            typeof document !== 'undefined' ? document.referrer : undefined
-        )
-    }, [pathname])
-
-    // Sync journey profile when it changes
-    useEffect(() => {
-        if (!visitorIdRef.current || !user.hasCompletedOnboarding) {
-            return
-        }
-
-        // Create a hash of the profile to detect changes
-        const profileHash = JSON.stringify({
-            journeyStage: user.journeyStage,
-            journeyType: user.journeyType,
-            isFirstTime: user.isFirstTime,
-            travelGroup: user.travelGroup,
-            travelDates: user.travelDates,
-        })
-
-        // Only save if changed
-        if (profileHash !== lastSavedProfile.current) {
-            lastSavedProfile.current = profileHash
-            saveJourneyProfile(visitorIdRef.current, user)
-        }
-    }, [user])
-
-    // Return the visitor ID and track function for manual tracking
-    const track = useCallback((eventType: string, eventData?: Record<string, unknown>) => {
-        if (visitorIdRef.current) {
-            trackEvent(visitorIdRef.current, eventType, eventData, pathname)
-        }
-    }, [pathname])
-
-    return {
-        visitorId: visitorIdRef.current,
-        track,
-        EventTypes,
-    }
-}
-
-/**
- * Hook for tracking chat messages
- */
-export function useChatTracking(context: string, contextLabel?: string) {
-    const sessionIdRef = useRef<string | null>(null)
-    const visitorIdRef = useRef<string | null>(null)
-
-    // Initialize session
-    useEffect(() => {
-        const initSession = async () => {
-            const deviceId = getDeviceId()
-            const visitor = await getOrCreateVisitor(deviceId)
-
-            if (visitor) {
-                visitorIdRef.current = visitor.id
-
-                // Import dynamically to avoid circular deps
-                const { createChatSession } = await import('@/lib/data-service')
-                const session = await createChatSession(visitor.id, context, contextLabel)
-
-                if (session) {
-                    sessionIdRef.current = session.id
+            if (user) {
+                profileIdRef.current = user.id
+            } else {
+                // Get or create anonymous visitor
+                const deviceId = getDeviceId()
+                const visitor = await getOrCreateAnonymousVisitor(deviceId)
+                if (visitor) {
+                    anonymousIdRef.current = visitor.id
                 }
             }
+
+            // Create chat topic
+            const topic = await createChatTopic({
+                profileId: profileIdRef.current || undefined,
+                anonymousId: anonymousIdRef.current || undefined,
+                context,
+                contextLabel,
+            })
+
+            if (topic) {
+                topicIdRef.current = topic.id
+            }
         }
 
-        initSession()
+        init()
 
-        // End session on unmount
+        // End topic on unmount
         return () => {
-            if (sessionIdRef.current) {
-                import('@/lib/data-service').then(({ endChatSession }) => {
-                    endChatSession(sessionIdRef.current!)
-                })
+            if (topicIdRef.current) {
+                endChatTopic(topicIdRef.current)
             }
         }
     }, [context, contextLabel])
 
     // Track a message
-    const trackMessage = useCallback(async (
-        role: 'user' | 'assistant',
-        content: string,
-        metadata?: { tokensUsed?: number; responseTimeMs?: number }
-    ) => {
-        if (!sessionIdRef.current || !visitorIdRef.current) {
-            return
-        }
+    const trackMessage = useCallback(async (role: 'user' | 'assistant', content: string) => {
+        if (!topicIdRef.current) return null
 
-        const { saveChatMessage } = await import('@/lib/data-service')
-        await saveChatMessage(
-            sessionIdRef.current,
-            visitorIdRef.current,
+        return saveChatMessage({
+            topicId: topicIdRef.current,
             role,
             content,
             context,
-            metadata
-        )
+        })
     }, [context])
 
     return {
-        sessionId: sessionIdRef.current,
-        visitorId: visitorIdRef.current,
+        topicId: topicIdRef.current,
         trackMessage,
     }
 }

@@ -3,6 +3,7 @@ import { Metadata } from 'next'
 import { Inter, Noto_Sans_Arabic, Plus_Jakarta_Sans } from 'next/font/google'
 import Script from 'next/script'
 import ThemeProvider from './theme-provider'
+import { AuthProvider } from '@/context/AuthContext'
 
 // Body font
 const inter = Inter({
@@ -57,7 +58,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           strategy="afterInteractive"
         />
         <ThemeProvider>
-          <div>{children}</div>
+          <AuthProvider>
+            <div>{children}</div>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

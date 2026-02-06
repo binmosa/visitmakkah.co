@@ -9,189 +9,172 @@ export type Json =
 export interface Database {
     public: {
         Tables: {
-            // Anonymous visitors
-            visitors: {
+            // User profiles (linked to Supabase Auth)
+            profiles: {
                 Row: {
                     id: string
-                    device_id: string
-                    first_seen: string
-                    last_seen: string
-                    user_agent: string | null
-                    country: string | null
-                    language: string | null
-                    created_at: string
-                }
-                Insert: {
-                    id?: string
-                    device_id: string
-                    first_seen?: string
-                    last_seen?: string
-                    user_agent?: string | null
-                    country?: string | null
-                    language?: string | null
-                    created_at?: string
-                }
-                Update: {
-                    id?: string
-                    device_id?: string
-                    first_seen?: string
-                    last_seen?: string
-                    user_agent?: string | null
-                    country?: string | null
-                    language?: string | null
-                    created_at?: string
-                }
-            }
-
-            // Journey profiles (onboarding data)
-            journey_profiles: {
-                Row: {
-                    id: string
-                    visitor_id: string
-                    journey_stage: string | null
+                    email: string | null
+                    phone: string | null
+                    display_name: string | null
+                    avatar_url: string | null
                     journey_type: string | null
-                    is_first_time: boolean | null
+                    is_first_time: boolean
                     travel_group: string | null
                     travel_dates: Json | null
-                    preferences: Json | null
-                    completed_steps: string[] | null
+                    home_country: string | null
+                    preferred_language: string
                     share_code: string | null
                     created_at: string
                     updated_at: string
                 }
                 Insert: {
-                    id?: string
-                    visitor_id: string
-                    journey_stage?: string | null
+                    id: string
+                    email?: string | null
+                    phone?: string | null
+                    display_name?: string | null
+                    avatar_url?: string | null
                     journey_type?: string | null
-                    is_first_time?: boolean | null
+                    is_first_time?: boolean
                     travel_group?: string | null
                     travel_dates?: Json | null
-                    preferences?: Json | null
-                    completed_steps?: string[] | null
+                    home_country?: string | null
+                    preferred_language?: string
                     share_code?: string | null
                     created_at?: string
                     updated_at?: string
                 }
                 Update: {
                     id?: string
-                    visitor_id?: string
-                    journey_stage?: string | null
+                    email?: string | null
+                    phone?: string | null
+                    display_name?: string | null
+                    avatar_url?: string | null
+                    journey_type?: string | null
+                    is_first_time?: boolean
+                    travel_group?: string | null
+                    travel_dates?: Json | null
+                    home_country?: string | null
+                    preferred_language?: string
+                    share_code?: string | null
+                    updated_at?: string
+                }
+            }
+
+            // Anonymous visitors (pre-signup)
+            anonymous_visitors: {
+                Row: {
+                    id: string
+                    device_id: string
+                    journey_type: string | null
+                    is_first_time: boolean | null
+                    travel_group: string | null
+                    travel_dates: Json | null
+                    preferences: Json | null
+                    share_code: string | null
+                    linked_profile_id: string | null
+                    first_seen: string
+                    last_seen: string
+                }
+                Insert: {
+                    id?: string
+                    device_id: string
                     journey_type?: string | null
                     is_first_time?: boolean | null
                     travel_group?: string | null
                     travel_dates?: Json | null
                     preferences?: Json | null
-                    completed_steps?: string[] | null
                     share_code?: string | null
-                    created_at?: string
-                    updated_at?: string
+                    linked_profile_id?: string | null
+                    first_seen?: string
+                    last_seen?: string
+                }
+                Update: {
+                    device_id?: string
+                    journey_type?: string | null
+                    is_first_time?: boolean | null
+                    travel_group?: string | null
+                    travel_dates?: Json | null
+                    preferences?: Json | null
+                    share_code?: string | null
+                    linked_profile_id?: string | null
+                    last_seen?: string
                 }
             }
 
-            // Chat sessions
-            chat_sessions: {
+            // Chat topics (what users discuss)
+            chat_topics: {
                 Row: {
                     id: string
-                    visitor_id: string
+                    profile_id: string | null
+                    anonymous_id: string | null
                     context: string
                     context_label: string | null
                     started_at: string
                     ended_at: string | null
                     message_count: number
-                    created_at: string
+                    user_rating: number | null
+                    was_helpful: boolean | null
+                    feedback_text: string | null
                 }
                 Insert: {
                     id?: string
-                    visitor_id: string
+                    profile_id?: string | null
+                    anonymous_id?: string | null
                     context: string
                     context_label?: string | null
                     started_at?: string
                     ended_at?: string | null
                     message_count?: number
-                    created_at?: string
+                    user_rating?: number | null
+                    was_helpful?: boolean | null
+                    feedback_text?: string | null
                 }
                 Update: {
-                    id?: string
-                    visitor_id?: string
+                    profile_id?: string | null
+                    anonymous_id?: string | null
                     context?: string
                     context_label?: string | null
-                    started_at?: string
                     ended_at?: string | null
                     message_count?: number
-                    created_at?: string
+                    user_rating?: number | null
+                    was_helpful?: boolean | null
+                    feedback_text?: string | null
                 }
             }
 
-            // Chat messages (for training data)
+            // Chat messages (AI training data)
             chat_messages: {
                 Row: {
                     id: string
-                    session_id: string
-                    visitor_id: string
+                    topic_id: string
                     role: 'user' | 'assistant'
                     content: string
                     context: string | null
-                    tokens_used: number | null
-                    response_time_ms: number | null
+                    was_edited: boolean
+                    thumbs_up: boolean | null
                     created_at: string
                 }
                 Insert: {
                     id?: string
-                    session_id: string
-                    visitor_id: string
+                    topic_id: string
                     role: 'user' | 'assistant'
                     content: string
                     context?: string | null
-                    tokens_used?: number | null
-                    response_time_ms?: number | null
+                    was_edited?: boolean
+                    thumbs_up?: boolean | null
                     created_at?: string
                 }
                 Update: {
-                    id?: string
-                    session_id?: string
-                    visitor_id?: string
+                    topic_id?: string
                     role?: 'user' | 'assistant'
                     content?: string
                     context?: string | null
-                    tokens_used?: number | null
-                    response_time_ms?: number | null
-                    created_at?: string
+                    was_edited?: boolean
+                    thumbs_up?: boolean | null
                 }
             }
 
-            // Analytics events
-            analytics_events: {
-                Row: {
-                    id: string
-                    visitor_id: string
-                    event_type: string
-                    event_data: Json | null
-                    page_path: string | null
-                    referrer: string | null
-                    created_at: string
-                }
-                Insert: {
-                    id?: string
-                    visitor_id: string
-                    event_type: string
-                    event_data?: Json | null
-                    page_path?: string | null
-                    referrer?: string | null
-                    created_at?: string
-                }
-                Update: {
-                    id?: string
-                    visitor_id?: string
-                    event_type?: string
-                    event_data?: Json | null
-                    page_path?: string | null
-                    referrer?: string | null
-                    created_at?: string
-                }
-            }
-
-            // Popular questions (aggregated for insights)
+            // Popular questions
             popular_questions: {
                 Row: {
                     id: string
@@ -199,7 +182,8 @@ export interface Database {
                     context: string
                     ask_count: number
                     last_asked: string
-                    created_at: string
+                    is_featured: boolean
+                    curated_answer: string | null
                 }
                 Insert: {
                     id?: string
@@ -207,15 +191,86 @@ export interface Database {
                     context: string
                     ask_count?: number
                     last_asked?: string
-                    created_at?: string
+                    is_featured?: boolean
+                    curated_answer?: string | null
                 }
                 Update: {
-                    id?: string
                     question?: string
                     context?: string
                     ask_count?: number
                     last_asked?: string
+                    is_featured?: boolean
+                    curated_answer?: string | null
+                }
+            }
+
+            // Waitlist / Newsletter
+            waitlist: {
+                Row: {
+                    id: string
+                    email: string
+                    phone: string | null
+                    name: string | null
+                    interests: string[] | null
+                    journey_type: string | null
+                    source: string | null
+                    utm_source: string | null
+                    utm_campaign: string | null
+                    verified: boolean
+                    subscribed: boolean
+                    created_at: string
+                }
+                Insert: {
+                    id?: string
+                    email: string
+                    phone?: string | null
+                    name?: string | null
+                    interests?: string[] | null
+                    journey_type?: string | null
+                    source?: string | null
+                    utm_source?: string | null
+                    utm_campaign?: string | null
+                    verified?: boolean
+                    subscribed?: boolean
                     created_at?: string
+                }
+                Update: {
+                    email?: string
+                    phone?: string | null
+                    name?: string | null
+                    interests?: string[] | null
+                    journey_type?: string | null
+                    source?: string | null
+                    verified?: boolean
+                    subscribed?: boolean
+                }
+            }
+
+            // Saved items
+            saved_items: {
+                Row: {
+                    id: string
+                    profile_id: string
+                    item_type: string
+                    item_id: string
+                    item_data: Json | null
+                    notes: string | null
+                    created_at: string
+                }
+                Insert: {
+                    id?: string
+                    profile_id: string
+                    item_type: string
+                    item_id: string
+                    item_data?: Json | null
+                    notes?: string | null
+                    created_at?: string
+                }
+                Update: {
+                    item_type?: string
+                    item_id?: string
+                    item_data?: Json | null
+                    notes?: string | null
                 }
             }
         }
@@ -223,9 +278,10 @@ export interface Database {
 }
 
 // Helper types
-export type Visitor = Database['public']['Tables']['visitors']['Row']
-export type JourneyProfile = Database['public']['Tables']['journey_profiles']['Row']
-export type ChatSession = Database['public']['Tables']['chat_sessions']['Row']
+export type Profile = Database['public']['Tables']['profiles']['Row']
+export type AnonymousVisitor = Database['public']['Tables']['anonymous_visitors']['Row']
+export type ChatTopic = Database['public']['Tables']['chat_topics']['Row']
 export type ChatMessage = Database['public']['Tables']['chat_messages']['Row']
-export type AnalyticsEvent = Database['public']['Tables']['analytics_events']['Row']
 export type PopularQuestion = Database['public']['Tables']['popular_questions']['Row']
+export type WaitlistEntry = Database['public']['Tables']['waitlist']['Row']
+export type SavedItem = Database['public']['Tables']['saved_items']['Row']

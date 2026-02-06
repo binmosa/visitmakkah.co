@@ -135,6 +135,7 @@ export function sanityCategoryToTCategory(category: SanityCategory, posts: Sanit
         description: category.description || '',
         color: (category.color || 'emerald') as any,
         count: posts.length,
+        date: new Date().toISOString().split('T')[0],
         thumbnail: {
             src: '/images/blog-category.jpg',
             alt: category.title,
@@ -156,6 +157,7 @@ export function createBlogCategory(posts: SanityPost[]): TCategory {
         description: 'Real experiences and insider knowledge from locals who know Makkah. Get authentic tips, hidden gems, and practical advice that you won\'t find in generic travel guides.',
         color: 'emerald' as any,
         count: posts.length,
+        date: new Date().toISOString().split('T')[0],
         thumbnail: {
             src: '/images/blog-cover.jpg',
             alt: 'Visit Makkah Blog',

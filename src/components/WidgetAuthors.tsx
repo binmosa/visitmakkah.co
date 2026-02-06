@@ -11,9 +11,9 @@ interface Props {
 
 const WidgetAuthors: FC<Props> = ({ className = 'bg-neutral-100 dark:bg-neutral-800', authors }) => {
   return (
-    <div className={clsx('widget-authors overflow-hidden rounded-3xl', className)}>
+    <div className={clsx('islamic-pattern-bg widget-authors overflow-hidden rounded-3xl', className)}>
       <WidgetHeading title="Hottest authors" viewAll={{ label: 'View all', href: '/#' }} />
-      <div className="flow-root">
+      <div className="relative z-10 flow-root">
         <div className="flex flex-col divide-y divide-neutral-200 dark:divide-neutral-700">
           {authors?.map((author) => (
             <CardAuthor
