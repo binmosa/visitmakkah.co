@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useId, useCallback } from 'react'
+import { useState, useId, useCallback, useEffect, useRef } from 'react'
 import { ChatKit, useChatKit } from '@openai/chatkit-react'
 import { useUserJourney } from '@/context/UserJourneyContext'
 import { SparklesIcon, Message01Icon } from '@hugeicons/core-free-icons'
@@ -156,6 +156,8 @@ function ActiveChatPanel({
     const { user } = useUserJourney()
     const visitorId = useId()
     const [error, setError] = useState<string | null>(null)
+    const [isReady, setIsReady] = useState(false)
+    const hasSentInitialQuestion = useRef(false)
 
     // Generate a stable user ID for the session
     const [userId] = useState(() => {
@@ -171,7 +173,7 @@ function ActiveChatPanel({
     })
 
     // Initialize ChatKit - only happens when this component mounts (user started chat)
-    const { control } = useChatKit({
+    const { control, sendUserMessage } = useChatKit({
         api: {
             async getClientSecret() {
                 try {
@@ -199,6 +201,7 @@ function ActiveChatPanel({
 
                     const data = await res.json()
                     setError(null)
+                    setIsReady(true)
                     return data.client_secret
                 } catch (err) {
                     console.error('Error getting client secret:', err)
@@ -208,6 +211,22 @@ function ActiveChatPanel({
             },
         },
     })
+
+    // Auto-send initial question when ChatKit is ready
+    useEffect(() => {
+        if (isReady && initialQuestion && !hasSentInitialQuestion.current && sendUserMessage) {
+            hasSentInitialQuestion.current = true
+            // Small delay to ensure ChatKit is fully initialized
+            const timer = setTimeout(() => {
+                try {
+                    sendUserMessage({ text: initialQuestion })
+                } catch (err) {
+                    console.error('Error sending initial message:', err)
+                }
+            }, 100)
+            return () => clearTimeout(timer)
+        }
+    }, [isReady, initialQuestion, sendUserMessage])
 
     // Error state
     if (error) {
