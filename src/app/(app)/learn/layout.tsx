@@ -14,9 +14,9 @@ export default async function Layout({ children }: { children: React.ReactNode }
                 subtitle="Guides, duas, and spiritual preparation"
                 navItems={learnNav?.children || []}
                 categoryId="learn"
-            >
-                {children}
-            </HubLayout>
+            />
+            {/* Children are rendered but HubLayout now contains the full ChatKit experience */}
+            <div className="hidden">{children}</div>
         </ApplicationLayout>
     )
 }

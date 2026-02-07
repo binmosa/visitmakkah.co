@@ -13,9 +13,8 @@ export default async function Layout({ children }: { children: React.ReactNode }
                 title="Local Tips"
                 subtitle="Navigate the city like a local"
                 navItems={currentNav?.children || []}
-            >
-                {children}
-            </HubLayout>
+            />
+            <div className="hidden">{children}</div>
         </ApplicationLayout>
     )
 }

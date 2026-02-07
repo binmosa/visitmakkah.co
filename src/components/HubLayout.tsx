@@ -5,7 +5,7 @@ import AIChatPanel from '@/components/AIPanel/AIChatPanel'
 import { TNavigationItem, getAISuggestions } from '@/data/navigation'
 import { useUserJourney } from '@/context/UserJourneyContext'
 import { usePathname } from 'next/navigation'
-import React, { ReactNode, useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
     // Prepare icons
@@ -35,7 +35,6 @@ import {
 } from '@hugeicons/core-free-icons'
 
 interface HubLayoutProps {
-    children: ReactNode
     title: string
     subtitle?: string
     navItems: TNavigationItem[]
@@ -77,7 +76,6 @@ const subItemIcons: Record<string, typeof ClipboardIcon> = {
 }
 
 const HubLayout = ({
-    children,
     title,
     subtitle,
     navItems,
@@ -111,12 +109,6 @@ const HubLayout = ({
         const item = navItems.find((n) => n.id === id)
         setActiveItemId(id)
         setActiveItem(item || null)
-
-        // Scroll to the AI chat panel for better UX
-        const chatPanel = document.querySelector('.lg\\:col-span-2')
-        if (chatPanel) {
-            chatPanel.scrollIntoView({ behavior: 'smooth', block: 'start' })
-        }
     }
 
     // Get the sub-topic key from the active item's href
@@ -194,66 +186,17 @@ const HubLayout = ({
                 </div>
             </div>
 
-            {/* Main Content Area - Responsive Layout */}
-            <div className="space-y-6 lg:grid lg:grid-cols-5 lg:gap-6 lg:space-y-0">
-                {/* AI Chat Panel - Full width on mobile, sidebar on desktop */}
-                <div className="lg:col-span-2">
-                    <div className="lg:sticky lg:top-24">
-                        <div className="h-[450px] sm:h-[500px] lg:h-[600px]">
-                            <AIChatPanel
-                                key={activeItemId || context}
-                                context={subTopic || context}
-                                contextLabel={activeItem?.name || title}
-                                placeholder={`Ask about ${activeItem?.name || title}...`}
-                                suggestedQuestions={suggestedQuestions}
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                {/* Content / Widgets Area */}
-                <div className="lg:col-span-3">
-                    <div
-                        id="hub-content-area"
-                        className="islamic-pattern-bg scroll-mt-16 overflow-hidden rounded-2xl border border-neutral-200 bg-white p-4 sm:p-6 dark:border-neutral-700 dark:bg-neutral-900"
-                    >
-                        {/* Dynamic content header */}
-                        {activeItem && (
-                            <div className="relative z-10 mb-5 flex items-center gap-3 border-b border-neutral-200 pb-5 dark:border-neutral-700">
-                                <div className="rounded-lg bg-primary-100 p-2 dark:bg-primary-900/30">
-                                    <HugeiconsIcon
-                                        icon={ActiveItemIcon}
-                                        className="size-5 text-primary-600 dark:text-primary-400"
-                                    />
-                                </div>
-                                <div>
-                                    <h2 className="font-semibold text-neutral-900 dark:text-white">
-                                        {activeItem.name}
-                                    </h2>
-                                    <p className="text-sm text-neutral-500 dark:text-neutral-400">
-                                        {activeItem.description || 'Ask the AI guide or explore below'}
-                                    </p>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Children content (widgets, etc.) */}
-                        <div className="relative z-10 min-h-[200px]">
-                            {children || (
-                                <div className="flex h-[200px] items-center justify-center text-center">
-                                    <div>
-                                        <p className="text-neutral-500 dark:text-neutral-400">
-                                            Select an action above or ask the AI assistant
-                                        </p>
-                                        <p className="mt-1 text-sm text-neutral-400 dark:text-neutral-500">
-                                            Content will appear here
-                                        </p>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
+            {/* AI Chat Panel - Full Width */}
+            <div className="h-[500px] sm:h-[550px] lg:h-[650px]">
+                <AIChatPanel
+                    key={activeItemId || context}
+                    context={subTopic || context}
+                    contextLabel={activeItem?.name || title}
+                    contextDescription={activeItem?.description}
+                    contextIcon={ActiveItemIcon}
+                    placeholder={`Ask about ${activeItem?.name || title}...`}
+                    suggestedQuestions={suggestedQuestions}
+                />
             </div>
         </div>
     )

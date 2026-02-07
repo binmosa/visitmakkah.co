@@ -203,6 +203,16 @@ export async function getNavigation(): Promise<TNavigationItem[]> {
         },
       ],
     },
+    {
+      id: 'blog',
+      href: '/blog',
+      name: 'Blog',
+      description: 'Articles, stories & guides',
+      icon: 'FaNewspaper',
+      relevantStages: ['planning', 'booked', 'in_makkah', 'returned'],
+      priority: 5,
+      actionVerb: 'read',
+    },
   ]
 }
 

@@ -13,9 +13,8 @@ export default async function Layout({ children }: { children: React.ReactNode }
                 title="Your Journey"
                 subtitle="Complete guides for Hajj, Umrah, rituals and spiritual preparation"
                 navItems={currentNav?.children || []}
-            >
-                {children}
-            </HubLayout>
+            />
+            <div className="hidden">{children}</div>
         </ApplicationLayout>
     )
 }

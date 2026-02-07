@@ -1,14 +1,16 @@
 'use client'
 
-import { useEffect, useState, useId, useCallback } from 'react'
+import { useState, useId, useCallback } from 'react'
 import { ChatKit, useChatKit } from '@openai/chatkit-react'
 import { useUserJourney } from '@/context/UserJourneyContext'
-import { SparklesIcon, Loading03Icon, Message01Icon } from '@hugeicons/core-free-icons'
-import { HugeiconsIcon } from '@hugeicons/react'
+import { SparklesIcon, Message01Icon } from '@hugeicons/core-free-icons'
+import { HugeiconsIcon, type HugeiconsProps } from '@hugeicons/react'
 
 interface AIChatPanelProps {
     context: string
     contextLabel: string
+    contextDescription?: string
+    contextIcon?: HugeiconsProps['icon']
     placeholder?: string
     suggestedQuestions?: string[]
 }
@@ -16,6 +18,8 @@ interface AIChatPanelProps {
 export default function AIChatPanel({
     context,
     contextLabel,
+    contextDescription,
+    contextIcon,
     placeholder = 'Ask me anything...',
     suggestedQuestions = [],
 }: AIChatPanelProps) {
@@ -36,6 +40,8 @@ export default function AIChatPanel({
         return (
             <ChatWelcomeScreen
                 contextLabel={contextLabel}
+                contextDescription={contextDescription}
+                contextIcon={contextIcon}
                 suggestedQuestions={suggestedQuestions}
                 onStartChat={handleStartChat}
             />
@@ -47,6 +53,7 @@ export default function AIChatPanel({
         <ActiveChatPanel
             context={context}
             contextLabel={contextLabel}
+            contextIcon={contextIcon}
             initialQuestion={initialQuestion}
         />
     )
@@ -55,63 +62,78 @@ export default function AIChatPanel({
 // Welcome screen - no API calls, just UI
 function ChatWelcomeScreen({
     contextLabel,
+    contextDescription,
+    contextIcon,
     suggestedQuestions,
     onStartChat,
 }: {
     contextLabel: string
+    contextDescription?: string
+    contextIcon?: HugeiconsProps['icon']
     suggestedQuestions: string[]
     onStartChat: (question?: string) => void
 }) {
+    const IconComponent = contextIcon || Message01Icon
+
     return (
         <div className="relative flex h-full flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-900">
-            <ChatKitHeader contextLabel={contextLabel} />
+            <ChatKitHeader contextLabel={contextLabel} contextIcon={contextIcon} />
 
             <div className="relative flex flex-1 flex-col items-center justify-center p-6">
-                <div className="relative z-10 rounded-full bg-primary-100 p-4 dark:bg-primary-900/30">
-                    <HugeiconsIcon icon={Message01Icon} className="size-8 text-primary-600 dark:text-primary-400" />
+                {/* Dynamic Icon */}
+                <div className="relative z-10 rounded-2xl bg-primary-100 p-5 dark:bg-primary-900/30">
+                    <HugeiconsIcon icon={IconComponent} className="size-10 text-primary-600 dark:text-primary-400" strokeWidth={1.5} />
                 </div>
 
-                <h3 className="relative z-10 mt-4 text-lg font-semibold text-neutral-900 dark:text-white">
-                    AI {contextLabel} Assistant
+                {/* Dynamic Title */}
+                <h3 className="relative z-10 mt-5 text-xl font-bold text-neutral-900 dark:text-white">
+                    {contextLabel}
                 </h3>
-                <p className="relative z-10 mt-2 max-w-xs text-center text-sm text-neutral-500 dark:text-neutral-400">
-                    Get personalized guidance and answers to your questions
+
+                {/* Dynamic Description */}
+                <p className="relative z-10 mt-2 max-w-md text-center text-sm leading-relaxed text-neutral-500 dark:text-neutral-400">
+                    {contextDescription || 'Get personalized AI guidance and answers to your questions'}
                 </p>
 
-                {/* Suggested questions */}
+                {/* Suggested questions as action buttons */}
                 {suggestedQuestions.length > 0 && (
-                    <div className="relative z-10 mt-6 w-full max-w-sm space-y-2">
-                        <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400">
-                            Suggested questions:
+                    <div className="relative z-10 mt-8 w-full max-w-lg">
+                        <p className="mb-3 text-center text-xs font-semibold uppercase tracking-wide text-neutral-400 dark:text-neutral-500">
+                            Quick Actions
                         </p>
-                        {suggestedQuestions.slice(0, 3).map((question, index) => (
-                            <button
-                                key={index}
-                                onClick={() => onStartChat(question)}
-                                className="w-full rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-2 text-left text-sm text-neutral-700 transition-colors hover:bg-neutral-100 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700"
-                            >
-                                {question}
-                            </button>
-                        ))}
+                        <div className="grid gap-2 sm:grid-cols-2">
+                            {suggestedQuestions.slice(0, 4).map((question, index) => (
+                                <button
+                                    key={index}
+                                    onClick={() => onStartChat(question)}
+                                    className="group flex items-center gap-3 rounded-xl border border-neutral-200 bg-white px-4 py-3 text-left text-sm text-neutral-700 transition-all hover:border-primary-300 hover:bg-primary-50 hover:shadow-sm dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:border-primary-600 dark:hover:bg-primary-900/20"
+                                >
+                                    <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-neutral-100 text-neutral-500 transition-colors group-hover:bg-primary-100 group-hover:text-primary-600 dark:bg-neutral-700 dark:group-hover:bg-primary-900/30 dark:group-hover:text-primary-400">
+                                        <HugeiconsIcon icon={SparklesIcon} className="size-4" strokeWidth={1.5} />
+                                    </span>
+                                    <span className="line-clamp-2">{question}</span>
+                                </button>
+                            ))}
+                        </div>
                     </div>
                 )}
 
                 {/* Start chat button */}
                 <button
                     onClick={() => onStartChat()}
-                    className="relative z-10 mt-6 rounded-xl bg-primary-600 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-700"
+                    className="relative z-10 mt-8 rounded-xl bg-primary-600 px-8 py-3 text-sm font-semibold text-white transition-all hover:bg-primary-700 hover:shadow-lg hover:shadow-primary-500/25"
                 >
                     Start Conversation
                 </button>
 
-                {/* Islamic pattern overlay */}
+                {/* Islamic pattern overlay - left side only */}
                 <div
-                    className="pointer-events-none absolute inset-0 z-0"
+                    className="pointer-events-none absolute inset-0 z-0 opacity-30"
                     style={{
                         backgroundImage: 'url(/images/islamic-pattern.png)',
-                        backgroundPosition: 'left top',
-                        backgroundRepeat: 'repeat-y',
-                        backgroundSize: 'auto 300px',
+                        backgroundPosition: 'left center',
+                        backgroundRepeat: 'no-repeat',
+                        backgroundSize: 'auto 100%',
                     }}
                 />
             </div>
@@ -123,10 +145,12 @@ function ChatWelcomeScreen({
 function ActiveChatPanel({
     context,
     contextLabel,
+    contextIcon,
     initialQuestion,
 }: {
     context: string
     contextLabel: string
+    contextIcon?: HugeiconsProps['icon']
     initialQuestion: string | null
 }) {
     const { user } = useUserJourney()
@@ -189,7 +213,7 @@ function ActiveChatPanel({
     if (error) {
         return (
             <div className="islamic-pattern-bg flex h-full flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-900">
-                <ChatKitHeader contextLabel={contextLabel} />
+                <ChatKitHeader contextLabel={contextLabel} contextIcon={contextIcon} />
                 <div className="relative z-10 flex flex-1 items-center justify-center p-4">
                     <div className="text-center">
                         <p className="text-sm text-red-600 dark:text-red-400">
@@ -209,7 +233,7 @@ function ActiveChatPanel({
 
     return (
         <div className="islamic-pattern-bg flex h-full flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-900">
-            <ChatKitHeader contextLabel={contextLabel} />
+            <ChatKitHeader contextLabel={contextLabel} contextIcon={contextIcon} />
 
             {/* ChatKit Component - Full chat UI with input */}
             <div className="relative z-10 flex-1 overflow-hidden">
@@ -233,18 +257,26 @@ function ActiveChatPanel({
 }
 
 // Shared header component
-function ChatKitHeader({ contextLabel }: { contextLabel: string }) {
+function ChatKitHeader({
+    contextLabel,
+    contextIcon,
+}: {
+    contextLabel: string
+    contextIcon?: HugeiconsProps['icon']
+}) {
+    const IconComponent = contextIcon || SparklesIcon
+
     return (
         <div className="relative z-10 flex items-center gap-3 border-b border-neutral-200 px-4 py-3 dark:border-neutral-700">
-            <div className="rounded-lg bg-gradient-to-br from-primary-500 to-primary-600 p-2">
-                <HugeiconsIcon icon={SparklesIcon} className="size-4 text-white" />
+            <div className="rounded-lg bg-primary-100 p-2 dark:bg-primary-900/30">
+                <HugeiconsIcon icon={IconComponent} className="size-4 text-primary-600 dark:text-primary-400" strokeWidth={1.5} />
             </div>
             <div>
                 <p className="text-sm font-semibold text-neutral-900 dark:text-white">
-                    AI {contextLabel} Guide
+                    {contextLabel}
                 </p>
                 <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                    Powered by OpenAI
+                    AI-Powered Guide
                 </p>
             </div>
         </div>

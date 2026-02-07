@@ -13,9 +13,8 @@ export default async function Layout({ children }: { children: React.ReactNode }
                 title="Stay & Food"
                 subtitle="Find the best hotels and dining"
                 navItems={currentNav?.children || []}
-            >
-                {children}
-            </HubLayout>
+            />
+            <div className="hidden">{children}</div>
         </ApplicationLayout>
     )
 }

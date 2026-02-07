@@ -9,6 +9,7 @@ import {
   BookOpen01Icon,
   MapsIcon,
   Idea01Icon,
+  News01Icon,
   Route01Icon,
   Passport01Icon,
   Backpack03Icon,
@@ -39,6 +40,7 @@ const navIcons: Record<string, typeof ClipboardIcon> = {
   'learn': BookOpen01Icon,
   'explore': MapsIcon,
   'tips': Idea01Icon,
+  'blog': News01Icon,
   // Prepare children
   'prepare-itinerary': Route01Icon,
   'prepare-visa': Passport01Icon,
