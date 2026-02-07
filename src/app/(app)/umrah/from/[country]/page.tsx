@@ -293,15 +293,15 @@ export default async function UmrahFromCountryPage({ params }: PageProps) {
 
         {/* CTA */}
         <div className="mt-12 p-8 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl text-white text-center">
-          <h2 className="text-2xl font-bold mb-4">Ready to Start Your Journey?</h2>
+          <h2 className="text-2xl font-bold mb-4">Plan Your Umrah from {country.name}</h2>
           <p className="mb-6 opacity-90">
-            Learn how to perform Umrah step-by-step with our comprehensive guide.
+            Get personalized guidance from our AI assistant. Visa help, itinerary planning, budget tips — all tailored for {country.name} pilgrims.
           </p>
           <Link
-            href="/learn"
+            href={`/?from=${countrySlug}`}
             className="inline-block bg-white text-emerald-600 font-semibold px-6 py-3 rounded-lg hover:bg-emerald-50 transition-colors"
           >
-            Complete Umrah Guide →
+            Start Planning with AI →
           </Link>
         </div>
 
