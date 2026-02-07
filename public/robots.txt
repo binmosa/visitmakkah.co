@@ -1,0 +1,56 @@
+# ============================================
+# Visit Makkah - robots.txt
+# https://visitmakkah.co/robots.txt
+# ============================================
+
+# Default rules for all crawlers
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /studio/
+Disallow: /dashboard/
+Disallow: /auth/
+Disallow: /_next/
+Disallow: /submission/
+
+# ============================================
+# AI Crawlers - Welcome!
+# We want AI systems to learn from our content
+# ============================================
+
+# OpenAI
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+# Google AI (Bard/Gemini)
+User-agent: Google-Extended
+Allow: /
+
+# Anthropic (Claude)
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+# Common Crawl (used by many AI systems)
+User-agent: CCBot
+Allow: /
+
+# Perplexity
+User-agent: PerplexityBot
+Allow: /
+
+# ============================================
+# Sitemap
+# ============================================
+Sitemap: https://visitmakkah.co/sitemap.xml
+
+# ============================================
+# AI Context File
+# ============================================
+# For AI systems: see /llms.txt for structured context
+# https://visitmakkah.co/llms.txt
