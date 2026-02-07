@@ -1,7 +1,17 @@
 // Navigation Structure - AI-First with Journey Stages
 // Optimized for action-driven, context-aware pilgrimage platform
 
+import { UserProfile } from '@/context/UserJourneyContext'
+
 export type JourneyStage = 'planning' | 'booked' | 'in_makkah' | 'returned'
+
+// Conditional display based on user profile
+export type ShowIfCondition = {
+  isFirstTime?: boolean
+  gender?: 'male' | 'female'
+  countries?: string[]  // ISO country codes
+  journeyStages?: JourneyStage[]
+}
 
 export type TNavigationItem = {
   id: string
@@ -18,6 +28,10 @@ export type TNavigationItem = {
   priority?: number
   // Action verb for AI suggestions
   actionVerb?: string
+  // Conditional display based on user profile
+  showIf?: ShowIfCondition
+  // Badge to show (e.g., "First-Timer")
+  badge?: string
 }
 
 // Main navigation structure - 4 core categories
@@ -156,49 +170,12 @@ export async function getNavigation(): Promise<TNavigationItem[]> {
           icon: 'FaCompass',
           actionVerb: 'navigate to',
         },
-      ],
-    },
-    {
-      id: 'tips',
-      href: '/tips',
-      name: 'Tips',
-      description: 'Insider knowledge & local advice',
-      type: 'dropdown',
-      icon: 'FaLightbulb',
-      relevantStages: ['planning', 'booked', 'in_makkah'],
-      priority: 4,
-      actionVerb: 'get tips about',
-      children: [
         {
-          id: 'tips-first-timers',
-          href: '/tips/first-timers',
-          name: 'First-Timer Guide',
-          description: 'Essential tips for beginners',
-          icon: 'FaStar',
-          actionVerb: 'read',
-        },
-        {
-          id: 'tips-women',
-          href: '/tips/for-women',
-          name: 'For Women',
-          description: 'Women-specific guidance',
-          icon: 'FaFemale',
-          actionVerb: 'read',
-        },
-        {
-          id: 'tips-ramadan',
-          href: '/tips/ramadan',
-          name: 'Ramadan Visit',
-          description: 'Special Ramadan advice',
-          icon: 'FaMoon',
-          actionVerb: 'prepare for',
-        },
-        {
-          id: 'tips-shortcuts',
-          href: '/tips/shortcuts',
-          name: 'Secret Shortcuts',
-          description: 'Insider routes & hacks',
-          icon: 'FaMapSigns',
+          id: 'explore-local-tips',
+          href: '/explore/local-tips',
+          name: 'Local Tips',
+          description: 'Insider knowledge & advice',
+          icon: 'FaLightbulb',
           actionVerb: 'discover',
         },
       ],
@@ -241,27 +218,28 @@ export async function getContextAwareNavigation(journeyStage: JourneyStage): Pro
 }
 
 // Get suggested actions based on journey stage
+// Using query parameters to pre-select sub-menu items on hub pages
 export function getSuggestedActions(journeyStage: JourneyStage): { label: string; href: string; description: string }[] {
   const suggestions: Record<JourneyStage, { label: string; href: string; description: string }[]> = {
     planning: [
-      { label: 'Build My Itinerary', href: '/prepare/build-itinerary', description: 'Let AI create your perfect trip plan' },
-      { label: 'Learn Umrah Steps', href: '/learn/umrah-guide', description: 'Understand the rituals before you go' },
-      { label: 'Calculate Budget', href: '/prepare/calculate-budget', description: 'Know how much you need' },
+      { label: 'Build My Itinerary', href: '/prepare?action=build-itinerary', description: 'Let AI create your perfect trip plan' },
+      { label: 'Learn Umrah Steps', href: '/learn?action=umrah-guide', description: 'Understand the rituals before you go' },
+      { label: 'Calculate Budget', href: '/prepare?action=calculate-budget', description: 'Know how much you need' },
     ],
     booked: [
-      { label: 'Pack My Bag', href: '/prepare/pack-my-bag', description: 'Don\'t forget anything important' },
-      { label: 'Get My Visa', href: '/prepare/get-visa', description: 'Complete your documentation' },
-      { label: 'Learn the Rituals', href: '/learn/step-by-step', description: 'Practice before you arrive' },
+      { label: 'Pack My Bag', href: '/prepare?action=pack-my-bag', description: 'Don\'t forget anything important' },
+      { label: 'Get My Visa', href: '/prepare?action=get-visa', description: 'Complete your documentation' },
+      { label: 'Learn the Rituals', href: '/learn?action=step-by-step', description: 'Practice before you arrive' },
     ],
     in_makkah: [
-      { label: 'Check Crowds', href: '/explore/check-crowds', description: 'Best time for Tawaf now' },
-      { label: 'Find Food', href: '/explore/find-food', description: 'Restaurants open near you' },
-      { label: 'Navigate to Haram', href: '/explore/navigate', description: 'Fastest route from your hotel' },
+      { label: 'Check Crowds', href: '/explore?action=check-crowds', description: 'Best time for Tawaf now' },
+      { label: 'Find Food', href: '/explore?action=find-food', description: 'Restaurants open near you' },
+      { label: 'Navigate to Haram', href: '/explore?action=navigate', description: 'Fastest route from your hotel' },
     ],
     returned: [
-      { label: 'Share My Journey', href: '/my-journey/share', description: 'Create a shareable memory' },
-      { label: 'Leave a Tip', href: '/tips/contribute', description: 'Help future pilgrims' },
-      { label: 'Plan Next Visit', href: '/prepare/build-itinerary', description: 'Start planning again' },
+      { label: 'Share My Journey', href: '/learn', description: 'Create a shareable memory' },
+      { label: 'Leave a Tip', href: '/explore?action=local-tips', description: 'Help future pilgrims' },
+      { label: 'Plan Next Visit', href: '/prepare?action=build-itinerary', description: 'Start planning again' },
     ],
   }
 
@@ -442,4 +420,159 @@ export const getCurrencies = async () => {
     { id: 'AED', name: 'AED', description: 'UAE Dirham', href: '#' },
     { id: 'MYR', name: 'MYR', description: 'Malaysian Ringgit', href: '#' },
   ]
+}
+
+// ============================================
+// Tips Topics - Used for AI Chat Suggestions
+// (Merged from standalone Tips category)
+// ============================================
+
+export interface TipTopic {
+  id: string
+  name: string
+  description: string
+  showIf?: ShowIfCondition
+  aiSuggestions: string[]
+}
+
+export const tipsTopics: TipTopic[] = [
+  {
+    id: 'first-timers',
+    name: 'First-Timer Guide',
+    description: 'Essential tips for beginners',
+    showIf: { isFirstTime: true },
+    aiSuggestions: [
+      'What I wish I knew before Umrah',
+      'Biggest mistakes first-timers make',
+      'How to prepare mentally for my first pilgrimage',
+    ],
+  },
+  {
+    id: 'for-women',
+    name: 'For Women',
+    description: 'Women-specific guidance',
+    showIf: { gender: 'female' },
+    aiSuggestions: [
+      'Tips for women traveling alone',
+      'Where is the women\'s prayer area?',
+      'What to wear as a woman in Makkah',
+    ],
+  },
+  {
+    id: 'ramadan',
+    name: 'Ramadan Visit',
+    description: 'Special Ramadan advice',
+    aiSuggestions: [
+      'Umrah during Ramadan tips',
+      'Where to have Iftar near Haram?',
+      'How crowded is Ramadan?',
+    ],
+  },
+  {
+    id: 'shortcuts',
+    name: 'Secret Shortcuts',
+    description: 'Insider routes & hacks',
+    aiSuggestions: [
+      'Secret entrances to Haram',
+      'Fastest routes to avoid crowds',
+      'Local tips only residents know',
+    ],
+  },
+]
+
+// ============================================
+// Personalized Navigation Functions
+// ============================================
+
+// Check if an item matches the showIf conditions
+function matchesShowIfCondition(showIf: ShowIfCondition | undefined, profile: UserProfile | null): boolean {
+  if (!showIf) return true // No condition means always show
+  if (!profile) return true // No profile means show all
+
+  // Check isFirstTime condition
+  if (showIf.isFirstTime !== undefined && profile.isFirstTime !== showIf.isFirstTime) {
+    return false
+  }
+
+  // Check gender condition
+  if (showIf.gender && profile.gender !== showIf.gender) {
+    return false
+  }
+
+  // Check country condition
+  if (showIf.countries && profile.country && !showIf.countries.includes(profile.country)) {
+    return false
+  }
+
+  // Check journey stage condition
+  if (showIf.journeyStages && profile.journeyStage && !showIf.journeyStages.includes(profile.journeyStage)) {
+    return false
+  }
+
+  return true
+}
+
+// Apply personalization badges/prefixes
+function applyPersonalization(item: TNavigationItem, profile: UserProfile | null): TNavigationItem {
+  if (!profile) return item
+
+  const result = { ...item }
+
+  // Add "First-Timer" badge for first-time users on relevant items
+  if (profile.isFirstTime && item.id.includes('first-timer')) {
+    result.badge = 'For You'
+  }
+
+  return result
+}
+
+// Get personalized navigation based on user profile
+export async function getPersonalizedNavigation(userProfile: UserProfile | null): Promise<TNavigationItem[]> {
+  const navigation = await getNavigation()
+
+  if (!userProfile || !userProfile.completedOnboarding) {
+    return navigation
+  }
+
+  // Filter and transform navigation items
+  return navigation
+    .filter((category) => matchesShowIfCondition(category.showIf, userProfile))
+    .map((category) => {
+      if (!category.children) {
+        return applyPersonalization(category, userProfile)
+      }
+
+      // Filter children based on showIf conditions
+      const filteredChildren = category.children
+        .filter((child) => matchesShowIfCondition(child.showIf, userProfile))
+        .map((child) => applyPersonalization(child, userProfile))
+
+      return {
+        ...applyPersonalization(category, userProfile),
+        children: filteredChildren,
+      }
+    })
+}
+
+// Get personalized AI suggestions based on user profile
+export function getPersonalizedAISuggestions(context: string, profile: UserProfile | null): string[] {
+  const baseSuggestions = getAISuggestions(context, profile?.journeyStage || 'planning')
+
+  if (!profile || !profile.completedOnboarding) return baseSuggestions
+
+  // Get personalized suggestions from tips topics
+  const personalizedTips = tipsTopics
+    .filter((topic) => matchesShowIfCondition(topic.showIf, profile))
+    .flatMap((topic) => topic.aiSuggestions.slice(0, 1)) // Get first suggestion from each matching topic
+
+  // For local-tips context, show all relevant tips
+  if (context === 'local-tips' || context === 'explore-local-tips') {
+    const allTips = tipsTopics
+      .filter((topic) => matchesShowIfCondition(topic.showIf, profile))
+      .flatMap((topic) => topic.aiSuggestions)
+    return allTips.slice(0, 4)
+  }
+
+  // Combine personalized tips with base suggestions
+  return [...personalizedTips, ...baseSuggestions].slice(0, 4)
 }

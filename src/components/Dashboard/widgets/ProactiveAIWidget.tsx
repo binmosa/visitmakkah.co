@@ -30,7 +30,7 @@ export default function ProactiveAIWidget() {
                     id: 'packing-urgent',
                     message: `Your departure is in ${daysUntilDeparture} days. Your packing list is ${user.packingProgress}% complete. Would you like help finishing it?`,
                     actions: [
-                        { label: 'Complete Packing List', href: '/smart-tools/packing-list' },
+                        { label: 'Complete Packing List', href: '/prepare?action=pack-my-bag' },
                         { label: 'Remind Later' },
                     ],
                 })
@@ -39,7 +39,7 @@ export default function ProactiveAIWidget() {
                     id: 'prep-reminder',
                     message: `${daysUntilDeparture} days until departure. Have you completed your visa requirements and vaccinations?`,
                     actions: [
-                        { label: 'Check Requirements', href: '/plan/visa-steps' },
+                        { label: 'Check Requirements', href: '/prepare?action=get-visa' },
                         { label: 'Already Done' },
                     ],
                 })
@@ -52,7 +52,7 @@ export default function ProactiveAIWidget() {
                 id: 'first-time-guide',
                 message: `As a first-time visitor, I recommend familiarizing yourself with the ${user.journeyType === 'hajj' ? 'Hajj' : 'Umrah'} rituals. Would you like a step-by-step guide?`,
                 actions: [
-                    { label: 'View Guide', href: `/your-journey/${user.journeyType || 'umrah'}` },
+                    { label: 'View Guide', href: `/learn?action=${user.journeyType === 'hajj' ? 'hajj-guide' : 'umrah-guide'}` },
                     { label: 'Maybe Later' },
                 ],
             })
@@ -64,7 +64,7 @@ export default function ProactiveAIWidget() {
                 id: 'planning-help',
                 message: 'Would you like help creating a personalized trip timeline based on your preferences?',
                 actions: [
-                    { label: 'Create Timeline', href: '/plan/timeline-builder' },
+                    { label: 'Create Timeline', href: '/prepare?action=build-itinerary' },
                     { label: 'Not Now' },
                 ],
             })
@@ -73,7 +73,7 @@ export default function ProactiveAIWidget() {
                 id: 'in-makkah-help',
                 message: 'You\'re in Makkah! Would you like real-time crowd information and the best times for Tawaf today?',
                 actions: [
-                    { label: 'Check Crowd Levels', href: '/local-tips/hajj-crowd-flow' },
+                    { label: 'Check Crowd Levels', href: '/explore?action=check-crowds' },
                     { label: 'View Prayer Times' },
                 ],
             })
@@ -85,7 +85,7 @@ export default function ProactiveAIWidget() {
                 id: 'default',
                 message: 'Assalamu Alaikum! How can I help you prepare for your journey today?',
                 actions: [
-                    { label: 'Explore Guides', href: '/your-journey' },
+                    { label: 'Explore Guides', href: '/learn' },
                     { label: 'Ask a Question' },
                 ],
             })

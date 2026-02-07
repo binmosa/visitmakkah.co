@@ -1,11 +1,10 @@
-import { getNavigation } from '@/data/navigation'
 import Logo from '@/shared/Logo'
 import SwitchDarkMode from '@/shared/SwitchDarkMode'
 import clsx from 'clsx'
 import { FC } from 'react'
 import AvatarDropdown from './AvatarDropdown'
 import HamburgerBtnMenu from './HamburgerBtnMenu'
-import Navigation from './Navigation/Navigation'
+import ClientNavigation from './Navigation/ClientNavigation'
 import NotifyDropdown from './NotifyDropdown'
 
 interface Props {
@@ -13,9 +12,7 @@ interface Props {
   className?: string
 }
 
-const Header2: FC<Props> = async ({ bottomBorder, className }) => {
-  const navigationMenu = await getNavigation()
-
+const Header2: FC<Props> = ({ bottomBorder, className }) => {
   return (
     <div
       className={clsx(
@@ -30,7 +27,7 @@ const Header2: FC<Props> = async ({ bottomBorder, className }) => {
         </div>
 
         <div className="mx-4 hidden flex-2 justify-center lg:flex">
-          <Navigation menu={navigationMenu} />
+          <ClientNavigation />
         </div>
 
         <div className="flex flex-1 items-center justify-end gap-x-0.5">

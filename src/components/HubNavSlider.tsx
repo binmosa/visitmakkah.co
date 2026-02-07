@@ -22,12 +22,7 @@ import {
     Restaurant01Icon,
     UserGroup03Icon,
     CompassIcon,
-    // Tips icons
     Idea01Icon,
-    StarIcon,
-    UserLove01Icon,
-    Moon02Icon,
-    Location01Icon,
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 
@@ -51,12 +46,7 @@ const iconMap: Record<string, typeof ClipboardIcon> = {
     'find-food': Restaurant01Icon,
     'check-crowds': UserGroup03Icon,
     'navigate': CompassIcon,
-    // Tips category
-    'tips': Idea01Icon,
-    'first-timers': StarIcon,
-    'for-women': UserLove01Icon,
-    'ramadan': Moon02Icon,
-    'shortcuts': Location01Icon,
+    'local-tips': Idea01Icon,
 }
 
 interface HubNavCardProps {

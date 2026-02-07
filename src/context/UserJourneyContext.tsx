@@ -6,12 +6,15 @@ import React, { createContext, useContext, useEffect, useState, ReactNode } from
 export type JourneyStage = 'planning' | 'booked' | 'in_makkah' | 'returned' | null
 export type JourneyType = 'hajj' | 'umrah' | 'both' | null
 export type TravelGroup = 'solo' | 'couple' | 'family' | 'group' | null
+export type Gender = 'male' | 'female' | null
 
 export interface UserProfile {
     // Onboarding data
     journeyStage: JourneyStage
     journeyType: JourneyType
     isFirstTime: boolean | null
+    gender: Gender
+    country: string | null  // ISO country code (e.g., 'US', 'SA', 'PK')
     travelGroup: TravelGroup
     travelDates: {
         departure: string | null
@@ -49,6 +52,8 @@ const defaultUser: UserProfile = {
     journeyStage: null,
     journeyType: null,
     isFirstTime: null,
+    gender: null,
+    country: null,
     travelGroup: null,
     travelDates: {
         departure: null,

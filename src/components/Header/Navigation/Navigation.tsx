@@ -5,7 +5,6 @@ import {
   ClipboardIcon,
   BookOpen01Icon,
   MapsIcon,
-  Idea01Icon,
   News01Icon,
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
@@ -19,7 +18,6 @@ const navIcons: Record<string, typeof ClipboardIcon> = {
   'prepare': ClipboardIcon,
   'learn': BookOpen01Icon,
   'explore': MapsIcon,
-  'tips': Idea01Icon,
   'blog': News01Icon,
 }
 
@@ -47,6 +45,11 @@ const NavLink = ({ menuItem, isActive }: { menuItem: TNavigationItem; isActive: 
         )}
       />
       {menuItem.name}
+      {menuItem.badge && (
+        <span className="ml-1 rounded-full bg-primary-100 px-1.5 py-0.5 text-[10px] font-semibold text-primary-700 dark:bg-primary-900/50 dark:text-primary-300">
+          {menuItem.badge}
+        </span>
+      )}
     </Link>
   )
 }

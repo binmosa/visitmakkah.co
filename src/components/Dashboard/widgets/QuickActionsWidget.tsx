@@ -29,12 +29,13 @@ interface QuickAction {
 }
 
 // All available quick actions with context-awareness
+// Using query parameters to pre-select sub-menu items on hub pages
 const allQuickActions: QuickAction[] = [
     // Prepare actions
     {
         label: 'Build Itinerary',
         description: 'AI trip planner',
-        href: '/prepare/build-itinerary',
+        href: '/prepare?action=build-itinerary',
         icon: Route01Icon,
         color: 'from-blue-500 to-blue-600',
         relevantStages: ['planning', 'booked'],
@@ -42,7 +43,7 @@ const allQuickActions: QuickAction[] = [
     {
         label: 'Pack My Bag',
         description: 'Smart checklist',
-        href: '/prepare/pack-my-bag',
+        href: '/prepare?action=pack-my-bag',
         icon: ClipboardIcon,
         color: 'from-indigo-500 to-indigo-600',
         relevantStages: ['planning', 'booked'],
@@ -51,7 +52,7 @@ const allQuickActions: QuickAction[] = [
     {
         label: 'Umrah Guide',
         description: 'Step-by-step',
-        href: '/learn/umrah-guide',
+        href: '/learn?action=umrah-guide',
         icon: Kaaba02Icon,
         color: 'from-primary-500 to-primary-600',
         relevantStages: ['planning', 'booked', 'in_makkah'],
@@ -59,7 +60,7 @@ const allQuickActions: QuickAction[] = [
     {
         label: 'Learn Rituals',
         description: 'Tawaf, Sai & more',
-        href: '/learn/step-by-step',
+        href: '/learn?action=step-by-step',
         icon: BookOpen01Icon,
         color: 'from-emerald-500 to-emerald-600',
         relevantStages: ['planning', 'booked', 'in_makkah'],
@@ -68,7 +69,7 @@ const allQuickActions: QuickAction[] = [
     {
         label: 'Find Hotels',
         description: 'Near Haram gates',
-        href: '/explore/find-hotels',
+        href: '/explore?action=find-hotels',
         icon: Building03Icon,
         color: 'from-orange-500 to-orange-600',
         relevantStages: ['planning', 'booked'],
@@ -76,7 +77,7 @@ const allQuickActions: QuickAction[] = [
     {
         label: 'Find Food',
         description: 'Restaurants nearby',
-        href: '/explore/find-food',
+        href: '/explore?action=find-food',
         icon: Restaurant01Icon,
         color: 'from-red-500 to-red-600',
         relevantStages: ['booked', 'in_makkah'],
@@ -84,7 +85,7 @@ const allQuickActions: QuickAction[] = [
     {
         label: 'Check Crowds',
         description: 'Best Tawaf times',
-        href: '/explore/check-crowds',
+        href: '/explore?action=check-crowds',
         icon: UserGroup03Icon,
         color: 'from-violet-500 to-violet-600',
         relevantStages: ['in_makkah'],
@@ -92,7 +93,7 @@ const allQuickActions: QuickAction[] = [
     {
         label: 'Navigate',
         description: 'Routes & gates',
-        href: '/explore/navigate',
+        href: '/explore?action=navigate',
         icon: MapsIcon,
         color: 'from-cyan-500 to-cyan-600',
         relevantStages: ['in_makkah'],
@@ -101,7 +102,7 @@ const allQuickActions: QuickAction[] = [
     {
         label: 'Get Tips',
         description: 'Insider advice',
-        href: '/tips',
+        href: '/explore?action=local-tips',
         icon: Idea01Icon,
         color: 'from-amber-500 to-amber-600',
         relevantStages: ['planning', 'booked', 'in_makkah', 'returned'],

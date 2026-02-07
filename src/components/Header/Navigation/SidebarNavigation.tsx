@@ -22,10 +22,6 @@ import {
   Restaurant01Icon,
   UserGroup03Icon,
   CompassIcon,
-  StarIcon,
-  UserLove01Icon,
-  Moon02Icon,
-  Location01Icon,
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import clsx from 'clsx'
@@ -39,7 +35,6 @@ const navIcons: Record<string, typeof ClipboardIcon> = {
   'prepare': ClipboardIcon,
   'learn': BookOpen01Icon,
   'explore': MapsIcon,
-  'tips': Idea01Icon,
   'blog': News01Icon,
   // Prepare children
   'prepare-itinerary': Route01Icon,
@@ -56,11 +51,7 @@ const navIcons: Record<string, typeof ClipboardIcon> = {
   'explore-food': Restaurant01Icon,
   'explore-crowds': UserGroup03Icon,
   'explore-navigate': CompassIcon,
-  // Tips children
-  'tips-first-timers': StarIcon,
-  'tips-women': UserLove01Icon,
-  'tips-ramadan': Moon02Icon,
-  'tips-shortcuts': Location01Icon,
+  'explore-local-tips': Idea01Icon,
 }
 
 interface Props {
@@ -184,7 +175,12 @@ const SidebarNavigation: React.FC<Props> = ({ data }) => {
                           )}
                         />
                       )}
-                      <span>{child.name}</span>
+                      <span className="flex-1">{child.name}</span>
+                      {child.badge && (
+                        <span className="rounded-full bg-primary-100 px-1.5 py-0.5 text-[10px] font-semibold text-primary-700 dark:bg-primary-900/50 dark:text-primary-300">
+                          {child.badge}
+                        </span>
+                      )}
                     </Link>
                   )
                 })}

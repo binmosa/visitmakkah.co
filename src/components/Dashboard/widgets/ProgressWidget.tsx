@@ -61,14 +61,14 @@ export default function ProgressWidget() {
                 label="Preparation"
                 progress={user.preparationProgress}
                 icon={TaskDone01Icon}
-                href="/smart-tools/trip-planner"
+                href="/prepare?action=build-itinerary"
                 color="primary"
             />
             <ProgressBar
                 label="Packing"
                 progress={user.packingProgress}
                 icon={Backpack03Icon}
-                href="/smart-tools/packing-list"
+                href="/prepare?action=pack-my-bag"
                 color="secondary"
             />
         </div>

@@ -1,6 +1,7 @@
 'use client'
 
-import { useUserJourney, JourneyStage, JourneyType, TravelGroup } from '@/context/UserJourneyContext'
+import { useUserJourney, JourneyStage, JourneyType, TravelGroup, Gender } from '@/context/UserJourneyContext'
+import { countries, filterCountries, detectCountryFromIP, getCountryByCode } from '@/data/countries'
 import {
     Calendar03Icon,
     AirplaneTakeOff01Icon,
@@ -11,12 +12,16 @@ import {
     UserMultiple02Icon,
     HeartCheckIcon,
     Mosque01Icon,
+    Male02Icon,
+    Female02Icon,
+    Search01Icon,
+    GlobalIcon,
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
-type OnboardingStep = 'welcome' | 'stage' | 'type' | 'firstTime' | 'group' | 'dates' | 'complete'
+type OnboardingStep = 'welcome' | 'stage' | 'type' | 'firstTime' | 'gender' | 'country' | 'group' | 'dates' | 'complete'
 
 interface StageOption {
     value: JourneyStage
@@ -96,12 +101,31 @@ export default function JourneyOnboarding() {
         journeyStage: null as JourneyStage,
         journeyType: null as JourneyType,
         isFirstTime: null as boolean | null,
+        gender: null as Gender,
+        country: null as string | null,
         travelGroup: null as TravelGroup,
         travelDates: {
             departure: '',
             return: '',
         },
     })
+
+    // Country selection state
+    const [countrySearch, setCountrySearch] = useState('')
+    const [detectedCountry, setDetectedCountry] = useState<string | null>(null)
+    const [isDetectingCountry, setIsDetectingCountry] = useState(true)
+
+    // Detect country from IP on mount
+    useEffect(() => {
+        detectCountryFromIP().then((code) => {
+            if (code) {
+                setDetectedCountry(code)
+                // Pre-fill the form with detected country
+                setFormData((prev) => ({ ...prev, country: code }))
+            }
+            setIsDetectingCountry(false)
+        })
+    }, [])
 
     const handleComplete = () => {
         completeOnboarding({
@@ -113,19 +137,19 @@ export default function JourneyOnboarding() {
         })
     }
 
+    const allSteps: OnboardingStep[] = ['welcome', 'stage', 'type', 'firstTime', 'gender', 'country', 'group', 'dates', 'complete']
+
     const nextStep = () => {
-        const steps: OnboardingStep[] = ['welcome', 'stage', 'type', 'firstTime', 'group', 'dates', 'complete']
-        const currentIndex = steps.indexOf(step)
-        if (currentIndex < steps.length - 1) {
-            setStep(steps[currentIndex + 1])
+        const currentIndex = allSteps.indexOf(step)
+        if (currentIndex < allSteps.length - 1) {
+            setStep(allSteps[currentIndex + 1])
         }
     }
 
     const prevStep = () => {
-        const steps: OnboardingStep[] = ['welcome', 'stage', 'type', 'firstTime', 'group', 'dates', 'complete']
-        const currentIndex = steps.indexOf(step)
+        const currentIndex = allSteps.indexOf(step)
         if (currentIndex > 0) {
-            setStep(steps[currentIndex - 1])
+            setStep(allSteps[currentIndex - 1])
         }
     }
 
@@ -283,6 +307,165 @@ export default function JourneyOnboarding() {
                     </div>
                 )
 
+            case 'gender':
+                return (
+                    <div>
+                        <h2 className="mb-2 text-xl font-bold text-neutral-900 sm:text-2xl dark:text-white">
+                            How should we address you?
+                        </h2>
+                        <p className="mb-6 text-sm text-neutral-600 dark:text-neutral-400">
+                            This helps us provide personalized guidance
+                        </p>
+                        <div className="grid gap-3 sm:grid-cols-2">
+                            <button
+                                onClick={() => {
+                                    setFormData({ ...formData, gender: 'male' })
+                                    nextStep()
+                                }}
+                                className={`flex flex-col items-center gap-3 rounded-xl border-2 p-6 transition-all ${
+                                    formData.gender === 'male'
+                                        ? 'border-primary-500 bg-primary-50 dark:border-primary-400 dark:bg-primary-900/20'
+                                        : 'border-neutral-200 hover:border-primary-300 dark:border-neutral-700 dark:hover:border-primary-600'
+                                }`}
+                            >
+                                <HugeiconsIcon
+                                    icon={Male02Icon}
+                                    className={`size-10 ${
+                                        formData.gender === 'male'
+                                            ? 'text-primary-600 dark:text-primary-400'
+                                            : 'text-neutral-500 dark:text-neutral-400'
+                                    }`}
+                                />
+                                <p className="text-lg font-bold text-neutral-900 dark:text-white">Male</p>
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setFormData({ ...formData, gender: 'female' })
+                                    nextStep()
+                                }}
+                                className={`flex flex-col items-center gap-3 rounded-xl border-2 p-6 transition-all ${
+                                    formData.gender === 'female'
+                                        ? 'border-primary-500 bg-primary-50 dark:border-primary-400 dark:bg-primary-900/20'
+                                        : 'border-neutral-200 hover:border-primary-300 dark:border-neutral-700 dark:hover:border-primary-600'
+                                }`}
+                            >
+                                <HugeiconsIcon
+                                    icon={Female02Icon}
+                                    className={`size-10 ${
+                                        formData.gender === 'female'
+                                            ? 'text-primary-600 dark:text-primary-400'
+                                            : 'text-neutral-500 dark:text-neutral-400'
+                                    }`}
+                                />
+                                <p className="text-lg font-bold text-neutral-900 dark:text-white">Female</p>
+                            </button>
+                        </div>
+                        <button onClick={prevStep} className="mt-4 text-sm text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300">
+                            Back
+                        </button>
+                    </div>
+                )
+
+            case 'country': {
+                const filteredCountries = filterCountries(countrySearch)
+                const selectedCountry = formData.country ? getCountryByCode(formData.country) : null
+                const detectedCountryInfo = detectedCountry ? getCountryByCode(detectedCountry) : null
+
+                return (
+                    <div>
+                        <h2 className="mb-2 text-xl font-bold text-neutral-900 sm:text-2xl dark:text-white">
+                            Where are you from?
+                        </h2>
+                        <p className="mb-6 text-sm text-neutral-600 dark:text-neutral-400">
+                            We&apos;ll customize visa info and tips for your country
+                        </p>
+
+                        {/* Show detected country if available */}
+                        {detectedCountryInfo && !countrySearch && (
+                            <div className="mb-4">
+                                <p className="mb-2 text-xs font-medium text-neutral-500 dark:text-neutral-400">
+                                    Detected from your location:
+                                </p>
+                                <button
+                                    onClick={() => {
+                                        setFormData({ ...formData, country: detectedCountry })
+                                        nextStep()
+                                    }}
+                                    className={`flex w-full items-center justify-between rounded-xl border-2 p-4 transition-all ${
+                                        formData.country === detectedCountry
+                                            ? 'border-primary-500 bg-primary-50 dark:border-primary-400 dark:bg-primary-900/20'
+                                            : 'border-primary-200 bg-primary-50/50 hover:border-primary-400 dark:border-primary-800 dark:bg-primary-900/10'
+                                    }`}
+                                >
+                                    <span className="flex items-center gap-3">
+                                        <span className="text-2xl">{detectedCountryInfo.flag}</span>
+                                        <span className="font-semibold text-neutral-900 dark:text-white">
+                                            {detectedCountryInfo.name}
+                                        </span>
+                                    </span>
+                                    <span className="text-sm text-primary-600 dark:text-primary-400">
+                                        Continue →
+                                    </span>
+                                </button>
+                            </div>
+                        )}
+
+                        {/* Search input */}
+                        <div className="relative mb-3">
+                            <HugeiconsIcon
+                                icon={Search01Icon}
+                                className="absolute left-3 top-1/2 size-5 -translate-y-1/2 text-neutral-400"
+                            />
+                            <input
+                                type="text"
+                                placeholder="Search your country..."
+                                value={countrySearch}
+                                onChange={(e) => setCountrySearch(e.target.value)}
+                                className="w-full rounded-xl border border-neutral-300 bg-white py-3 pl-10 pr-4 text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-neutral-600 dark:bg-neutral-800 dark:text-white"
+                            />
+                        </div>
+
+                        {/* Country list */}
+                        <div className="max-h-48 overflow-y-auto rounded-xl border border-neutral-200 dark:border-neutral-700">
+                            {isDetectingCountry ? (
+                                <div className="flex items-center justify-center gap-2 py-8 text-neutral-500">
+                                    <HugeiconsIcon icon={GlobalIcon} className="size-5 animate-pulse" />
+                                    <span>Detecting your location...</span>
+                                </div>
+                            ) : filteredCountries.length === 0 ? (
+                                <div className="py-8 text-center text-neutral-500">
+                                    No countries found
+                                </div>
+                            ) : (
+                                filteredCountries.map((country) => (
+                                    <button
+                                        key={country.code}
+                                        onClick={() => {
+                                            setFormData({ ...formData, country: country.code })
+                                            nextStep()
+                                        }}
+                                        className={`flex w-full items-center gap-3 px-4 py-3 text-left transition-colors ${
+                                            formData.country === country.code
+                                                ? 'bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-400'
+                                                : 'hover:bg-neutral-100 dark:hover:bg-neutral-800'
+                                        }`}
+                                    >
+                                        <span className="text-xl">{country.flag}</span>
+                                        <span className="font-medium text-neutral-900 dark:text-white">
+                                            {country.name}
+                                        </span>
+                                    </button>
+                                ))
+                            )}
+                        </div>
+
+                        <button onClick={prevStep} className="mt-4 text-sm text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300">
+                            Back
+                        </button>
+                    </div>
+                )
+            }
+
             case 'group':
                 return (
                     <div>
@@ -417,9 +600,8 @@ export default function JourneyOnboarding() {
     }
 
     // Progress indicator
-    const steps: OnboardingStep[] = ['welcome', 'stage', 'type', 'firstTime', 'group', 'dates', 'complete']
-    const currentIndex = steps.indexOf(step)
-    const progress = ((currentIndex) / (steps.length - 1)) * 100
+    const currentIndex = allSteps.indexOf(step)
+    const progress = ((currentIndex) / (allSteps.length - 1)) * 100
 
     return (
         <div className="flex min-h-[80vh] items-center justify-center px-4 py-8">
@@ -436,7 +618,7 @@ export default function JourneyOnboarding() {
                             />
                         </div>
                         <p className="mt-2 text-center text-xs text-neutral-500">
-                            Step {currentIndex} of {steps.length - 2}
+                            Step {currentIndex} of {allSteps.length - 2}
                         </p>
                     </div>
                 )}

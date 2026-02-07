@@ -4,8 +4,8 @@ import HubNavMenu from '@/components/HubNavSlider'
 import AIChatPanel from '@/components/AIPanel/AIChatPanel'
 import { TNavigationItem, getAISuggestions } from '@/data/navigation'
 import { useUserJourney } from '@/context/UserJourneyContext'
-import { usePathname } from 'next/navigation'
-import React, { useState, useEffect } from 'react'
+import { usePathname, useSearchParams } from 'next/navigation'
+import React, { useState, useEffect, Suspense } from 'react'
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
     // Prepare icons
@@ -68,6 +68,7 @@ const subItemIcons: Record<string, typeof ClipboardIcon> = {
     'find-food': Restaurant01Icon,
     'check-crowds': UserGroup03Icon,
     'navigate': CompassIcon,
+    'local-tips': Idea01Icon,
     // Tips
     'first-timers': StarIcon,
     'for-women': UserLove01Icon,
@@ -75,7 +76,8 @@ const subItemIcons: Record<string, typeof ClipboardIcon> = {
     'shortcuts': Location01Icon,
 }
 
-const HubLayout = ({
+// Inner component that uses useSearchParams (needs Suspense boundary)
+const HubLayoutInner = ({
     title,
     subtitle,
     navItems,
@@ -84,6 +86,7 @@ const HubLayout = ({
     categoryId,
 }: HubLayoutProps) => {
     const pathname = usePathname()
+    const searchParams = useSearchParams()
     const { user } = useUserJourney()
     const [activeItemId, setActiveItemId] = useState<string | null>(null)
     const [activeItem, setActiveItem] = useState<TNavigationItem | null>(null)
@@ -93,8 +96,24 @@ const HubLayout = ({
     const context = aiContext || contextFromPath
     const CategoryIcon = categoryIcons[context] || ClipboardIcon
 
-    // Find active item based on current pathname
+    // Find active item based on action query param or pathname
     useEffect(() => {
+        const actionParam = searchParams.get('action')
+
+        // First, try to match by action query parameter (e.g., ?action=find-food)
+        if (actionParam) {
+            const matchByAction = navItems.find((item) => {
+                const hrefSlug = item.href?.split('/').pop() || ''
+                return hrefSlug === actionParam
+            })
+            if (matchByAction) {
+                setActiveItemId(matchByAction.id || null)
+                setActiveItem(matchByAction)
+                return
+            }
+        }
+
+        // Fallback: match by pathname
         const current = navItems.find((item) => item.href === pathname)
         if (current) {
             setActiveItemId(current.id || null)
@@ -103,7 +122,7 @@ const HubLayout = ({
             setActiveItemId(navItems[0].id || null)
             setActiveItem(navItems[0])
         }
-    }, [pathname, navItems])
+    }, [pathname, searchParams, navItems])
 
     const handleItemClick = (id: string) => {
         const item = navItems.find((n) => n.id === id)
@@ -198,6 +217,42 @@ const HubLayout = ({
                     suggestedQuestions={suggestedQuestions}
                 />
             </div>
+        </div>
+    )
+}
+
+// Wrapper component with Suspense boundary for useSearchParams
+const HubLayout = (props: HubLayoutProps) => {
+    return (
+        <Suspense fallback={<HubLayoutSkeleton title={props.title} subtitle={props.subtitle} />}>
+            <HubLayoutInner {...props} />
+        </Suspense>
+    )
+}
+
+// Loading skeleton while search params are being read
+const HubLayoutSkeleton = ({ title, subtitle }: { title: string; subtitle?: string }) => {
+    return (
+        <div className="container py-6 sm:py-8 lg:py-12">
+            <div className="mb-6 sm:mb-8">
+                <div className="relative z-10 flex items-center gap-3">
+                    <div className="rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 p-3 shadow-lg shadow-primary-500/20">
+                        <div className="size-6 animate-pulse rounded bg-white/30" />
+                    </div>
+                    <div>
+                        <h1 className="text-xl font-bold text-neutral-900 sm:text-2xl dark:text-white">
+                            {title}
+                        </h1>
+                        {subtitle && (
+                            <p className="mt-0.5 text-sm text-neutral-500 dark:text-neutral-400">
+                                {subtitle}
+                            </p>
+                        )}
+                    </div>
+                </div>
+            </div>
+            <div className="mb-6 h-32 animate-pulse rounded-2xl bg-neutral-100 dark:bg-neutral-800" />
+            <div className="h-[500px] animate-pulse rounded-2xl bg-neutral-100 sm:h-[550px] lg:h-[650px] dark:bg-neutral-800" />
         </div>
     )
 }
