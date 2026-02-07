@@ -1,0 +1,206 @@
+import { MetadataRoute } from 'next'
+import { getAllSlugsForSitemap } from '@/lib/sanity'
+import { countries } from '@/data/countries'
+
+const BASE_URL = 'https://visitmakkah.co'
+
+// ============================================
+// DYNAMIC SITEMAP GENERATOR
+// Automatically includes all content from Sanity
+// Plus programmatic SEO pages
+// ============================================
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  // Fetch all slugs from Sanity CMS
+  let sanitySlugs = { posts: [], guides: [], faqs: [], categories: [] }
+  try {
+    sanitySlugs = await getAllSlugsForSitemap()
+  } catch (error) {
+    console.error('Error fetching Sanity slugs for sitemap:', error)
+  }
+
+  // Current date for lastModified
+  const now = new Date()
+
+  // ============================================
+  // STATIC PAGES - Core site pages
+  // ============================================
+  const staticPages: MetadataRoute.Sitemap = [
+    {
+      url: BASE_URL,
+      lastModified: now,
+      changeFrequency: 'daily',
+      priority: 1.0,
+    },
+    {
+      url: `${BASE_URL}/about`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
+      url: `${BASE_URL}/contact`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+    {
+      url: `${BASE_URL}/blog`,
+      lastModified: now,
+      changeFrequency: 'daily',
+      priority: 0.9,
+    },
+    {
+      url: `${BASE_URL}/learn`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+    {
+      url: `${BASE_URL}/prepare`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+    {
+      url: `${BASE_URL}/your-journey`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+    {
+      url: `${BASE_URL}/stay-and-food`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.7,
+    },
+    {
+      url: `${BASE_URL}/smart-tools`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+    {
+      url: `${BASE_URL}/local-tips`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+    {
+      url: `${BASE_URL}/explore`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.7,
+    },
+    {
+      url: `${BASE_URL}/search`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.5,
+    },
+    {
+      url: `${BASE_URL}/prayer-times`,
+      lastModified: now,
+      changeFrequency: 'daily',
+      priority: 0.9,
+    },
+  ]
+
+  // ============================================
+  // BLOG POSTS from Sanity
+  // ============================================
+  const blogPosts: MetadataRoute.Sitemap = (sanitySlugs.posts || []).map(
+    (slug: string) => ({
+      url: `${BASE_URL}/blog/${slug}`,
+      lastModified: now,
+      changeFrequency: 'weekly' as const,
+      priority: 0.8,
+    })
+  )
+
+  // ============================================
+  // GUIDES from Sanity
+  // ============================================
+  const guides: MetadataRoute.Sitemap = (sanitySlugs.guides || []).map(
+    (slug: string) => ({
+      url: `${BASE_URL}/guides/${slug}`,
+      lastModified: now,
+      changeFrequency: 'weekly' as const,
+      priority: 0.9,
+    })
+  )
+
+  // ============================================
+  // CATEGORIES from Sanity
+  // ============================================
+  const categoryPages: MetadataRoute.Sitemap = (sanitySlugs.categories || []).map(
+    (slug: string) => ({
+      url: `${BASE_URL}/category/${slug}`,
+      lastModified: now,
+      changeFrequency: 'weekly' as const,
+      priority: 0.7,
+    })
+  )
+
+  // ============================================
+  // PROGRAMMATIC SEO: Country-specific Umrah pages
+  // Generates /umrah/from/[country] for all countries
+  // ============================================
+  const countryPages: MetadataRoute.Sitemap = countries.slice(0, 50).map(
+    (country) => ({
+      url: `${BASE_URL}/umrah/from/${country.name.toLowerCase().replace(/\s+/g, '-')}`,
+      lastModified: now,
+      changeFrequency: 'monthly' as const,
+      priority: 0.7,
+    })
+  )
+
+  // ============================================
+  // PROGRAMMATIC SEO: Ramadan pages
+  // Time-sensitive content for Ramadan 2026
+  // ============================================
+  const ramadanPages: MetadataRoute.Sitemap = [
+    {
+      url: `${BASE_URL}/ramadan/2026`,
+      lastModified: now,
+      changeFrequency: 'daily',
+      priority: 0.95,
+    },
+    {
+      url: `${BASE_URL}/ramadan/2026/umrah`,
+      lastModified: now,
+      changeFrequency: 'daily',
+      priority: 0.95,
+    },
+    {
+      url: `${BASE_URL}/ramadan/2026/last-10-nights`,
+      lastModified: now,
+      changeFrequency: 'daily',
+      priority: 0.9,
+    },
+    {
+      url: `${BASE_URL}/ramadan/2026/taraweeh`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.85,
+    },
+    {
+      url: `${BASE_URL}/ramadan/2026/iftar`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+  ]
+
+  // ============================================
+  // COMBINE ALL PAGES
+  // ============================================
+  return [
+    ...staticPages,
+    ...ramadanPages,
+    ...blogPosts,
+    ...guides,
+    ...categoryPages,
+    ...countryPages,
+  ]
+}
