@@ -1,0 +1,329 @@
+{
+  "version": "1.0",
+  "name": "Ritual Guide Card",
+  "template": "{\"type\":\"Card\",\"size\":\"md\",\"padding\":0,\"children\":[{\"type\":\"Col\",\"children\":[{%- set _c -%},{\"type\":\"Row\",\"align\":\"center\",\"gap\":3,\"padding\":{\"x\":4,\"top\":4,\"bottom\":2},\"background\":{\"light\":\"#E6FFFB\",\"dark\":\"#0F766E\"},\"children\":[{\"type\":\"Box\",\"size\":36,\"background\":{\"light\":\"#0F766E\",\"dark\":\"#0E7490\"},\"radius\":\"sm\",\"align\":\"center\",\"justify\":\"center\",\"children\":[{\"type\":\"Icon\",\"name\":\"compass\",\"size\":\"lg\",\"color\":\"white\"}]},{\"type\":\"Col\",\"gap\":0,\"flex\":1,\"children\":[{\"type\":\"Title\",\"value\":{{ (data.title) | tojson }},\"size\":\"sm\"},{\"type\":\"Row\",\"gap\":2,\"children\":[{\"type\":\"Caption\",\"value\":{{ ((data.totalRounds ~ \" rounds\")) | tojson }},\"color\":{\"light\":\"#0E7490\",\"dark\":\"#99F6E4\"}},{\"type\":\"Caption\",\"value\":{{ (data.duration) | tojson }},\"color\":{\"light\":\"#0E7490\",\"dark\":\"#99F6E4\"}}]}]},{\"type\":\"Badge\",\"label\":\"Ritual\",\"color\":\"info\",\"variant\":\"soft\",\"size\":\"sm\"}]}{%-if (data.steps[0] and data.steps[0].image) -%},{\"type\":\"Image\",\"src\":{{ (data.steps[0].image) | tojson }},\"alt\":{{ (data.steps[0].title) | tojson }},\"height\":160,\"fit\":\"cover\",\"frame\":true,\"flush\":true}{%-else-%}{%-endif-%},{\"type\":\"Col\",\"gap\":2,\"padding\":{\"x\":4,\"y\":3},\"children\":[{%- set _c -%},{\"type\":\"Row\",\"gap\":2,\"align\":\"center\",\"children\":[{\"type\":\"Box\",\"background\":{\"light\":\"#14B8A6\",\"dark\":\"#134E4A\"},\"radius\":\"full\",\"width\":6,\"height\":6},{\"type\":\"Text\",\"value\":{{ ((\"Step \" ~ data.steps[0].step)) | tojson }},\"size\":\"sm\",\"color\":{\"light\":\"#0E7490\",\"dark\":\"#99F6E4\"}},{\"type\":\"Text\",\"value\":{{ (data.steps[0].title) | tojson }},\"size\":\"sm\",\"weight\":\"semibold\"}]},{\"type\":\"Text\",\"value\":{{ (data.steps[0].description) | tojson }},\"size\":\"sm\",\"color\":\"secondary\"}{%-if (data.steps[0] and data.steps[0].dua) -%},{\"type\":\"Box\",\"background\":{\"light\":\"#F0FDFA\",\"dark\":\"#0B4A44\"},\"radius\":\"sm\",\"padding\":2,\"border\":{\"size\":1,\"color\":{\"light\":\"#99F6E4\",\"dark\":\"#134E4A\"}},\"children\":[{\"type\":\"Row\",\"gap\":2,\"align\":\"center\",\"children\":[{\"type\":\"Icon\",\"name\":\"sparkle\",\"color\":{\"light\":\"#0E7490\",\"dark\":\"#99F6E4\"}},{\"type\":\"Text\",\"value\":{{ ((\"Dua: \" ~ data.steps[0].dua)) | tojson }},\"size\":\"sm\"}]}]}{%-else-%}{%-endif-%}{%- endset -%}{{- (_c[1:] if _c and _c[0] == ',' else _c) -}}]},{\"type\":\"Row\",\"padding\":{\"x\":4,\"y\":3},\"background\":\"surface-elevated-secondary\",\"border\":{\"top\":{\"size\":1}},\"children\":[{\"type\":\"Button\",\"label\":\"Start guided\",\"style\":\"primary\",\"color\":\"info\",\"onClickAction\":{\"type\":\"ritual.start_guided_mode\",\"payload\":{\"title\":{{ (data.title) | tojson }}}}},{\"type\":\"Spacer\"},{\"type\":\"Row\",\"gap\":1,\"children\":[{\"type\":\"Button\",\"iconStart\":\"star\",\"variant\":\"outline\",\"color\":\"secondary\",\"uniform\":true,\"onClickAction\":{\"type\":\"ritual.bookmark\",\"payload\":{\"title\":{{ (data.title) | tojson }}}}},{\"type\":\"Button\",\"iconStart\":\"external-link\",\"variant\":\"outline\",\"color\":\"secondary\",\"uniform\":true,\"onClickAction\":{\"type\":\"ritual.share\",\"payload\":{\"title\":{{ (data.title) | tojson }}}}}]}]}{%- endset -%}{{- (_c[1:] if _c and _c[0] == ',' else _c) -}}]}]}",
+  "jsonSchema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "properties": {
+      "type": {
+        "type": "string",
+        "const": "ritual"
+      },
+      "data": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "steps": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "step": {
+                  "type": "number"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "image": {
+                  "type": "string"
+                },
+                "dua": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "step",
+                "title",
+                "description"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "totalRounds": {
+            "type": "number"
+          },
+          "duration": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "steps",
+          "totalRounds",
+          "duration"
+        ],
+        "additionalProperties": false
+      },
+      "actions": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "enum": [
+            "start_guided_mode",
+            "bookmark",
+            "share"
+          ]
+        }
+      }
+    },
+    "required": [
+      "type",
+      "data",
+      "actions"
+    ],
+    "additionalProperties": false
+  },
+  "outputJsonPreview": {
+    "type": "Card",
+    "size": "md",
+    "padding": 0,
+    "children": [
+      {
+        "type": "Col",
+        "children": [
+          {
+            "type": "Row",
+            "align": "center",
+            "gap": 3,
+            "padding": {
+              "x": 4,
+              "top": 4,
+              "bottom": 2
+            },
+            "background": {
+              "light": "#E6FFFB",
+              "dark": "#0F766E"
+            },
+            "children": [
+              {
+                "type": "Box",
+                "size": 36,
+                "background": {
+                  "light": "#0F766E",
+                  "dark": "#0E7490"
+                },
+                "radius": "sm",
+                "align": "center",
+                "justify": "center",
+                "children": [
+                  {
+                    "type": "Icon",
+                    "name": "compass",
+                    "size": "lg",
+                    "color": "white"
+                  }
+                ]
+              },
+              {
+                "type": "Col",
+                "gap": 0,
+                "flex": 1,
+                "children": [
+                  {
+                    "type": "Title",
+                    "value": "How to Perform Tawaf",
+                    "size": "sm"
+                  },
+                  {
+                    "type": "Row",
+                    "gap": 2,
+                    "children": [
+                      {
+                        "type": "Caption",
+                        "value": "7 rounds",
+                        "color": {
+                          "light": "#0E7490",
+                          "dark": "#99F6E4"
+                        }
+                      },
+                      {
+                        "type": "Caption",
+                        "value": "45-60 minutes",
+                        "color": {
+                          "light": "#0E7490",
+                          "dark": "#99F6E4"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "Badge",
+                "label": "Ritual",
+                "color": "info",
+                "variant": "soft",
+                "size": "sm"
+              }
+            ]
+          },
+          {
+            "type": "Image",
+            "src": "/images/rituals/tawaf-start.jpg",
+            "alt": "Start at Black Stone",
+            "height": 160,
+            "fit": "cover",
+            "frame": true,
+            "flush": true
+          },
+          {
+            "type": "Col",
+            "gap": 2,
+            "padding": {
+              "x": 4,
+              "y": 3
+            },
+            "children": [
+              {
+                "type": "Row",
+                "gap": 2,
+                "align": "center",
+                "children": [
+                  {
+                    "type": "Box",
+                    "background": {
+                      "light": "#14B8A6",
+                      "dark": "#134E4A"
+                    },
+                    "radius": "full",
+                    "width": 6,
+                    "height": 6
+                  },
+                  {
+                    "type": "Text",
+                    "value": "Step 1",
+                    "size": "sm",
+                    "color": {
+                      "light": "#0E7490",
+                      "dark": "#99F6E4"
+                    }
+                  },
+                  {
+                    "type": "Text",
+                    "value": "Start at Black Stone",
+                    "size": "sm",
+                    "weight": "semibold"
+                  }
+                ]
+              },
+              {
+                "type": "Text",
+                "value": "Begin at Hajar al-Aswad corner",
+                "size": "sm",
+                "color": "secondary"
+              },
+              {
+                "type": "Box",
+                "background": {
+                  "light": "#F0FDFA",
+                  "dark": "#0B4A44"
+                },
+                "radius": "sm",
+                "padding": 2,
+                "border": {
+                  "size": 1,
+                  "color": {
+                    "light": "#99F6E4",
+                    "dark": "#134E4A"
+                  }
+                },
+                "children": [
+                  {
+                    "type": "Row",
+                    "gap": 2,
+                    "align": "center",
+                    "children": [
+                      {
+                        "type": "Icon",
+                        "name": "sparkle",
+                        "color": {
+                          "light": "#0E7490",
+                          "dark": "#99F6E4"
+                        }
+                      },
+                      {
+                        "type": "Text",
+                        "value": "Dua: Bismillah, Allahu Akbar",
+                        "size": "sm"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "Row",
+            "padding": {
+              "x": 4,
+              "y": 3
+            },
+            "background": "surface-elevated-secondary",
+            "border": {
+              "top": {
+                "size": 1
+              }
+            },
+            "children": [
+              {
+                "type": "Button",
+                "label": "Start guided",
+                "style": "primary",
+                "color": "info",
+                "onClickAction": {
+                  "type": "ritual.start_guided_mode",
+                  "payload": {
+                    "title": "How to Perform Tawaf"
+                  }
+                }
+              },
+              {
+                "type": "Spacer"
+              },
+              {
+                "type": "Row",
+                "gap": 1,
+                "children": [
+                  {
+                    "type": "Button",
+                    "iconStart": "star",
+                    "variant": "outline",
+                    "color": "secondary",
+                    "uniform": true,
+                    "onClickAction": {
+                      "type": "ritual.bookmark",
+                      "payload": {
+                        "title": "How to Perform Tawaf"
+                      }
+                    }
+                  },
+                  {
+                    "type": "Button",
+                    "iconStart": "external-link",
+                    "variant": "outline",
+                    "color": "secondary",
+                    "uniform": true,
+                    "onClickAction": {
+                      "type": "ritual.share",
+                      "payload": {
+                        "title": "How to Perform Tawaf"
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "encodedWidget": "eyJpZCI6IjFmZjYwNWZmLWJkZjktNGYwMS1hNjAwLWQyNjQyNjMzMTkyYiIsIm5hbWUiOiJSaXR1YWwgR3VpZGUgQ2FyZCIsInZpZXciOiI8Q2FyZCBzaXplPVwibWRcIiBwYWRkaW5nPXswfT5cbiAgPENvbD5cbiAgICA8Um93XG4gICAgICBhbGlnbj1cImNlbnRlclwiXG4gICAgICBnYXA9ezN9XG4gICAgICBwYWRkaW5nPXt7IHg6IDQsIHRvcDogNCwgYm90dG9tOiAyIH19XG4gICAgICBiYWNrZ3JvdW5kPXt7IGxpZ2h0OiBcIiNFNkZGRkJcIiwgZGFyazogXCIjMEY3NjZFXCIgfX1cbiAgICA-XG4gICAgICA8Qm94XG4gICAgICAgIHNpemU9ezM2fVxuICAgICAgICBiYWNrZ3JvdW5kPXt7IGxpZ2h0OiBcIiMwRjc2NkVcIiwgZGFyazogXCIjMEU3NDkwXCIgfX1cbiAgICAgICAgcmFkaXVzPVwic21cIlxuICAgICAgICBhbGlnbj1cImNlbnRlclwiXG4gICAgICAgIGp1c3RpZnk9XCJjZW50ZXJcIlxuICAgICAgPlxuICAgICAgICA8SWNvbiBuYW1lPVwiY29tcGFzc1wiIHNpemU9XCJsZ1wiIGNvbG9yPVwid2hpdGVcIiAvPlxuICAgICAgPC9Cb3g-XG4gICAgICA8Q29sIGdhcD17MH0gZmxleD17MX0-XG4gICAgICAgIDxUaXRsZSB2YWx1ZT17ZGF0YS50aXRsZX0gc2l6ZT1cInNtXCIgLz5cbiAgICAgICAgPFJvdyBnYXA9ezJ9PlxuICAgICAgICAgIDxDYXB0aW9uXG4gICAgICAgICAgICB2YWx1ZT17YCR7ZGF0YS50b3RhbFJvdW5kc30gcm91bmRzYH1cbiAgICAgICAgICAgIGNvbG9yPXt7IGxpZ2h0OiBcIiMwRTc0OTBcIiwgZGFyazogXCIjOTlGNkU0XCIgfX1cbiAgICAgICAgICAvPlxuICAgICAgICAgIDxDYXB0aW9uXG4gICAgICAgICAgICB2YWx1ZT17ZGF0YS5kdXJhdGlvbn1cbiAgICAgICAgICAgIGNvbG9yPXt7IGxpZ2h0OiBcIiMwRTc0OTBcIiwgZGFyazogXCIjOTlGNkU0XCIgfX1cbiAgICAgICAgICAvPlxuICAgICAgICA8L1Jvdz5cbiAgICAgIDwvQ29sPlxuICAgICAgPEJhZGdlIGxhYmVsPVwiUml0dWFsXCIgY29sb3I9XCJpbmZvXCIgdmFyaWFudD1cInNvZnRcIiBzaXplPVwic21cIiAvPlxuICAgIDwvUm93PlxuXG4gICAge2RhdGEuc3RlcHNbMF0gJiYgZGF0YS5zdGVwc1swXS5pbWFnZSAmJiAoXG4gICAgICA8SW1hZ2VcbiAgICAgICAgc3JjPXtkYXRhLnN0ZXBzWzBdLmltYWdlfVxuICAgICAgICBhbHQ9e2RhdGEuc3RlcHNbMF0udGl0bGV9XG4gICAgICAgIGhlaWdodD17MTYwfVxuICAgICAgICBmaXQ9XCJjb3ZlclwiXG4gICAgICAgIGZyYW1lXG4gICAgICAgIGZsdXNoXG4gICAgICAvPlxuICAgICl9XG5cbiAgICA8Q29sIGdhcD17Mn0gcGFkZGluZz17eyB4OiA0LCB5OiAzIH19PlxuICAgICAgPFJvdyBnYXA9ezJ9IGFsaWduPVwiY2VudGVyXCI-XG4gICAgICAgIDxCb3hcbiAgICAgICAgICBiYWNrZ3JvdW5kPXt7IGxpZ2h0OiBcIiMxNEI4QTZcIiwgZGFyazogXCIjMTM0RTRBXCIgfX1cbiAgICAgICAgICByYWRpdXM9XCJmdWxsXCJcbiAgICAgICAgICB3aWR0aD17Nn1cbiAgICAgICAgICBoZWlnaHQ9ezZ9XG4gICAgICAgIC8-XG4gICAgICAgIDxUZXh0XG4gICAgICAgICAgdmFsdWU9e2BTdGVwICR7ZGF0YS5zdGVwc1swXS5zdGVwfWB9XG4gICAgICAgICAgc2l6ZT1cInNtXCJcbiAgICAgICAgICBjb2xvcj17eyBsaWdodDogXCIjMEU3NDkwXCIsIGRhcms6IFwiIzk5RjZFNFwiIH19XG4gICAgICAgIC8-XG4gICAgICAgIDxUZXh0IHZhbHVlPXtkYXRhLnN0ZXBzWzBdLnRpdGxlfSBzaXplPVwic21cIiB3ZWlnaHQ9XCJzZW1pYm9sZFwiIC8-XG4gICAgICA8L1Jvdz5cbiAgICAgIDxUZXh0IHZhbHVlPXtkYXRhLnN0ZXBzWzBdLmRlc2NyaXB0aW9ufSBzaXplPVwic21cIiBjb2xvcj1cInNlY29uZGFyeVwiIC8-XG4gICAgICB7ZGF0YS5zdGVwc1swXSAmJiBkYXRhLnN0ZXBzWzBdLmR1YSAmJiAoXG4gICAgICAgIDxCb3hcbiAgICAgICAgICBiYWNrZ3JvdW5kPXt7IGxpZ2h0OiBcIiNGMEZERkFcIiwgZGFyazogXCIjMEI0QTQ0XCIgfX1cbiAgICAgICAgICByYWRpdXM9XCJzbVwiXG4gICAgICAgICAgcGFkZGluZz17Mn1cbiAgICAgICAgICBib3JkZXI9e3sgc2l6ZTogMSwgY29sb3I6IHsgbGlnaHQ6IFwiIzk5RjZFNFwiLCBkYXJrOiBcIiMxMzRFNEFcIiB9IH19XG4gICAgICAgID5cbiAgICAgICAgICA8Um93IGdhcD17Mn0gYWxpZ249XCJjZW50ZXJcIj5cbiAgICAgICAgICAgIDxJY29uXG4gICAgICAgICAgICAgIG5hbWU9XCJzcGFya2xlXCJcbiAgICAgICAgICAgICAgY29sb3I9e3sgbGlnaHQ6IFwiIzBFNzQ5MFwiLCBkYXJrOiBcIiM5OUY2RTRcIiB9fVxuICAgICAgICAgICAgLz5cbiAgICAgICAgICAgIDxUZXh0IHZhbHVlPXtgRHVhOiAke2RhdGEuc3RlcHNbMF0uZHVhfWB9IHNpemU9XCJzbVwiIC8-XG4gICAgICAgICAgPC9Sb3c-XG4gICAgICAgIDwvQm94PlxuICAgICAgKX1cbiAgICA8L0NvbD5cblxuICAgIDxSb3dcbiAgICAgIHBhZGRpbmc9e3sgeDogNCwgeTogMyB9fVxuICAgICAgYmFja2dyb3VuZD1cInN1cmZhY2UtZWxldmF0ZWQtc2Vjb25kYXJ5XCJcbiAgICAgIGJvcmRlcj17eyB0b3A6IHsgc2l6ZTogMSB9IH19XG4gICAgPlxuICAgICAgPEJ1dHRvblxuICAgICAgICBsYWJlbD1cIlN0YXJ0IGd1aWRlZFwiXG4gICAgICAgIHN0eWxlPVwicHJpbWFyeVwiXG4gICAgICAgIGNvbG9yPVwiaW5mb1wiXG4gICAgICAgIG9uQ2xpY2tBY3Rpb249e3tcbiAgICAgICAgICB0eXBlOiBcInJpdHVhbC5zdGFydF9ndWlkZWRfbW9kZVwiLFxuICAgICAgICAgIHBheWxvYWQ6IHsgdGl0bGU6IGRhdGEudGl0bGUgfSxcbiAgICAgICAgfX1cbiAgICAgIC8-XG4gICAgICA8U3BhY2VyIC8-XG4gICAgICA8Um93IGdhcD17MX0-XG4gICAgICAgIDxCdXR0b25cbiAgICAgICAgICBpY29uU3RhcnQ9XCJzdGFyXCJcbiAgICAgICAgICB2YXJpYW50PVwib3V0bGluZVwiXG4gICAgICAgICAgY29sb3I9XCJzZWNvbmRhcnlcIlxuICAgICAgICAgIHVuaWZvcm1cbiAgICAgICAgICBvbkNsaWNrQWN0aW9uPXt7XG4gICAgICAgICAgICB0eXBlOiBcInJpdHVhbC5ib29rbWFya1wiLFxuICAgICAgICAgICAgcGF5bG9hZDogeyB0aXRsZTogZGF0YS50aXRsZSB9LFxuICAgICAgICAgIH19XG4gICAgICAgIC8-XG4gICAgICAgIDxCdXR0b25cbiAgICAgICAgICBpY29uU3RhcnQ9XCJleHRlcm5hbC1saW5rXCJcbiAgICAgICAgICB2YXJpYW50PVwib3V0bGluZVwiXG4gICAgICAgICAgY29sb3I9XCJzZWNvbmRhcnlcIlxuICAgICAgICAgIHVuaWZvcm1cbiAgICAgICAgICBvbkNsaWNrQWN0aW9uPXt7XG4gICAgICAgICAgICB0eXBlOiBcInJpdHVhbC5zaGFyZVwiLFxuICAgICAgICAgICAgcGF5bG9hZDogeyB0aXRsZTogZGF0YS50aXRsZSB9LFxuICAgICAgICAgIH19XG4gICAgICAgIC8-XG4gICAgICA8L1Jvdz5cbiAgICA8L1Jvdz5cbiAgPC9Db2w-XG48L0NhcmQ-IiwiZGVmYXVsdFN0YXRlIjp7InR5cGUiOiJyaXR1YWwiLCJkYXRhIjp7InRpdGxlIjoiSG93IHRvIFBlcmZvcm0gVGF3YWYiLCJzdGVwcyI6W3sic3RlcCI6MSwidGl0bGUiOiJTdGFydCBhdCBCbGFjayBTdG9uZSIsImRlc2NyaXB0aW9uIjoiQmVnaW4gYXQgSGFqYXIgYWwtQXN3YWQgY29ybmVyIiwiaW1hZ2UiOiIvaW1hZ2VzL3JpdHVhbHMvdGF3YWYtc3RhcnQuanBnIiwiZHVhIjoiQmlzbWlsbGFoLCBBbGxhaHUgQWtiYXIifV0sInRvdGFsUm91bmRzIjo3LCJkdXJhdGlvbiI6IjQ1LTYwIG1pbnV0ZXMifSwiYWN0aW9ucyI6WyJzdGFydF9ndWlkZWRfbW9kZSIsImJvb2ttYXJrIiwic2hhcmUiXX0sInN0YXRlcyI6W10sInNjaGVtYSI6ImltcG9ydCB7IHogfSBmcm9tIFwiem9kXCJcblxuY29uc3QgU3RlcCA9IHouc3RyaWN0T2JqZWN0KHtcbiAgc3RlcDogei5udW1iZXIoKSxcbiAgdGl0bGU6IHouc3RyaW5nKCksXG4gIGRlc2NyaXB0aW9uOiB6LnN0cmluZygpLFxuICBpbWFnZTogei5zdHJpbmcoKS5vcHRpb25hbCgpLFxuICBkdWE6IHouc3RyaW5nKCkub3B0aW9uYWwoKSxcbn0pXG5cbmNvbnN0IFJpdHVhbERhdGEgPSB6LnN0cmljdE9iamVjdCh7XG4gIHRpdGxlOiB6LnN0cmluZygpLFxuICBzdGVwczogei5hcnJheShTdGVwKS5taW4oMSksXG4gIHRvdGFsUm91bmRzOiB6Lm51bWJlcigpLFxuICBkdXJhdGlvbjogei5zdHJpbmcoKSxcbn0pXG5cbmNvbnN0IFdpZGdldFN0YXRlID0gei5zdHJpY3RPYmplY3Qoe1xuICB0eXBlOiB6LmxpdGVyYWwoXCJyaXR1YWxcIiksXG4gIGRhdGE6IFJpdHVhbERhdGEsXG4gIGFjdGlvbnM6IHouYXJyYXkoei5lbnVtKFtcInN0YXJ0X2d1aWRlZF9tb2RlXCIsIFwiYm9va21hcmtcIiwgXCJzaGFyZVwiXSkpLFxufSlcblxuZXhwb3J0IGRlZmF1bHQgV2lkZ2V0U3RhdGUiLCJqc29uU2NoZW1hIjp7fSwic2NoZW1hTW9kZSI6InpvZCIsInNjaGVtYVZhbGlkaXR5IjoidmFsaWQiLCJ2aWV3VmFsaWRpdHkiOiJ2YWxpZCIsImRlZmF1bHRTdGF0ZVZhbGlkaXR5IjoidmFsaWQifQ"
+}

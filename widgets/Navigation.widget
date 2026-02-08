@@ -1,0 +1,442 @@
+{
+  "version": "1.0",
+  "name": "Navigation route",
+  "template": "{\"type\":\"Card\",\"size\":\"md\",\"padding\":0,\"children\":[{\"type\":\"Box\",\"background\":\"teal-600\",\"padding\":{\"x\":4,\"y\":3},\"children\":[{\"type\":\"Row\",\"gap\":3,\"align\":\"center\",\"children\":[{\"type\":\"Box\",\"size\":36,\"radius\":\"full\",\"background\":\"teal-50\",\"align\":\"center\",\"justify\":\"center\",\"children\":[{\"type\":\"Icon\",\"name\":\"map-pin\",\"color\":\"teal-600\"}]},{\"type\":\"Title\",\"value\":{{ (title) | tojson }},\"size\":\"md\",\"color\":\"white\"},{\"type\":\"Spacer\"},{\"type\":\"Badge\",\"label\":\"Accessible\",\"color\":\"success\",\"variant\":\"soft\"}]}]},{\"type\":\"Col\",\"padding\":{\"x\":4,\"y\":3},\"gap\":3,\"children\":[{\"type\":\"Row\",\"gap\":2,\"children\":[{\"type\":\"Col\",\"gap\":0,\"children\":[{\"type\":\"Caption\",\"value\":\"From\",\"color\":\"secondary\"},{\"type\":\"Text\",\"value\":{{ (from.name) | tojson }},\"color\":\"emphasis\"}]},{\"type\":\"Icon\",\"name\":\"chevron-right\",\"color\":\"secondary\"},{\"type\":\"Col\",\"gap\":0,\"children\":[{\"type\":\"Caption\",\"value\":\"To\",\"color\":\"secondary\"},{\"type\":\"Text\",\"value\":{{ (to.name) | tojson }},\"color\":\"emphasis\"}]}]},{\"type\":\"Row\",\"gap\":2,\"children\":[{\"type\":\"Badge\",\"label\":{{ (distance) | tojson }},\"color\":\"info\",\"variant\":\"soft\"},{\"type\":\"Badge\",\"label\":{{ (walkingTime) | tojson }},\"color\":\"success\",\"variant\":\"soft\"}]},{\"type\":\"Divider\"},{\"type\":\"Col\",\"gap\":2,\"children\":[{%- set _c -%}{%-for item in steps -%}{%-set index = loop.index0 -%},{\"type\":\"Row\",\"key\":{{ ((index ~ \"-\" ~ item.distance)) | tojson }},\"gap\":3,\"align\":\"start\",\"children\":[{\"type\":\"Box\",\"size\":10,\"radius\":\"full\",\"background\":\"teal-600\"},{\"type\":\"Col\",\"gap\":0,\"children\":[{\"type\":\"Text\",\"value\":{{ (item.instruction) | tojson }},\"size\":\"sm\",\"weight\":\"semibold\"},{\"type\":\"Caption\",\"value\":{{ (item.distance) | tojson }}}]}]}{%-endfor-%}{%- endset -%}{{- (_c[1:] if _c and _c[0] == ',' else _c) -}}]},{\"type\":\"Divider\"},{\"type\":\"Row\",\"align\":\"center\",\"gap\":2,\"children\":[{%- set _c -%},{\"type\":\"Caption\",\"value\":\"Nearby gates\"},{\"type\":\"Spacer\"}{%-for g in gates -%}{%-set i = loop.index0 -%},{\"type\":\"Badge\",\"key\":{{ ((g.number ~ \"-\" ~ i)) | tojson }},\"label\":{{ ((g.name ~ \" \" ~ g.number)) | tojson }},\"color\":\"info\",\"variant\":\"outline\"}{%-endfor-%}{%- endset -%}{{- (_c[1:] if _c and _c[0] == ',' else _c) -}}]},{\"type\":\"Row\",\"gap\":2,\"children\":[{\"type\":\"Button\",\"label\":\"Open in Maps\",\"iconStart\":\"external-link\",\"color\":\"info\",\"variant\":\"soft\",\"onClickAction\":{\"type\":\"open_maps\",\"payload\":{\"lat\":{{ (to.coordinates.lat) | tojson }},\"lng\":{{ (to.coordinates.lng) | tojson }},\"label\":{{ (to.name) | tojson }}}}},{\"type\":\"Button\",\"label\":\"Save\",\"iconStart\":\"star\",\"color\":\"success\",\"variant\":\"soft\",\"onClickAction\":{\"type\":\"save_route\",\"payload\":{\"title\":{{ (title) | tojson }},\"to\":{{ (to.name) | tojson }}}}},{\"type\":\"Button\",\"label\":\"Share\",\"iconStart\":\"mail\",\"variant\":\"outline\",\"onClickAction\":{\"type\":\"share\",\"payload\":{\"title\":{{ (title) | tojson }},\"distance\":{{ (distance) | tojson }},\"walkingTime\":{{ (walkingTime) | tojson }}}}}]}]}]}",
+  "jsonSchema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "properties": {
+      "title": {
+        "type": "string"
+      },
+      "from": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "coordinates": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "lat": {
+                    "type": "number"
+                  },
+                  "lng": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "lat",
+                  "lng"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "coordinates"
+        ],
+        "additionalProperties": false
+      },
+      "to": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "coordinates": {
+            "type": "object",
+            "properties": {
+              "lat": {
+                "type": "number"
+              },
+              "lng": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "lat",
+              "lng"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "name",
+          "coordinates"
+        ],
+        "additionalProperties": false
+      },
+      "distance": {
+        "type": "string"
+      },
+      "walkingTime": {
+        "type": "string"
+      },
+      "steps": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "instruction": {
+              "type": "string"
+            },
+            "distance": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "instruction",
+            "distance"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "gates": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "number": {
+              "type": "number"
+            },
+            "accessibility": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "name",
+            "number",
+            "accessibility"
+          ],
+          "additionalProperties": false
+        }
+      }
+    },
+    "required": [
+      "title",
+      "from",
+      "to",
+      "distance",
+      "walkingTime",
+      "steps",
+      "gates"
+    ],
+    "additionalProperties": false
+  },
+  "outputJsonPreview": {
+    "type": "Card",
+    "size": "md",
+    "padding": 0,
+    "children": [
+      {
+        "type": "Box",
+        "background": "teal-600",
+        "padding": {
+          "x": 4,
+          "y": 3
+        },
+        "children": [
+          {
+            "type": "Row",
+            "gap": 3,
+            "align": "center",
+            "children": [
+              {
+                "type": "Box",
+                "size": 36,
+                "radius": "full",
+                "background": "teal-50",
+                "align": "center",
+                "justify": "center",
+                "children": [
+                  {
+                    "type": "Icon",
+                    "name": "map-pin",
+                    "color": "teal-600"
+                  }
+                ]
+              },
+              {
+                "type": "Title",
+                "value": "Route to King Fahd Gate",
+                "size": "md",
+                "color": "white"
+              },
+              {
+                "type": "Spacer"
+              },
+              {
+                "type": "Badge",
+                "label": "Accessible",
+                "color": "success",
+                "variant": "soft"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "Col",
+        "padding": {
+          "x": 4,
+          "y": 3
+        },
+        "gap": 3,
+        "children": [
+          {
+            "type": "Row",
+            "gap": 2,
+            "children": [
+              {
+                "type": "Col",
+                "gap": 0,
+                "children": [
+                  {
+                    "type": "Caption",
+                    "value": "From",
+                    "color": "secondary"
+                  },
+                  {
+                    "type": "Text",
+                    "value": "Your Hotel",
+                    "color": "emphasis"
+                  }
+                ]
+              },
+              {
+                "type": "Icon",
+                "name": "chevron-right",
+                "color": "secondary"
+              },
+              {
+                "type": "Col",
+                "gap": 0,
+                "children": [
+                  {
+                    "type": "Caption",
+                    "value": "To",
+                    "color": "secondary"
+                  },
+                  {
+                    "type": "Text",
+                    "value": "King Fahd Gate (Gate 79)",
+                    "color": "emphasis"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "Row",
+            "gap": 2,
+            "children": [
+              {
+                "type": "Badge",
+                "label": "450m",
+                "color": "info",
+                "variant": "soft"
+              },
+              {
+                "type": "Badge",
+                "label": "6 minutes",
+                "color": "success",
+                "variant": "soft"
+              }
+            ]
+          },
+          {
+            "type": "Divider"
+          },
+          {
+            "type": "Col",
+            "gap": 2,
+            "children": [
+              {
+                "type": "Row",
+                "key": "0-50m",
+                "gap": 3,
+                "align": "start",
+                "children": [
+                  {
+                    "type": "Box",
+                    "size": 10,
+                    "radius": "full",
+                    "background": "teal-600"
+                  },
+                  {
+                    "type": "Col",
+                    "gap": 0,
+                    "children": [
+                      {
+                        "type": "Text",
+                        "value": "Exit hotel, turn right",
+                        "size": "sm",
+                        "weight": "semibold"
+                      },
+                      {
+                        "type": "Caption",
+                        "value": "50m"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "Row",
+                "key": "1-300m",
+                "gap": 3,
+                "align": "start",
+                "children": [
+                  {
+                    "type": "Box",
+                    "size": 10,
+                    "radius": "full",
+                    "background": "teal-600"
+                  },
+                  {
+                    "type": "Col",
+                    "gap": 0,
+                    "children": [
+                      {
+                        "type": "Text",
+                        "value": "Continue on Ibrahim Al-Khalil St",
+                        "size": "sm",
+                        "weight": "semibold"
+                      },
+                      {
+                        "type": "Caption",
+                        "value": "300m"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "Row",
+                "key": "2-100m",
+                "gap": 3,
+                "align": "start",
+                "children": [
+                  {
+                    "type": "Box",
+                    "size": 10,
+                    "radius": "full",
+                    "background": "teal-600"
+                  },
+                  {
+                    "type": "Col",
+                    "gap": 0,
+                    "children": [
+                      {
+                        "type": "Text",
+                        "value": "Gate 79 on your left",
+                        "size": "sm",
+                        "weight": "semibold"
+                      },
+                      {
+                        "type": "Caption",
+                        "value": "100m"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "Divider"
+          },
+          {
+            "type": "Row",
+            "align": "center",
+            "gap": 2,
+            "children": [
+              {
+                "type": "Caption",
+                "value": "Nearby gates"
+              },
+              {
+                "type": "Spacer"
+              },
+              {
+                "type": "Badge",
+                "key": "79-0",
+                "label": "King Fahd Gate 79",
+                "color": "info",
+                "variant": "outline"
+              },
+              {
+                "type": "Badge",
+                "key": "1-1",
+                "label": "King Abdul Aziz Gate 1",
+                "color": "info",
+                "variant": "outline"
+              }
+            ]
+          },
+          {
+            "type": "Row",
+            "gap": 2,
+            "children": [
+              {
+                "type": "Button",
+                "label": "Open in Maps",
+                "iconStart": "external-link",
+                "color": "info",
+                "variant": "soft",
+                "onClickAction": {
+                  "type": "open_maps",
+                  "payload": {
+                    "lat": 21.4225,
+                    "lng": 39.8262,
+                    "label": "King Fahd Gate (Gate 79)"
+                  }
+                }
+              },
+              {
+                "type": "Button",
+                "label": "Save",
+                "iconStart": "star",
+                "color": "success",
+                "variant": "soft",
+                "onClickAction": {
+                  "type": "save_route",
+                  "payload": {
+                    "title": "Route to King Fahd Gate",
+                    "to": "King Fahd Gate (Gate 79)"
+                  }
+                }
+              },
+              {
+                "type": "Button",
+                "label": "Share",
+                "iconStart": "mail",
+                "variant": "outline",
+                "onClickAction": {
+                  "type": "share",
+                  "payload": {
+                    "title": "Route to King Fahd Gate",
+                    "distance": "450m",
+                    "walkingTime": "6 minutes"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "encodedWidget": "eyJpZCI6IjYzZjY4MGE5LTYxOTktNDc1My04Njk2LWU2MGE1ODAwNGUxNCIsIm5hbWUiOiJOYXZpZ2F0aW9uIHJvdXRlIiwidmlldyI6IjxDYXJkIHNpemU9XCJtZFwiIHBhZGRpbmc9ezB9PlxuICA8Qm94IGJhY2tncm91bmQ9XCJ0ZWFsLTYwMFwiIHBhZGRpbmc9e3sgeDogNCwgeTogMyB9fT5cbiAgICA8Um93IGdhcD17M30gYWxpZ249XCJjZW50ZXJcIj5cbiAgICAgIDxCb3hcbiAgICAgICAgc2l6ZT17MzZ9XG4gICAgICAgIHJhZGl1cz1cImZ1bGxcIlxuICAgICAgICBiYWNrZ3JvdW5kPVwidGVhbC01MFwiXG4gICAgICAgIGFsaWduPVwiY2VudGVyXCJcbiAgICAgICAganVzdGlmeT1cImNlbnRlclwiXG4gICAgICA-XG4gICAgICAgIDxJY29uIG5hbWU9XCJtYXAtcGluXCIgY29sb3I9XCJ0ZWFsLTYwMFwiIC8-XG4gICAgICA8L0JveD5cbiAgICAgIDxUaXRsZSB2YWx1ZT17dGl0bGV9IHNpemU9XCJtZFwiIGNvbG9yPVwid2hpdGVcIiAvPlxuICAgICAgPFNwYWNlciAvPlxuICAgICAgPEJhZGdlIGxhYmVsPVwiQWNjZXNzaWJsZVwiIGNvbG9yPVwic3VjY2Vzc1wiIHZhcmlhbnQ9XCJzb2Z0XCIgLz5cbiAgICA8L1Jvdz5cbiAgPC9Cb3g-XG5cbiAgPENvbCBwYWRkaW5nPXt7IHg6IDQsIHk6IDMgfX0gZ2FwPXszfT5cbiAgICA8Um93IGdhcD17Mn0-XG4gICAgICA8Q29sIGdhcD17MH0-XG4gICAgICAgIDxDYXB0aW9uIHZhbHVlPVwiRnJvbVwiIGNvbG9yPVwic2Vjb25kYXJ5XCIgLz5cbiAgICAgICAgPFRleHQgdmFsdWU9e2Zyb20ubmFtZX0gY29sb3I9XCJlbXBoYXNpc1wiIC8-XG4gICAgICA8L0NvbD5cbiAgICAgIDxJY29uIG5hbWU9XCJjaGV2cm9uLXJpZ2h0XCIgY29sb3I9XCJzZWNvbmRhcnlcIiAvPlxuICAgICAgPENvbCBnYXA9ezB9PlxuICAgICAgICA8Q2FwdGlvbiB2YWx1ZT1cIlRvXCIgY29sb3I9XCJzZWNvbmRhcnlcIiAvPlxuICAgICAgICA8VGV4dCB2YWx1ZT17dG8ubmFtZX0gY29sb3I9XCJlbXBoYXNpc1wiIC8-XG4gICAgICA8L0NvbD5cbiAgICA8L1Jvdz5cblxuICAgIDxSb3cgZ2FwPXsyfT5cbiAgICAgIDxCYWRnZSBsYWJlbD17ZGlzdGFuY2V9IGNvbG9yPVwiaW5mb1wiIHZhcmlhbnQ9XCJzb2Z0XCIgLz5cbiAgICAgIDxCYWRnZSBsYWJlbD17d2Fsa2luZ1RpbWV9IGNvbG9yPVwic3VjY2Vzc1wiIHZhcmlhbnQ9XCJzb2Z0XCIgLz5cbiAgICA8L1Jvdz5cblxuICAgIDxEaXZpZGVyIC8-XG5cbiAgICA8Q29sIGdhcD17Mn0-XG4gICAgICB7c3RlcHMubWFwKChpdGVtLCBpbmRleCkgPT4gKFxuICAgICAgICA8Um93IGtleT17YCR7aW5kZXh9LSR7aXRlbS5kaXN0YW5jZX1gfSBnYXA9ezN9IGFsaWduPVwic3RhcnRcIj5cbiAgICAgICAgICA8Qm94IHNpemU9ezEwfSByYWRpdXM9XCJmdWxsXCIgYmFja2dyb3VuZD1cInRlYWwtNjAwXCIgLz5cbiAgICAgICAgICA8Q29sIGdhcD17MH0-XG4gICAgICAgICAgICA8VGV4dCB2YWx1ZT17aXRlbS5pbnN0cnVjdGlvbn0gc2l6ZT1cInNtXCIgd2VpZ2h0PVwic2VtaWJvbGRcIiAvPlxuICAgICAgICAgICAgPENhcHRpb24gdmFsdWU9e2l0ZW0uZGlzdGFuY2V9IC8-XG4gICAgICAgICAgPC9Db2w-XG4gICAgICAgIDwvUm93PlxuICAgICAgKSl9XG4gICAgPC9Db2w-XG5cbiAgICA8RGl2aWRlciAvPlxuXG4gICAgPFJvdyBhbGlnbj1cImNlbnRlclwiIGdhcD17Mn0-XG4gICAgICA8Q2FwdGlvbiB2YWx1ZT1cIk5lYXJieSBnYXRlc1wiIC8-XG4gICAgICA8U3BhY2VyIC8-XG4gICAgICB7Z2F0ZXMubWFwKChnLCBpKSA9PiAoXG4gICAgICAgIDxCYWRnZVxuICAgICAgICAgIGtleT17YCR7Zy5udW1iZXJ9LSR7aX1gfVxuICAgICAgICAgIGxhYmVsPXtgJHtnLm5hbWV9ICR7Zy5udW1iZXJ9YH1cbiAgICAgICAgICBjb2xvcj1cImluZm9cIlxuICAgICAgICAgIHZhcmlhbnQ9XCJvdXRsaW5lXCJcbiAgICAgICAgLz5cbiAgICAgICkpfVxuICAgIDwvUm93PlxuXG4gICAgPFJvdyBnYXA9ezJ9PlxuICAgICAgPEJ1dHRvblxuICAgICAgICBsYWJlbD1cIk9wZW4gaW4gTWFwc1wiXG4gICAgICAgIGljb25TdGFydD1cImV4dGVybmFsLWxpbmtcIlxuICAgICAgICBjb2xvcj1cImluZm9cIlxuICAgICAgICB2YXJpYW50PVwic29mdFwiXG4gICAgICAgIG9uQ2xpY2tBY3Rpb249e3tcbiAgICAgICAgICB0eXBlOiBcIm9wZW5fbWFwc1wiLFxuICAgICAgICAgIHBheWxvYWQ6IHtcbiAgICAgICAgICAgIGxhdDogdG8uY29vcmRpbmF0ZXMubGF0LFxuICAgICAgICAgICAgbG5nOiB0by5jb29yZGluYXRlcy5sbmcsXG4gICAgICAgICAgICBsYWJlbDogdG8ubmFtZSxcbiAgICAgICAgICB9LFxuICAgICAgICB9fVxuICAgICAgLz5cbiAgICAgIDxCdXR0b25cbiAgICAgICAgbGFiZWw9XCJTYXZlXCJcbiAgICAgICAgaWNvblN0YXJ0PVwic3RhclwiXG4gICAgICAgIGNvbG9yPVwic3VjY2Vzc1wiXG4gICAgICAgIHZhcmlhbnQ9XCJzb2Z0XCJcbiAgICAgICAgb25DbGlja0FjdGlvbj17eyB0eXBlOiBcInNhdmVfcm91dGVcIiwgcGF5bG9hZDogeyB0aXRsZSwgdG86IHRvLm5hbWUgfSB9fVxuICAgICAgLz5cbiAgICAgIDxCdXR0b25cbiAgICAgICAgbGFiZWw9XCJTaGFyZVwiXG4gICAgICAgIGljb25TdGFydD1cIm1haWxcIlxuICAgICAgICB2YXJpYW50PVwib3V0bGluZVwiXG4gICAgICAgIG9uQ2xpY2tBY3Rpb249e3tcbiAgICAgICAgICB0eXBlOiBcInNoYXJlXCIsXG4gICAgICAgICAgcGF5bG9hZDogeyB0aXRsZSwgZGlzdGFuY2UsIHdhbGtpbmdUaW1lIH0sXG4gICAgICAgIH19XG4gICAgICAvPlxuICAgIDwvUm93PlxuICA8L0NvbD5cbjwvQ2FyZD4iLCJkZWZhdWx0U3RhdGUiOnsidGl0bGUiOiJSb3V0ZSB0byBLaW5nIEZhaGQgR2F0ZSIsImZyb20iOnsibmFtZSI6IllvdXIgSG90ZWwiLCJjb29yZGluYXRlcyI6bnVsbH0sInRvIjp7Im5hbWUiOiJLaW5nIEZhaGQgR2F0ZSAoR2F0ZSA3OSkiLCJjb29yZGluYXRlcyI6eyJsYXQiOjIxLjQyMjUsImxuZyI6MzkuODI2Mn19LCJkaXN0YW5jZSI6IjQ1MG0iLCJ3YWxraW5nVGltZSI6IjYgbWludXRlcyIsInN0ZXBzIjpbeyJpbnN0cnVjdGlvbiI6IkV4aXQgaG90ZWwsIHR1cm4gcmlnaHQiLCJkaXN0YW5jZSI6IjUwbSJ9LHsiaW5zdHJ1Y3Rpb24iOiJDb250aW51ZSBvbiBJYnJhaGltIEFsLUtoYWxpbCBTdCIsImRpc3RhbmNlIjoiMzAwbSJ9LHsiaW5zdHJ1Y3Rpb24iOiJHYXRlIDc5IG9uIHlvdXIgbGVmdCIsImRpc3RhbmNlIjoiMTAwbSJ9XSwiZ2F0ZXMiOlt7Im5hbWUiOiJLaW5nIEZhaGQgR2F0ZSIsIm51bWJlciI6NzksImFjY2Vzc2liaWxpdHkiOnRydWV9LHsibmFtZSI6IktpbmcgQWJkdWwgQXppeiBHYXRlIiwibnVtYmVyIjoxLCJhY2Nlc3NpYmlsaXR5Ijp0cnVlfV19LCJzdGF0ZXMiOltdLCJzY2hlbWEiOiJpbXBvcnQgeyB6IH0gZnJvbSBcInpvZFwiXG5cbmNvbnN0IENvb3JkaW5hdGVzID0gei5zdHJpY3RPYmplY3Qoe1xuICBsYXQ6IHoubnVtYmVyKCksXG4gIGxuZzogei5udW1iZXIoKSxcbn0pXG5cbmNvbnN0IFBsYWNlID0gei5zdHJpY3RPYmplY3Qoe1xuICBuYW1lOiB6LnN0cmluZygpLFxuICBjb29yZGluYXRlczogei51bmlvbihbQ29vcmRpbmF0ZXMsIHoubnVsbCgpXSksXG59KVxuXG5jb25zdCBTdGVwID0gei5zdHJpY3RPYmplY3Qoe1xuICBpbnN0cnVjdGlvbjogei5zdHJpbmcoKSxcbiAgZGlzdGFuY2U6IHouc3RyaW5nKCksXG59KVxuXG5jb25zdCBHYXRlID0gei5zdHJpY3RPYmplY3Qoe1xuICBuYW1lOiB6LnN0cmluZygpLFxuICBudW1iZXI6IHoubnVtYmVyKCksXG4gIGFjY2Vzc2liaWxpdHk6IHouYm9vbGVhbigpLFxufSlcblxuY29uc3QgV2lkZ2V0U3RhdGUgPSB6LnN0cmljdE9iamVjdCh7XG4gIHRpdGxlOiB6LnN0cmluZygpLFxuICBmcm9tOiBQbGFjZSxcbiAgdG86IHouc3RyaWN0T2JqZWN0KHsgbmFtZTogei5zdHJpbmcoKSwgY29vcmRpbmF0ZXM6IENvb3JkaW5hdGVzIH0pLFxuICBkaXN0YW5jZTogei5zdHJpbmcoKSxcbiAgd2Fsa2luZ1RpbWU6IHouc3RyaW5nKCksXG4gIHN0ZXBzOiB6LmFycmF5KFN0ZXApLFxuICBnYXRlczogei5hcnJheShHYXRlKSxcbn0pXG5cbmV4cG9ydCBkZWZhdWx0IFdpZGdldFN0YXRlIiwianNvblNjaGVtYSI6e30sInNjaGVtYU1vZGUiOiJ6b2QiLCJzY2hlbWFWYWxpZGl0eSI6InZhbGlkIiwidmlld1ZhbGlkaXR5IjoidmFsaWQiLCJkZWZhdWx0U3RhdGVWYWxpZGl0eSI6InZhbGlkIn0"
+}

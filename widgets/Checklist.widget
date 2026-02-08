@@ -1,0 +1,380 @@
+{
+  "version": "1.0",
+  "name": "Teal Checklist",
+  "template": "{\"type\":\"Card\",\"size\":\"md\",\"padding\":0,\"children\":[{\"type\":\"Form\",\"onSubmitAction\":{\"type\":\"checklist.save\"},\"children\":[{\"type\":\"Col\",\"gap\":0,\"children\":[{\"type\":\"Box\",\"background\":{{ (brand.tealDark) | tojson }},\"padding\":{\"x\":4,\"y\":4},\"children\":[{\"type\":\"Row\",\"align\":\"center\",\"gap\":3,\"children\":[{\"type\":\"Box\",\"size\":28,\"radius\":\"full\",\"background\":{{ (brand.white) | tojson }},\"align\":\"center\",\"justify\":\"center\",\"children\":[{\"type\":\"Icon\",\"name\":\"check\",\"size\":\"sm\",\"color\":{{ (brand.tealDark) | tojson }}}]},{\"type\":\"Title\",\"value\":{{ (title) | tojson }},\"size\":\"md\",\"color\":{{ (brand.white) | tojson }}},{\"type\":\"Spacer\"},{\"type\":\"Badge\",\"label\":{{ (progress.pctLabel) | tojson }},\"color\":\"info\",\"variant\":\"soft\"}]}]},{\"type\":\"Col\",\"padding\":{\"x\":4,\"y\":3},\"gap\":3,\"children\":[{%- set _c -%},{\"type\":\"Col\",\"gap\":1,\"children\":[{\"type\":\"Row\",\"align\":\"center\",\"children\":[{\"type\":\"Caption\",\"value\":{{ ((progress.completed ~ \" of \" ~ progress.total ~ \" complete\")) | tojson }},\"color\":{{ (brand.gray) | tojson }}},{\"type\":\"Spacer\"},{\"type\":\"Caption\",\"value\":{{ (progress.pctLabel) | tojson }},\"color\":{{ (brand.gray) | tojson }}}]},{\"type\":\"Box\",\"height\":8,\"width\":\"100%\",\"radius\":\"full\",\"background\":{{ (brand.track) | tojson }},\"border\":{\"size\":1,\"color\":{{ (brand.trackBorder) | tojson }}},\"children\":[{\"type\":\"Box\",\"height\":\"100%\",\"width\":{{ (progress.pctWidth) | tojson }},\"background\":{{ (brand.tealLight) | tojson }},\"radius\":\"full\"}]}]}{%-for category in categories -%},{\"type\":\"Col\",\"key\":{{ (category.name) | tojson }},\"gap\":2,\"children\":[{%- set _c -%},{\"type\":\"Row\",\"gap\":2,\"align\":\"center\",\"children\":[{\"type\":\"Box\",\"width\":3,\"height\":18,\"radius\":\"full\",\"background\":{{ (brand.tealLight) | tojson }}},{\"type\":\"Caption\",\"value\":{{ (category.name) | tojson }},\"color\":{{ (brand.tealDark) | tojson }},\"weight\":\"semibold\"}]}{%-for item in category[\"items\"] -%},{\"type\":\"Row\",\"key\":{{ (item.id) | tojson }},\"align\":\"center\",\"gap\":2,\"children\":[{%- set _c -%},{\"type\":\"Checkbox\",\"name\":{{ ((\"checklist.items.\" ~ item.id)) | tojson }},\"label\":{{ (item.text) | tojson }},\"defaultChecked\":{{ (item.checked) | tojson }},\"onChangeAction\":{\"type\":\"checklist.toggle\",\"payload\":{\"id\":{{ (item.id) | tojson }}}}}{%-if item.required -%},{\"type\":\"Badge\",\"label\":\"Required\",\"color\":\"danger\",\"variant\":\"outline\"}{%-else-%}{%-endif-%}{%- endset -%}{{- (_c[1:] if _c and _c[0] == ',' else _c) -}}]}{%-endfor-%}{%- endset -%}{{- (_c[1:] if _c and _c[0] == ',' else _c) -}}]}{%-endfor-%},{\"type\":\"Divider\"},{\"type\":\"Row\",\"gap\":2,\"children\":[{%- set _c -%}{%-if none -%},{\"type\":\"Button\",\"submit\":true,\"label\":\"Save\",\"style\":\"primary\",\"iconStart\":\"check\"}{%-else-%}{%-endif-%},{\"type\":\"Spacer\"}{%-if none -%},{\"type\":\"Button\",\"label\":\"Mark all\",\"variant\":\"outline\",\"iconStart\":\"check\",\"onClickAction\":{\"type\":\"checklist.mark_all\"}}{%-else-%}{%-endif-%}{%-if none -%},{\"type\":\"Button\",\"label\":\"Reset\",\"variant\":\"ghost\",\"iconStart\":\"reload\",\"onClickAction\":{\"type\":\"checklist.reset\"}}{%-else-%}{%-endif-%}{%- endset -%}{{- (_c[1:] if _c and _c[0] == ',' else _c) -}}]}{%- endset -%}{{- (_c[1:] if _c and _c[0] == ',' else _c) -}}]}]}]}]}",
+  "jsonSchema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "properties": {
+      "title": {
+        "type": "string"
+      },
+      "categories": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "number"
+                      }
+                    ]
+                  },
+                  "text": {
+                    "type": "string"
+                  },
+                  "checked": {
+                    "type": "boolean"
+                  },
+                  "required": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "id",
+                  "text",
+                  "checked",
+                  "required"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [
+            "name",
+            "items"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "actions": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "enum": [
+            "save",
+            "mark_all",
+            "reset"
+          ]
+        }
+      },
+      "progress": {
+        "type": "object",
+        "properties": {
+          "completed": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          },
+          "pctLabel": {
+            "type": "string"
+          },
+          "pctWidth": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "completed",
+          "total",
+          "pctLabel",
+          "pctWidth"
+        ],
+        "additionalProperties": false
+      },
+      "brand": {
+        "type": "object",
+        "properties": {
+          "tealLight": {
+            "type": "string"
+          },
+          "tealDark": {
+            "type": "string"
+          },
+          "white": {
+            "type": "string"
+          },
+          "gray": {
+            "type": "string"
+          },
+          "track": {
+            "type": "string"
+          },
+          "trackBorder": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "tealLight",
+          "tealDark",
+          "white",
+          "gray",
+          "track",
+          "trackBorder"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "required": [
+      "title",
+      "categories",
+      "actions",
+      "progress",
+      "brand"
+    ],
+    "additionalProperties": false
+  },
+  "outputJsonPreview": {
+    "type": "Card",
+    "size": "md",
+    "padding": 0,
+    "children": [
+      {
+        "type": "Form",
+        "onSubmitAction": {
+          "type": "checklist.save"
+        },
+        "children": [
+          {
+            "type": "Col",
+            "gap": 0,
+            "children": [
+              {
+                "type": "Box",
+                "background": "#0f766e",
+                "padding": {
+                  "x": 4,
+                  "y": 4
+                },
+                "children": [
+                  {
+                    "type": "Row",
+                    "align": "center",
+                    "gap": 3,
+                    "children": [
+                      {
+                        "type": "Box",
+                        "size": 28,
+                        "radius": "full",
+                        "background": "#ffffff",
+                        "align": "center",
+                        "justify": "center",
+                        "children": [
+                          {
+                            "type": "Icon",
+                            "name": "check",
+                            "size": "sm",
+                            "color": "#0f766e"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Title",
+                        "value": "Visa Requirements",
+                        "size": "md",
+                        "color": "#ffffff"
+                      },
+                      {
+                        "type": "Spacer"
+                      },
+                      {
+                        "type": "Badge",
+                        "label": "0%",
+                        "color": "info",
+                        "variant": "soft"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "Col",
+                "padding": {
+                  "x": 4,
+                  "y": 3
+                },
+                "gap": 3,
+                "children": [
+                  {
+                    "type": "Col",
+                    "gap": 1,
+                    "children": [
+                      {
+                        "type": "Row",
+                        "align": "center",
+                        "children": [
+                          {
+                            "type": "Caption",
+                            "value": "0 of 10 complete",
+                            "color": "#6b7280"
+                          },
+                          {
+                            "type": "Spacer"
+                          },
+                          {
+                            "type": "Caption",
+                            "value": "0%",
+                            "color": "#6b7280"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Box",
+                        "height": 8,
+                        "width": "100%",
+                        "radius": "full",
+                        "background": "#e5e7eb",
+                        "border": {
+                          "size": 1,
+                          "color": "#d1d5db"
+                        },
+                        "children": [
+                          {
+                            "type": "Box",
+                            "height": "100%",
+                            "width": "0%",
+                            "background": "#2dd4bf",
+                            "radius": "full"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Col",
+                    "key": "Documents",
+                    "gap": 2,
+                    "children": [
+                      {
+                        "type": "Row",
+                        "gap": 2,
+                        "align": "center",
+                        "children": [
+                          {
+                            "type": "Box",
+                            "width": 3,
+                            "height": 18,
+                            "radius": "full",
+                            "background": "#2dd4bf"
+                          },
+                          {
+                            "type": "Caption",
+                            "value": "Documents",
+                            "color": "#0f766e",
+                            "weight": "semibold"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Row",
+                        "key": 1,
+                        "align": "center",
+                        "gap": 2,
+                        "children": [
+                          {
+                            "type": "Checkbox",
+                            "name": "checklist.items.1",
+                            "label": "Valid passport (6+ months)",
+                            "defaultChecked": false,
+                            "onChangeAction": {
+                              "type": "checklist.toggle",
+                              "payload": {
+                                "id": 1
+                              }
+                            }
+                          },
+                          {
+                            "type": "Badge",
+                            "label": "Required",
+                            "color": "danger",
+                            "variant": "outline"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Row",
+                        "key": 2,
+                        "align": "center",
+                        "gap": 2,
+                        "children": [
+                          {
+                            "type": "Checkbox",
+                            "name": "checklist.items.2",
+                            "label": "Passport photos (white background)",
+                            "defaultChecked": false,
+                            "onChangeAction": {
+                              "type": "checklist.toggle",
+                              "payload": {
+                                "id": 2
+                              }
+                            }
+                          },
+                          {
+                            "type": "Badge",
+                            "label": "Required",
+                            "color": "danger",
+                            "variant": "outline"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Divider"
+                  },
+                  {
+                    "type": "Row",
+                    "gap": 2,
+                    "children": [
+                      {
+                        "type": "Button",
+                        "submit": true,
+                        "label": "Save",
+                        "style": "primary",
+                        "iconStart": "check"
+                      },
+                      {
+                        "type": "Spacer"
+                      },
+                      {
+                        "type": "Button",
+                        "label": "Mark all",
+                        "variant": "outline",
+                        "iconStart": "check",
+                        "onClickAction": {
+                          "type": "checklist.mark_all"
+                        }
+                      },
+                      {
+                        "type": "Button",
+                        "label": "Reset",
+                        "variant": "ghost",
+                        "iconStart": "reload",
+                        "onClickAction": {
+                          "type": "checklist.reset"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "encodedWidget": "eyJpZCI6IjcxNGUzZjI0LTNhZDItNDY2MS05NTUyLWNkNTAyMzk1ZGUwYyIsIm5hbWUiOiJUZWFsIENoZWNrbGlzdCIsInZpZXciOiI8Q2FyZCBzaXplPVwibWRcIiBwYWRkaW5nPXswfT5cbiAgPEZvcm0gb25TdWJtaXRBY3Rpb249e3sgdHlwZTogXCJjaGVja2xpc3Quc2F2ZVwiIH19PlxuICAgIDxDb2wgZ2FwPXswfT5cbiAgICAgIDxCb3ggYmFja2dyb3VuZD17YnJhbmQudGVhbERhcmt9IHBhZGRpbmc9e3sgeDogNCwgeTogNCB9fT5cbiAgICAgICAgPFJvdyBhbGlnbj1cImNlbnRlclwiIGdhcD17M30-XG4gICAgICAgICAgPEJveFxuICAgICAgICAgICAgc2l6ZT17Mjh9XG4gICAgICAgICAgICByYWRpdXM9XCJmdWxsXCJcbiAgICAgICAgICAgIGJhY2tncm91bmQ9e2JyYW5kLndoaXRlfVxuICAgICAgICAgICAgYWxpZ249XCJjZW50ZXJcIlxuICAgICAgICAgICAganVzdGlmeT1cImNlbnRlclwiXG4gICAgICAgICAgPlxuICAgICAgICAgICAgPEljb24gbmFtZT1cImNoZWNrXCIgc2l6ZT1cInNtXCIgY29sb3I9e2JyYW5kLnRlYWxEYXJrfSAvPlxuICAgICAgICAgIDwvQm94PlxuICAgICAgICAgIDxUaXRsZSB2YWx1ZT17dGl0bGV9IHNpemU9XCJtZFwiIGNvbG9yPXticmFuZC53aGl0ZX0gLz5cbiAgICAgICAgICA8U3BhY2VyIC8-XG4gICAgICAgICAgPEJhZGdlIGxhYmVsPXtwcm9ncmVzcy5wY3RMYWJlbH0gY29sb3I9XCJpbmZvXCIgdmFyaWFudD1cInNvZnRcIiAvPlxuICAgICAgICA8L1Jvdz5cbiAgICAgIDwvQm94PlxuXG4gICAgICA8Q29sIHBhZGRpbmc9e3sgeDogNCwgeTogMyB9fSBnYXA9ezN9PlxuICAgICAgICA8Q29sIGdhcD17MX0-XG4gICAgICAgICAgPFJvdyBhbGlnbj1cImNlbnRlclwiPlxuICAgICAgICAgICAgPENhcHRpb25cbiAgICAgICAgICAgICAgdmFsdWU9e2Ake3Byb2dyZXNzLmNvbXBsZXRlZH0gb2YgJHtwcm9ncmVzcy50b3RhbH0gY29tcGxldGVgfVxuICAgICAgICAgICAgICBjb2xvcj17YnJhbmQuZ3JheX1cbiAgICAgICAgICAgIC8-XG4gICAgICAgICAgICA8U3BhY2VyIC8-XG4gICAgICAgICAgICA8Q2FwdGlvbiB2YWx1ZT17cHJvZ3Jlc3MucGN0TGFiZWx9IGNvbG9yPXticmFuZC5ncmF5fSAvPlxuICAgICAgICAgIDwvUm93PlxuICAgICAgICAgIDxCb3hcbiAgICAgICAgICAgIGhlaWdodD17OH1cbiAgICAgICAgICAgIHdpZHRoPVwiMTAwJVwiXG4gICAgICAgICAgICByYWRpdXM9XCJmdWxsXCJcbiAgICAgICAgICAgIGJhY2tncm91bmQ9e2JyYW5kLnRyYWNrfVxuICAgICAgICAgICAgYm9yZGVyPXt7IHNpemU6IDEsIGNvbG9yOiBicmFuZC50cmFja0JvcmRlciB9fVxuICAgICAgICAgID5cbiAgICAgICAgICAgIDxCb3hcbiAgICAgICAgICAgICAgaGVpZ2h0PVwiMTAwJVwiXG4gICAgICAgICAgICAgIHdpZHRoPXtwcm9ncmVzcy5wY3RXaWR0aH1cbiAgICAgICAgICAgICAgYmFja2dyb3VuZD17YnJhbmQudGVhbExpZ2h0fVxuICAgICAgICAgICAgICByYWRpdXM9XCJmdWxsXCJcbiAgICAgICAgICAgIC8-XG4gICAgICAgICAgPC9Cb3g-XG4gICAgICAgIDwvQ29sPlxuXG4gICAgICAgIHtjYXRlZ29yaWVzLm1hcCgoY2F0ZWdvcnkpID0-IChcbiAgICAgICAgICA8Q29sIGtleT17Y2F0ZWdvcnkubmFtZX0gZ2FwPXsyfT5cbiAgICAgICAgICAgIDxSb3cgZ2FwPXsyfSBhbGlnbj1cImNlbnRlclwiPlxuICAgICAgICAgICAgICA8Qm94XG4gICAgICAgICAgICAgICAgd2lkdGg9ezN9XG4gICAgICAgICAgICAgICAgaGVpZ2h0PXsxOH1cbiAgICAgICAgICAgICAgICByYWRpdXM9XCJmdWxsXCJcbiAgICAgICAgICAgICAgICBiYWNrZ3JvdW5kPXticmFuZC50ZWFsTGlnaHR9XG4gICAgICAgICAgICAgIC8-XG4gICAgICAgICAgICAgIDxDYXB0aW9uXG4gICAgICAgICAgICAgICAgdmFsdWU9e2NhdGVnb3J5Lm5hbWV9XG4gICAgICAgICAgICAgICAgY29sb3I9e2JyYW5kLnRlYWxEYXJrfVxuICAgICAgICAgICAgICAgIHdlaWdodD1cInNlbWlib2xkXCJcbiAgICAgICAgICAgICAgLz5cbiAgICAgICAgICAgIDwvUm93PlxuICAgICAgICAgICAge2NhdGVnb3J5Lml0ZW1zLm1hcCgoaXRlbSkgPT4gKFxuICAgICAgICAgICAgICA8Um93IGtleT17aXRlbS5pZH0gYWxpZ249XCJjZW50ZXJcIiBnYXA9ezJ9PlxuICAgICAgICAgICAgICAgIDxDaGVja2JveFxuICAgICAgICAgICAgICAgICAgbmFtZT17YGNoZWNrbGlzdC5pdGVtcy4ke2l0ZW0uaWR9YH1cbiAgICAgICAgICAgICAgICAgIGxhYmVsPXtpdGVtLnRleHR9XG4gICAgICAgICAgICAgICAgICBkZWZhdWx0Q2hlY2tlZD17aXRlbS5jaGVja2VkfVxuICAgICAgICAgICAgICAgICAgb25DaGFuZ2VBY3Rpb249e3tcbiAgICAgICAgICAgICAgICAgICAgdHlwZTogXCJjaGVja2xpc3QudG9nZ2xlXCIsXG4gICAgICAgICAgICAgICAgICAgIHBheWxvYWQ6IHsgaWQ6IGl0ZW0uaWQgfSxcbiAgICAgICAgICAgICAgICAgIH19XG4gICAgICAgICAgICAgICAgLz5cbiAgICAgICAgICAgICAgICB7aXRlbS5yZXF1aXJlZCAmJiAoXG4gICAgICAgICAgICAgICAgICA8QmFkZ2UgbGFiZWw9XCJSZXF1aXJlZFwiIGNvbG9yPVwiZGFuZ2VyXCIgdmFyaWFudD1cIm91dGxpbmVcIiAvPlxuICAgICAgICAgICAgICAgICl9XG4gICAgICAgICAgICAgIDwvUm93PlxuICAgICAgICAgICAgKSl9XG4gICAgICAgICAgPC9Db2w-XG4gICAgICAgICkpfVxuXG4gICAgICAgIDxEaXZpZGVyIC8-XG4gICAgICAgIDxSb3cgZ2FwPXsyfT5cbiAgICAgICAgICB7YWN0aW9ucy5pbmNsdWRlcyhcInNhdmVcIikgJiYgKFxuICAgICAgICAgICAgPEJ1dHRvbiBzdWJtaXQgbGFiZWw9XCJTYXZlXCIgc3R5bGU9XCJwcmltYXJ5XCIgaWNvblN0YXJ0PVwiY2hlY2tcIiAvPlxuICAgICAgICAgICl9XG4gICAgICAgICAgPFNwYWNlciAvPlxuICAgICAgICAgIHthY3Rpb25zLmluY2x1ZGVzKFwibWFya19hbGxcIikgJiYgKFxuICAgICAgICAgICAgPEJ1dHRvblxuICAgICAgICAgICAgICBsYWJlbD1cIk1hcmsgYWxsXCJcbiAgICAgICAgICAgICAgdmFyaWFudD1cIm91dGxpbmVcIlxuICAgICAgICAgICAgICBpY29uU3RhcnQ9XCJjaGVja1wiXG4gICAgICAgICAgICAgIG9uQ2xpY2tBY3Rpb249e3sgdHlwZTogXCJjaGVja2xpc3QubWFya19hbGxcIiB9fVxuICAgICAgICAgICAgLz5cbiAgICAgICAgICApfVxuICAgICAgICAgIHthY3Rpb25zLmluY2x1ZGVzKFwicmVzZXRcIikgJiYgKFxuICAgICAgICAgICAgPEJ1dHRvblxuICAgICAgICAgICAgICBsYWJlbD1cIlJlc2V0XCJcbiAgICAgICAgICAgICAgdmFyaWFudD1cImdob3N0XCJcbiAgICAgICAgICAgICAgaWNvblN0YXJ0PVwicmVsb2FkXCJcbiAgICAgICAgICAgICAgb25DbGlja0FjdGlvbj17eyB0eXBlOiBcImNoZWNrbGlzdC5yZXNldFwiIH19XG4gICAgICAgICAgICAvPlxuICAgICAgICAgICl9XG4gICAgICAgIDwvUm93PlxuICAgICAgPC9Db2w-XG4gICAgPC9Db2w-XG4gIDwvRm9ybT5cbjwvQ2FyZD4iLCJkZWZhdWx0U3RhdGUiOnsidGl0bGUiOiJWaXNhIFJlcXVpcmVtZW50cyIsImNhdGVnb3JpZXMiOlt7Im5hbWUiOiJEb2N1bWVudHMiLCJpdGVtcyI6W3siaWQiOjEsInRleHQiOiJWYWxpZCBwYXNzcG9ydCAoNisgbW9udGhzKSIsImNoZWNrZWQiOmZhbHNlLCJyZXF1aXJlZCI6dHJ1ZX0seyJpZCI6MiwidGV4dCI6IlBhc3Nwb3J0IHBob3RvcyAod2hpdGUgYmFja2dyb3VuZCkiLCJjaGVja2VkIjpmYWxzZSwicmVxdWlyZWQiOnRydWV9XX1dLCJhY3Rpb25zIjpbInNhdmUiLCJtYXJrX2FsbCIsInJlc2V0Il0sInByb2dyZXNzIjp7ImNvbXBsZXRlZCI6MCwidG90YWwiOjEwLCJwY3RMYWJlbCI6IjAlIiwicGN0V2lkdGgiOiIwJSJ9LCJicmFuZCI6eyJ0ZWFsTGlnaHQiOiIjMmRkNGJmIiwidGVhbERhcmsiOiIjMGY3NjZlIiwid2hpdGUiOiIjZmZmZmZmIiwiZ3JheSI6IiM2YjcyODAiLCJ0cmFjayI6IiNlNWU3ZWIiLCJ0cmFja0JvcmRlciI6IiNkMWQ1ZGIifX0sInN0YXRlcyI6W10sInNjaGVtYSI6ImltcG9ydCB7IHogfSBmcm9tIFwiem9kXCJcblxuY29uc3QgSXRlbSA9IHouc3RyaWN0T2JqZWN0KHtcbiAgaWQ6IHoudW5pb24oW3ouc3RyaW5nKCksIHoubnVtYmVyKCldKSxcbiAgdGV4dDogei5zdHJpbmcoKSxcbiAgY2hlY2tlZDogei5ib29sZWFuKCksXG4gIHJlcXVpcmVkOiB6LmJvb2xlYW4oKSxcbn0pXG5cbmNvbnN0IENhdGVnb3J5ID0gei5zdHJpY3RPYmplY3Qoe1xuICBuYW1lOiB6LnN0cmluZygpLFxuICBpdGVtczogei5hcnJheShJdGVtKSxcbn0pXG5cbmNvbnN0IFdpZGdldFN0YXRlID0gei5zdHJpY3RPYmplY3Qoe1xuICB0aXRsZTogei5zdHJpbmcoKSxcbiAgY2F0ZWdvcmllczogei5hcnJheShDYXRlZ29yeSksXG4gIGFjdGlvbnM6IHouYXJyYXkoei5lbnVtKFtcInNhdmVcIiwgXCJtYXJrX2FsbFwiLCBcInJlc2V0XCJdKSksXG4gIHByb2dyZXNzOiB6LnN0cmljdE9iamVjdCh7XG4gICAgY29tcGxldGVkOiB6Lm51bWJlcigpLFxuICAgIHRvdGFsOiB6Lm51bWJlcigpLFxuICAgIHBjdExhYmVsOiB6LnN0cmluZygpLFxuICAgIHBjdFdpZHRoOiB6LnN0cmluZygpLFxuICB9KSxcbiAgYnJhbmQ6IHouc3RyaWN0T2JqZWN0KHtcbiAgICB0ZWFsTGlnaHQ6IHouc3RyaW5nKCksXG4gICAgdGVhbERhcms6IHouc3RyaW5nKCksXG4gICAgd2hpdGU6IHouc3RyaW5nKCksXG4gICAgZ3JheTogei5zdHJpbmcoKSxcbiAgICB0cmFjazogei5zdHJpbmcoKSxcbiAgICB0cmFja0JvcmRlcjogei5zdHJpbmcoKSxcbiAgfSksXG59KVxuXG5leHBvcnQgZGVmYXVsdCBXaWRnZXRTdGF0ZSIsImpzb25TY2hlbWEiOnt9LCJzY2hlbWFNb2RlIjoiem9kIiwic2NoZW1hVmFsaWRpdHkiOiJ2YWxpZCIsInZpZXdWYWxpZGl0eSI6InZhbGlkIiwiZGVmYXVsdFN0YXRlVmFsaWRpdHkiOiJ2YWxpZCJ9"
+}

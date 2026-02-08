@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useId, useCallback, useEffect, useRef } from 'react'
+import { useState, useId, useCallback, useMemo, useEffect } from 'react'
 import { ChatKit, useChatKit } from '@openai/chatkit-react'
-import { useUserJourney } from '@/context/UserJourneyContext'
 import { SparklesIcon, Message01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon, type HugeiconsProps } from '@hugeicons/react'
+import { useUserJourney } from '@/context/UserJourneyContext'
+import { setSessionContext, setUserProfileGetter, handleClientTool } from '@/lib/client-tools'
 
 interface AIChatPanelProps {
     context: string
@@ -169,6 +170,50 @@ function ChatWelcomeScreen({
     )
 }
 
+// Context metadata for agent routing (not shown to user)
+interface SessionContext {
+    page: string           // e.g., 'prepare', 'learn', 'explore'
+    action: string         // e.g., 'find-hotels', 'build-itinerary'
+    actionLabel: string    // e.g., 'Find Hotels', 'Build My Itinerary'
+}
+
+// Create a client secret fetcher that caches the secret
+function createClientSecretFetcher(userId: string, context?: SessionContext) {
+    return async (currentSecret: string | null): Promise<string> => {
+        // Return cached secret if it exists
+        if (currentSecret) return currentSecret
+
+        const res = await fetch('/api/chatkit/session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                userId,
+                // Send context metadata (agent receives this, user doesn't see it)
+                context: context ? {
+                    page: context.page,
+                    action: context.action,
+                    actionLabel: context.actionLabel,
+                } : undefined,
+            }),
+        })
+
+        const payload = await res.json().catch(() => ({})) as {
+            client_secret?: string
+            error?: string
+        }
+
+        if (!res.ok) {
+            throw new Error(payload.error ?? 'Failed to create session')
+        }
+
+        if (!payload.client_secret) {
+            throw new Error('Missing client secret in response')
+        }
+
+        return payload.client_secret
+    }
+}
+
 // Active chat - only created when user starts chatting
 function ActiveChatPanel({
     context,
@@ -183,18 +228,15 @@ function ActiveChatPanel({
     contextLabel: string
     contextIcon?: HugeiconsProps['icon']
     initialQuestion: string | null
-    classification: 'prepare' | 'learn' | 'explore' | 'blog'
-    action: string
-    actionLabel: string
+    classification?: string
+    action?: string
+    actionLabel?: string
 }) {
-    const { user } = useUserJourney()
     const visitorId = useId()
-    const [error, setError] = useState<string | null>(null)
-    const [isReady, setIsReady] = useState(false)
-    const hasSentInitialQuestion = useRef(false)
+    const { user, daysUntilDeparture } = useUserJourney()
 
     // Generate a stable user ID for the session
-    const [userId] = useState(() => {
+    const userId = useMemo(() => {
         if (typeof window !== 'undefined') {
             let storedId = localStorage.getItem('visitmakkah_user_id')
             if (!storedId) {
@@ -204,113 +246,76 @@ function ActiveChatPanel({
             return storedId
         }
         return `user_${visitorId}`
-    })
+    }, [visitorId])
 
-    // Initialize ChatKit - only happens when this component mounts (user started chat)
-    const { control, sendUserMessage } = useChatKit({
-        api: {
-            async getClientSecret() {
-                try {
-                    const res = await fetch('/api/chatkit/session', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            context,
-                            userId,
-                            userProfile: {
-                                journeyStage: user.journeyStage,
-                                journeyType: user.journeyType,
-                                isFirstTime: user.isFirstTime,
-                                travelGroup: user.travelGroup,
-                                gender: user.gender,
-                                country: user.country,
-                            },
-                            // Classification metadata for agent routing
-                            routing: {
-                                classification, // 'prepare' | 'learn' | 'explore' | 'blog'
-                                action,         // e.g., 'build-itinerary', 'find-food'
-                                actionLabel,    // e.g., 'Build My Itinerary', 'Find Food'
-                            },
-                            initialQuestion, // Pass initial question to potentially include in context
-                        }),
-                    })
+    // Set up session context for client tools (page, action, actionLabel)
+    useEffect(() => {
+        setSessionContext({
+            page: classification || 'general',
+            action: action || context,
+            actionLabel: actionLabel || contextLabel,
+        })
+    }, [classification, action, context, actionLabel, contextLabel])
 
-                    if (!res.ok) {
-                        const errorData = await res.json().catch(() => ({}))
-                        console.error('Session error:', errorData)
-                        throw new Error(errorData.error || 'Failed to get session token')
-                    }
+    // Set up user profile getter for client tools
+    useEffect(() => {
+        setUserProfileGetter(() => ({
+            journeyStage: user.journeyStage,
+            journeyType: user.journeyType,
+            isFirstTime: user.isFirstTime,
+            gender: user.gender,
+            country: user.country,
+            travelGroup: user.travelGroup,
+            departureDate: user.travelDates.departure,
+            returnDate: user.travelDates.return,
+            completedOnboarding: user.completedOnboarding,
+            preparationProgress: user.preparationProgress,
+            packingProgress: user.packingProgress,
+            daysUntilDeparture: daysUntilDeparture,
+        }))
+    }, [user, daysUntilDeparture])
 
-                    const data = await res.json()
-                    setError(null)
-                    setIsReady(true)
-                    return data.client_secret
-                } catch (err) {
-                    console.error('Error getting client secret:', err)
-                    setError(err instanceof Error ? err.message : 'Failed to connect to AI assistant')
-                    throw err
-                }
-            },
+    // Create memoized fetcher with context metadata (sent to agent, hidden from user)
+    const getClientSecret = useMemo(
+        () => createClientSecretFetcher(userId, {
+            page: classification || 'general',
+            action: action || context,
+            actionLabel: actionLabel || contextLabel,
+        }),
+        [userId, classification, action, context, actionLabel, contextLabel]
+    )
+
+    // Handle client tool calls from the agent
+    const onClientTool = useCallback(async (tool: { name: string; params: Record<string, unknown> }) => {
+        console.log('[ChatKit] Client tool called:', tool.name, tool.params)
+        const result = await handleClientTool(tool.name, tool.params)
+        return result.data as Record<string, unknown>
+    }, [])
+
+    // Initialize ChatKit with client tool support
+    const chatkit = useChatKit({
+        api: { getClientSecret },
+        onClientTool,
+        startScreen: {
+            greeting: initialQuestion || `Ask me anything about ${contextLabel}`,
+            prompts: initialQuestion ? [
+                { label: initialQuestion, prompt: initialQuestion, icon: 'sparkle' },
+            ] : undefined,
+        },
+        composer: {
+            placeholder: `Ask about ${contextLabel}...`,
         },
     })
 
-    // Auto-send initial question when ChatKit is ready
-    useEffect(() => {
-        if (isReady && initialQuestion && !hasSentInitialQuestion.current && sendUserMessage) {
-            hasSentInitialQuestion.current = true
-            // Small delay to ensure ChatKit is fully initialized
-            const timer = setTimeout(() => {
-                try {
-                    sendUserMessage({ text: initialQuestion })
-                } catch (err) {
-                    console.error('Error sending initial message:', err)
-                }
-            }, 100)
-            return () => clearTimeout(timer)
-        }
-    }, [isReady, initialQuestion, sendUserMessage])
-
-    // Error state
-    if (error) {
-        return (
-            <div className="islamic-pattern-bg flex h-full flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-900">
-                <ChatKitHeader contextLabel={contextLabel} contextIcon={contextIcon} />
-                <div className="relative z-10 flex flex-1 items-center justify-center p-4">
-                    <div className="text-center">
-                        <p className="text-sm text-red-600 dark:text-red-400">
-                            {error}
-                        </p>
-                        <button
-                            onClick={() => window.location.reload()}
-                            className="mt-3 rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700"
-                        >
-                            Retry
-                        </button>
-                    </div>
-                </div>
-            </div>
-        )
-    }
-
     return (
-        <div className="islamic-pattern-bg flex h-full flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-900">
+        <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-900">
             <ChatKitHeader contextLabel={contextLabel} contextIcon={contextIcon} />
 
             {/* ChatKit Component - Full chat UI with input */}
             <div className="relative z-10 flex-1 overflow-hidden">
                 <ChatKit
-                    control={control}
+                    control={chatkit.control}
                     className="h-full w-full"
-                />
-                {/* Islamic pattern overlay for chat area */}
-                <div
-                    className="pointer-events-none absolute inset-0 z-20"
-                    style={{
-                        backgroundImage: 'url(/images/islamic-pattern.png)',
-                        backgroundPosition: 'left top',
-                        backgroundRepeat: 'repeat-y',
-                        backgroundSize: 'auto 300px',
-                    }}
                 />
             </div>
         </div>

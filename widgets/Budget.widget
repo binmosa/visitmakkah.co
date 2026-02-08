@@ -1,0 +1,552 @@
+{
+  "version": "1.0",
+  "name": "Budget",
+  "template": "{\"type\":\"Card\",\"size\":\"md\",\"padding\":0,\"children\":[{\"type\":\"Col\",\"gap\":0,\"children\":[{\"type\":\"Box\",\"background\":{{ (theme.darkTeal) | tojson }},\"padding\":4,\"children\":[{\"type\":\"Col\",\"gap\":1,\"children\":[{\"type\":\"Caption\",\"value\":{{ (currency) | tojson }},\"color\":{{ (theme.white) | tojson }}},{\"type\":\"Title\",\"value\":{{ (title) | tojson }},\"size\":\"md\",\"color\":{{ (theme.white) | tojson }}}]}]},{\"type\":\"Col\",\"gap\":3,\"padding\":4,\"children\":[{\"type\":\"Row\",\"gap\":3,\"children\":[{\"type\":\"Box\",\"flex\":1,\"background\":{{ (theme.white) | tojson }},\"border\":{\"size\":1,\"color\":\"subtle\"},\"radius\":\"lg\",\"padding\":3,\"children\":[{\"type\":\"Text\",\"value\":\"Total\",\"size\":\"sm\",\"color\":{{ (theme.gray) | tojson }}},{\"type\":\"Title\",\"value\":{{ (totalFormatted) | tojson }},\"size\":\"md\"}]},{\"type\":\"Box\",\"flex\":1,\"background\":{{ (theme.white) | tojson }},\"border\":{\"size\":1,\"color\":\"subtle\"},\"radius\":\"lg\",\"padding\":3,\"children\":[{\"type\":\"Text\",\"value\":\"Per day\",\"size\":\"sm\",\"color\":{{ (theme.gray) | tojson }}},{\"type\":\"Title\",\"value\":{{ (perDayFormatted) | tojson }},\"size\":\"md\"}]}]},{\"type\":\"Box\",\"background\":{{ (theme.white) | tojson }},\"border\":{\"size\":1,\"color\":\"subtle\"},\"radius\":\"lg\",\"padding\":3,\"children\":[{\"type\":\"Chart\",\"data\":{{ (chart.data) | tojson }},\"series\":[{\"type\":\"Text\",\"value\":{\"type\":\"bar\",\"dataKey\":\"value\",\"color\":{{ (chart.barColor) | tojson }}}}],\"xAxis\":{\"dataKey\":\"name\"},\"showYAxis\":false,\"showLegend\":false,\"height\":140}]},{\"type\":\"Col\",\"gap\":2,\"children\":[{%- set _c -%}{%-for item in items -%},{\"type\":\"Row\",\"key\":{{ (item.id) | tojson }},\"gap\":3,\"align\":\"center\",\"children\":[{\"type\":\"Box\",\"background\":{{ (theme.lightTeal) | tojson }},\"radius\":\"sm\",\"padding\":2,\"children\":[{\"type\":\"Icon\",\"name\":{{ (item.icon) | tojson }},\"color\":{{ (theme.darkTeal) | tojson }}}]},{\"type\":\"Col\",\"children\":[{\"type\":\"Text\",\"value\":{{ (item.label) | tojson }},\"size\":\"sm\",\"weight\":\"semibold\"},{\"type\":\"Caption\",\"value\":{{ ((item.percent ~ \"%\")) | tojson }},\"color\":\"secondary\"}]},{\"type\":\"Spacer\"},{\"type\":\"Text\",\"value\":{{ (item.amount) | tojson }},\"size\":\"sm\",\"weight\":\"semibold\"}]}{%-endfor-%}{%- endset -%}{{- (_c[1:] if _c and _c[0] == ',' else _c) -}}]},{\"type\":\"Row\",\"gap\":2,\"children\":[{\"type\":\"Button\",\"label\":\"Save\",\"style\":\"primary\",\"onClickAction\":{\"type\":\"budget.save\",\"payload\":{\"title\":{{ (title) | tojson }}}}},{\"type\":\"Button\",\"label\":\"Adjust\",\"variant\":\"outline\",\"onClickAction\":{\"type\":\"budget.adjust\",\"payload\":{\"title\":{{ (title) | tojson }}}}},{\"type\":\"Button\",\"label\":\"Share\",\"variant\":\"outline\",\"iconStart\":\"external-link\",\"onClickAction\":{\"type\":\"budget.share\",\"payload\":{\"title\":{{ (title) | tojson }}}}}]}]}]}]}",
+  "jsonSchema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "properties": {
+      "title": {
+        "type": "string"
+      },
+      "currency": {
+        "type": "string"
+      },
+      "totalFormatted": {
+        "type": "string"
+      },
+      "perDayFormatted": {
+        "type": "string"
+      },
+      "items": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "icon": {
+              "type": "string",
+              "enum": [
+                "suitcase",
+                "map-pin",
+                "star-filled",
+                "maps",
+                "dots-horizontal"
+              ]
+            },
+            "label": {
+              "type": "string"
+            },
+            "amount": {
+              "type": "string"
+            },
+            "percent": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "id",
+            "icon",
+            "label",
+            "amount",
+            "percent"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "chart": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "name",
+                "value"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "barColor": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "barColor"
+        ],
+        "additionalProperties": false
+      },
+      "theme": {
+        "type": "object",
+        "properties": {
+          "lightTeal": {
+            "type": "string"
+          },
+          "darkTeal": {
+            "type": "string"
+          },
+          "gray": {
+            "type": "string"
+          },
+          "white": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "lightTeal",
+          "darkTeal",
+          "gray",
+          "white"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "required": [
+      "title",
+      "currency",
+      "totalFormatted",
+      "perDayFormatted",
+      "items",
+      "chart",
+      "theme"
+    ],
+    "additionalProperties": false
+  },
+  "outputJsonPreview": {
+    "type": "Card",
+    "size": "md",
+    "padding": 0,
+    "children": [
+      {
+        "type": "Col",
+        "gap": 0,
+        "children": [
+          {
+            "type": "Box",
+            "background": "#0F766E",
+            "padding": 4,
+            "children": [
+              {
+                "type": "Col",
+                "gap": 1,
+                "children": [
+                  {
+                    "type": "Caption",
+                    "value": "USD",
+                    "color": "#FFFFFF"
+                  },
+                  {
+                    "type": "Title",
+                    "value": "10-Day Umrah Budget",
+                    "size": "md",
+                    "color": "#FFFFFF"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "Col",
+            "gap": 3,
+            "padding": 4,
+            "children": [
+              {
+                "type": "Row",
+                "gap": 3,
+                "children": [
+                  {
+                    "type": "Box",
+                    "flex": 1,
+                    "background": "#FFFFFF",
+                    "border": {
+                      "size": 1,
+                      "color": "subtle"
+                    },
+                    "radius": "lg",
+                    "padding": 3,
+                    "children": [
+                      {
+                        "type": "Text",
+                        "value": "Total",
+                        "size": "sm",
+                        "color": "#6B7280"
+                      },
+                      {
+                        "type": "Title",
+                        "value": "$4,500",
+                        "size": "md"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Box",
+                    "flex": 1,
+                    "background": "#FFFFFF",
+                    "border": {
+                      "size": 1,
+                      "color": "subtle"
+                    },
+                    "radius": "lg",
+                    "padding": 3,
+                    "children": [
+                      {
+                        "type": "Text",
+                        "value": "Per day",
+                        "size": "sm",
+                        "color": "#6B7280"
+                      },
+                      {
+                        "type": "Title",
+                        "value": "$450/day",
+                        "size": "md"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "Box",
+                "background": "#FFFFFF",
+                "border": {
+                  "size": 1,
+                  "color": "subtle"
+                },
+                "radius": "lg",
+                "padding": 3,
+                "children": [
+                  {
+                    "type": "Chart",
+                    "data": [
+                      {
+                        "name": "Flights",
+                        "value": 1200
+                      },
+                      {
+                        "name": "Hotel",
+                        "value": 1500
+                      },
+                      {
+                        "name": "Food",
+                        "value": 500
+                      },
+                      {
+                        "name": "Transport",
+                        "value": 300
+                      },
+                      {
+                        "name": "Misc",
+                        "value": 1000
+                      }
+                    ],
+                    "series": [
+                      {
+                        "type": "bar",
+                        "dataKey": "value",
+                        "color": "#0F766E"
+                      }
+                    ],
+                    "xAxis": {
+                      "dataKey": "name"
+                    },
+                    "showYAxis": false,
+                    "showLegend": false,
+                    "height": 140
+                  }
+                ]
+              },
+              {
+                "type": "Col",
+                "gap": 2,
+                "children": [
+                  {
+                    "type": "Row",
+                    "key": "flights",
+                    "gap": 3,
+                    "align": "center",
+                    "children": [
+                      {
+                        "type": "Box",
+                        "background": "#CCFBF1",
+                        "radius": "sm",
+                        "padding": 2,
+                        "children": [
+                          {
+                            "type": "Icon",
+                            "name": "suitcase",
+                            "color": "#0F766E"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Col",
+                        "children": [
+                          {
+                            "type": "Text",
+                            "value": "Flights",
+                            "size": "sm",
+                            "weight": "semibold"
+                          },
+                          {
+                            "type": "Caption",
+                            "value": "27%",
+                            "color": "secondary"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Spacer"
+                      },
+                      {
+                        "type": "Text",
+                        "value": "$1,200",
+                        "size": "sm",
+                        "weight": "semibold"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Row",
+                    "key": "hotel",
+                    "gap": 3,
+                    "align": "center",
+                    "children": [
+                      {
+                        "type": "Box",
+                        "background": "#CCFBF1",
+                        "radius": "sm",
+                        "padding": 2,
+                        "children": [
+                          {
+                            "type": "Icon",
+                            "name": "map-pin",
+                            "color": "#0F766E"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Col",
+                        "children": [
+                          {
+                            "type": "Text",
+                            "value": "Hotel",
+                            "size": "sm",
+                            "weight": "semibold"
+                          },
+                          {
+                            "type": "Caption",
+                            "value": "33%",
+                            "color": "secondary"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Spacer"
+                      },
+                      {
+                        "type": "Text",
+                        "value": "$1,500",
+                        "size": "sm",
+                        "weight": "semibold"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Row",
+                    "key": "food",
+                    "gap": 3,
+                    "align": "center",
+                    "children": [
+                      {
+                        "type": "Box",
+                        "background": "#CCFBF1",
+                        "radius": "sm",
+                        "padding": 2,
+                        "children": [
+                          {
+                            "type": "Icon",
+                            "name": "star-filled",
+                            "color": "#0F766E"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Col",
+                        "children": [
+                          {
+                            "type": "Text",
+                            "value": "Food",
+                            "size": "sm",
+                            "weight": "semibold"
+                          },
+                          {
+                            "type": "Caption",
+                            "value": "11%",
+                            "color": "secondary"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Spacer"
+                      },
+                      {
+                        "type": "Text",
+                        "value": "$500",
+                        "size": "sm",
+                        "weight": "semibold"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Row",
+                    "key": "transport",
+                    "gap": 3,
+                    "align": "center",
+                    "children": [
+                      {
+                        "type": "Box",
+                        "background": "#CCFBF1",
+                        "radius": "sm",
+                        "padding": 2,
+                        "children": [
+                          {
+                            "type": "Icon",
+                            "name": "maps",
+                            "color": "#0F766E"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Col",
+                        "children": [
+                          {
+                            "type": "Text",
+                            "value": "Transport",
+                            "size": "sm",
+                            "weight": "semibold"
+                          },
+                          {
+                            "type": "Caption",
+                            "value": "7%",
+                            "color": "secondary"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Spacer"
+                      },
+                      {
+                        "type": "Text",
+                        "value": "$300",
+                        "size": "sm",
+                        "weight": "semibold"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Row",
+                    "key": "misc",
+                    "gap": 3,
+                    "align": "center",
+                    "children": [
+                      {
+                        "type": "Box",
+                        "background": "#CCFBF1",
+                        "radius": "sm",
+                        "padding": 2,
+                        "children": [
+                          {
+                            "type": "Icon",
+                            "name": "dots-horizontal",
+                            "color": "#0F766E"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Col",
+                        "children": [
+                          {
+                            "type": "Text",
+                            "value": "Misc",
+                            "size": "sm",
+                            "weight": "semibold"
+                          },
+                          {
+                            "type": "Caption",
+                            "value": "22%",
+                            "color": "secondary"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Spacer"
+                      },
+                      {
+                        "type": "Text",
+                        "value": "$1,000",
+                        "size": "sm",
+                        "weight": "semibold"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "Row",
+                "gap": 2,
+                "children": [
+                  {
+                    "type": "Button",
+                    "label": "Save",
+                    "style": "primary",
+                    "onClickAction": {
+                      "type": "budget.save",
+                      "payload": {
+                        "title": "10-Day Umrah Budget"
+                      }
+                    }
+                  },
+                  {
+                    "type": "Button",
+                    "label": "Adjust",
+                    "variant": "outline",
+                    "onClickAction": {
+                      "type": "budget.adjust",
+                      "payload": {
+                        "title": "10-Day Umrah Budget"
+                      }
+                    }
+                  },
+                  {
+                    "type": "Button",
+                    "label": "Share",
+                    "variant": "outline",
+                    "iconStart": "external-link",
+                    "onClickAction": {
+                      "type": "budget.share",
+                      "payload": {
+                        "title": "10-Day Umrah Budget"
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "encodedWidget": "eyJpZCI6ImIzZTIxNjAyLWE4YmQtNDIwNy1iOGU0LTA5YzRhOGM0ZGI0MCIsIm5hbWUiOiJCdWRnZXQiLCJ2aWV3IjoiPENhcmQgc2l6ZT1cIm1kXCIgcGFkZGluZz17MH0-XG4gIDxDb2wgZ2FwPXswfT5cbiAgICA8Qm94IGJhY2tncm91bmQ9e3RoZW1lLmRhcmtUZWFsfSBwYWRkaW5nPXs0fT5cbiAgICAgIDxDb2wgZ2FwPXsxfT5cbiAgICAgICAgPENhcHRpb24gdmFsdWU9e2N1cnJlbmN5fSBjb2xvcj17dGhlbWUud2hpdGV9IC8-XG4gICAgICAgIDxUaXRsZSB2YWx1ZT17dGl0bGV9IHNpemU9XCJtZFwiIGNvbG9yPXt0aGVtZS53aGl0ZX0gLz5cbiAgICAgIDwvQ29sPlxuICAgIDwvQm94PlxuXG4gICAgPENvbCBnYXA9ezN9IHBhZGRpbmc9ezR9PlxuICAgICAgPFJvdyBnYXA9ezN9PlxuICAgICAgICA8Qm94XG4gICAgICAgICAgZmxleD17MX1cbiAgICAgICAgICBiYWNrZ3JvdW5kPXt0aGVtZS53aGl0ZX1cbiAgICAgICAgICBib3JkZXI9e3sgc2l6ZTogMSwgY29sb3I6IFwic3VidGxlXCIgfX1cbiAgICAgICAgICByYWRpdXM9XCJsZ1wiXG4gICAgICAgICAgcGFkZGluZz17M31cbiAgICAgICAgPlxuICAgICAgICAgIDxUZXh0IHZhbHVlPVwiVG90YWxcIiBzaXplPVwic21cIiBjb2xvcj17dGhlbWUuZ3JheX0gLz5cbiAgICAgICAgICA8VGl0bGUgdmFsdWU9e3RvdGFsRm9ybWF0dGVkfSBzaXplPVwibWRcIiAvPlxuICAgICAgICA8L0JveD5cbiAgICAgICAgPEJveFxuICAgICAgICAgIGZsZXg9ezF9XG4gICAgICAgICAgYmFja2dyb3VuZD17dGhlbWUud2hpdGV9XG4gICAgICAgICAgYm9yZGVyPXt7IHNpemU6IDEsIGNvbG9yOiBcInN1YnRsZVwiIH19XG4gICAgICAgICAgcmFkaXVzPVwibGdcIlxuICAgICAgICAgIHBhZGRpbmc9ezN9XG4gICAgICAgID5cbiAgICAgICAgICA8VGV4dCB2YWx1ZT1cIlBlciBkYXlcIiBzaXplPVwic21cIiBjb2xvcj17dGhlbWUuZ3JheX0gLz5cbiAgICAgICAgICA8VGl0bGUgdmFsdWU9e3BlckRheUZvcm1hdHRlZH0gc2l6ZT1cIm1kXCIgLz5cbiAgICAgICAgPC9Cb3g-XG4gICAgICA8L1Jvdz5cblxuICAgICAgPEJveFxuICAgICAgICBiYWNrZ3JvdW5kPXt0aGVtZS53aGl0ZX1cbiAgICAgICAgYm9yZGVyPXt7IHNpemU6IDEsIGNvbG9yOiBcInN1YnRsZVwiIH19XG4gICAgICAgIHJhZGl1cz1cImxnXCJcbiAgICAgICAgcGFkZGluZz17M31cbiAgICAgID5cbiAgICAgICAgPENoYXJ0XG4gICAgICAgICAgZGF0YT17Y2hhcnQuZGF0YX1cbiAgICAgICAgICBzZXJpZXM9e1t7IHR5cGU6IFwiYmFyXCIsIGRhdGFLZXk6IFwidmFsdWVcIiwgY29sb3I6IGNoYXJ0LmJhckNvbG9yIH1dfVxuICAgICAgICAgIHhBeGlzPXt7IGRhdGFLZXk6IFwibmFtZVwiIH19XG4gICAgICAgICAgc2hvd1lBeGlzPXtmYWxzZX1cbiAgICAgICAgICBzaG93TGVnZW5kPXtmYWxzZX1cbiAgICAgICAgICBoZWlnaHQ9ezE0MH1cbiAgICAgICAgLz5cbiAgICAgIDwvQm94PlxuXG4gICAgICA8Q29sIGdhcD17Mn0-XG4gICAgICAgIHtpdGVtcy5tYXAoKGl0ZW0pID0-IChcbiAgICAgICAgICA8Um93IGtleT17aXRlbS5pZH0gZ2FwPXszfSBhbGlnbj1cImNlbnRlclwiPlxuICAgICAgICAgICAgPEJveCBiYWNrZ3JvdW5kPXt0aGVtZS5saWdodFRlYWx9IHJhZGl1cz1cInNtXCIgcGFkZGluZz17Mn0-XG4gICAgICAgICAgICAgIDxJY29uIG5hbWU9e2l0ZW0uaWNvbn0gY29sb3I9e3RoZW1lLmRhcmtUZWFsfSAvPlxuICAgICAgICAgICAgPC9Cb3g-XG4gICAgICAgICAgICA8Q29sPlxuICAgICAgICAgICAgICA8VGV4dCB2YWx1ZT17aXRlbS5sYWJlbH0gc2l6ZT1cInNtXCIgd2VpZ2h0PVwic2VtaWJvbGRcIiAvPlxuICAgICAgICAgICAgICA8Q2FwdGlvbiB2YWx1ZT17YCR7aXRlbS5wZXJjZW50fSVgfSBjb2xvcj1cInNlY29uZGFyeVwiIC8-XG4gICAgICAgICAgICA8L0NvbD5cbiAgICAgICAgICAgIDxTcGFjZXIgLz5cbiAgICAgICAgICAgIDxUZXh0IHZhbHVlPXtpdGVtLmFtb3VudH0gc2l6ZT1cInNtXCIgd2VpZ2h0PVwic2VtaWJvbGRcIiAvPlxuICAgICAgICAgIDwvUm93PlxuICAgICAgICApKX1cbiAgICAgIDwvQ29sPlxuXG4gICAgICA8Um93IGdhcD17Mn0-XG4gICAgICAgIDxCdXR0b25cbiAgICAgICAgICBsYWJlbD1cIlNhdmVcIlxuICAgICAgICAgIHN0eWxlPVwicHJpbWFyeVwiXG4gICAgICAgICAgb25DbGlja0FjdGlvbj17eyB0eXBlOiBcImJ1ZGdldC5zYXZlXCIsIHBheWxvYWQ6IHsgdGl0bGUgfSB9fVxuICAgICAgICAvPlxuICAgICAgICA8QnV0dG9uXG4gICAgICAgICAgbGFiZWw9XCJBZGp1c3RcIlxuICAgICAgICAgIHZhcmlhbnQ9XCJvdXRsaW5lXCJcbiAgICAgICAgICBvbkNsaWNrQWN0aW9uPXt7IHR5cGU6IFwiYnVkZ2V0LmFkanVzdFwiLCBwYXlsb2FkOiB7IHRpdGxlIH0gfX1cbiAgICAgICAgLz5cbiAgICAgICAgPEJ1dHRvblxuICAgICAgICAgIGxhYmVsPVwiU2hhcmVcIlxuICAgICAgICAgIHZhcmlhbnQ9XCJvdXRsaW5lXCJcbiAgICAgICAgICBpY29uU3RhcnQ9XCJleHRlcm5hbC1saW5rXCJcbiAgICAgICAgICBvbkNsaWNrQWN0aW9uPXt7IHR5cGU6IFwiYnVkZ2V0LnNoYXJlXCIsIHBheWxvYWQ6IHsgdGl0bGUgfSB9fVxuICAgICAgICAvPlxuICAgICAgPC9Sb3c-XG4gICAgPC9Db2w-XG4gIDwvQ29sPlxuPC9DYXJkPiIsImRlZmF1bHRTdGF0ZSI6eyJ0aXRsZSI6IjEwLURheSBVbXJhaCBCdWRnZXQiLCJjdXJyZW5jeSI6IlVTRCIsInRvdGFsRm9ybWF0dGVkIjoiJDQsNTAwIiwicGVyRGF5Rm9ybWF0dGVkIjoiJDQ1MC9kYXkiLCJpdGVtcyI6W3siaWQiOiJmbGlnaHRzIiwiaWNvbiI6InN1aXRjYXNlIiwibGFiZWwiOiJGbGlnaHRzIiwiYW1vdW50IjoiJDEsMjAwIiwicGVyY2VudCI6Mjd9LHsiaWQiOiJob3RlbCIsImljb24iOiJtYXAtcGluIiwibGFiZWwiOiJIb3RlbCIsImFtb3VudCI6IiQxLDUwMCIsInBlcmNlbnQiOjMzfSx7ImlkIjoiZm9vZCIsImljb24iOiJzdGFyLWZpbGxlZCIsImxhYmVsIjoiRm9vZCIsImFtb3VudCI6IiQ1MDAiLCJwZXJjZW50IjoxMX0seyJpZCI6InRyYW5zcG9ydCIsImljb24iOiJtYXBzIiwibGFiZWwiOiJUcmFuc3BvcnQiLCJhbW91bnQiOiIkMzAwIiwicGVyY2VudCI6N30seyJpZCI6Im1pc2MiLCJpY29uIjoiZG90cy1ob3Jpem9udGFsIiwibGFiZWwiOiJNaXNjIiwiYW1vdW50IjoiJDEsMDAwIiwicGVyY2VudCI6MjJ9XSwiY2hhcnQiOnsiZGF0YSI6W3sibmFtZSI6IkZsaWdodHMiLCJ2YWx1ZSI6MTIwMH0seyJuYW1lIjoiSG90ZWwiLCJ2YWx1ZSI6MTUwMH0seyJuYW1lIjoiRm9vZCIsInZhbHVlIjo1MDB9LHsibmFtZSI6IlRyYW5zcG9ydCIsInZhbHVlIjozMDB9LHsibmFtZSI6Ik1pc2MiLCJ2YWx1ZSI6MTAwMH1dLCJiYXJDb2xvciI6IiMwRjc2NkUifSwidGhlbWUiOnsibGlnaHRUZWFsIjoiI0NDRkJGMSIsImRhcmtUZWFsIjoiIzBGNzY2RSIsImdyYXkiOiIjNkI3MjgwIiwid2hpdGUiOiIjRkZGRkZGIn19LCJzdGF0ZXMiOltdLCJzY2hlbWEiOiJpbXBvcnQgeyB6IH0gZnJvbSBcInpvZFwiXG5cbmNvbnN0IEljb25OYW1lID0gei5lbnVtKFtcbiAgXCJzdWl0Y2FzZVwiLFxuICBcIm1hcC1waW5cIixcbiAgXCJzdGFyLWZpbGxlZFwiLFxuICBcIm1hcHNcIixcbiAgXCJkb3RzLWhvcml6b250YWxcIixcbl0pXG5cbmNvbnN0IEJyZWFrZG93bkl0ZW0gPSB6LnN0cmljdE9iamVjdCh7XG4gIGlkOiB6LnN0cmluZygpLFxuICBpY29uOiBJY29uTmFtZSxcbiAgbGFiZWw6IHouc3RyaW5nKCksXG4gIGFtb3VudDogei5zdHJpbmcoKSxcbiAgcGVyY2VudDogei5udW1iZXIoKSxcbn0pXG5cbmNvbnN0IENoYXJ0Um93ID0gei5zdHJpY3RPYmplY3Qoe1xuICBuYW1lOiB6LnN0cmluZygpLFxuICB2YWx1ZTogei5udW1iZXIoKSxcbn0pXG5cbmNvbnN0IFdpZGdldFN0YXRlID0gei5zdHJpY3RPYmplY3Qoe1xuICB0aXRsZTogei5zdHJpbmcoKSxcbiAgY3VycmVuY3k6IHouc3RyaW5nKCksXG4gIHRvdGFsRm9ybWF0dGVkOiB6LnN0cmluZygpLFxuICBwZXJEYXlGb3JtYXR0ZWQ6IHouc3RyaW5nKCksXG4gIGl0ZW1zOiB6LmFycmF5KEJyZWFrZG93bkl0ZW0pLFxuICBjaGFydDogei5zdHJpY3RPYmplY3Qoe1xuICAgIGRhdGE6IHouYXJyYXkoQ2hhcnRSb3cpLFxuICAgIGJhckNvbG9yOiB6LnN0cmluZygpLFxuICB9KSxcbiAgdGhlbWU6IHouc3RyaWN0T2JqZWN0KHtcbiAgICBsaWdodFRlYWw6IHouc3RyaW5nKCksXG4gICAgZGFya1RlYWw6IHouc3RyaW5nKCksXG4gICAgZ3JheTogei5zdHJpbmcoKSxcbiAgICB3aGl0ZTogei5zdHJpbmcoKSxcbiAgfSksXG59KVxuXG5leHBvcnQgZGVmYXVsdCBXaWRnZXRTdGF0ZSIsImpzb25TY2hlbWEiOnt9LCJzY2hlbWFNb2RlIjoiem9kIiwic2NoZW1hVmFsaWRpdHkiOiJ2YWxpZCIsInZpZXdWYWxpZGl0eSI6InZhbGlkIiwiZGVmYXVsdFN0YXRlVmFsaWRpdHkiOiJ2YWxpZCJ9"
+}

@@ -1,0 +1,482 @@
+{
+  "version": "1.0",
+  "name": "Places widget",
+  "template": "{\"type\":\"Card\",\"size\":\"md\",\"padding\":0,\"theme\":\"light\",\"children\":[{\"type\":\"Col\",\"gap\":0,\"children\":[{\"type\":\"Box\",\"background\":{\"light\":\"teal-600\",\"dark\":\"teal-700\"},\"padding\":{\"x\":4,\"y\":3},\"children\":[{\"type\":\"Row\",\"align\":\"center\",\"gap\":3,\"children\":[{\"type\":\"Col\",\"gap\":1,\"children\":[{\"type\":\"Caption\",\"value\":{{ (data.category) | tojson }},\"color\":{\"light\":\"white\",\"dark\":\"white\"}},{\"type\":\"Title\",\"value\":{{ (data.title) | tojson }},\"size\":\"md\",\"color\":{\"light\":\"white\",\"dark\":\"white\"}}]},{\"type\":\"Spacer\"},{\"type\":\"Row\",\"gap\":2,\"children\":[{\"type\":\"Button\",\"label\":\"Map\",\"iconStart\":\"maps\",\"variant\":\"soft\",\"color\":\"info\",\"onClickAction\":{\"type\":\"places.show_map\",\"payload\":{\"items\":{{ (data[\"items\"]) | tojson }}}}},{\"type\":\"Button\",\"label\":\"Filters\",\"iconStart\":\"settings-slider\",\"variant\":\"outline\",\"color\":\"secondary\",\"onClickAction\":{\"type\":\"places.filter\",\"payload\":{\"filters\":{{ (data.filters) | tojson }},\"category\":{{ (data.category) | tojson }}}}}]}]}]},{\"type\":\"Col\",\"padding\":{\"x\":4,\"y\":2},\"gap\":2,\"background\":{\"light\":\"teal-100\",\"dark\":\"teal-100\"},\"children\":[{\"type\":\"Row\",\"wrap\":\"wrap\",\"gap\":2,\"children\":[{%- set _c -%}{%-for f in data.filters -%}{%-set i = loop.index0 -%},{\"type\":\"Button\",\"key\":{{ ((f ~ \"-\" ~ i)) | tojson }},\"label\":{{ (f) | tojson }},\"size\":\"xs\",\"variant\":\"soft\",\"color\":\"info\",\"onClickAction\":{\"type\":\"places.filter\",\"payload\":{\"key\":{{ (f) | tojson }},\"category\":{{ (data.category) | tojson }}}}}{%-endfor-%}{%- endset -%}{{- (_c[1:] if _c and _c[0] == ',' else _c) -}}]}]},{\"type\":\"Divider\"},{\"type\":\"ListView\",\"children\":[{%- set _c -%}{%-for item in data[\"items\"] -%},{\"type\":\"ListViewItem\",\"key\":{{ (item.id) | tojson }},\"align\":\"stretch\",\"gap\":3,\"onClickAction\":{\"type\":\"places.select\",\"payload\":{\"id\":{{ (item.id) | tojson }}}},\"children\":[{\"type\":\"Image\",\"src\":{{ (item.image) | tojson }},\"alt\":{{ (item.name) | tojson }},\"size\":64,\"radius\":\"lg\",\"fit\":\"cover\"},{\"type\":\"Col\",\"flex\":1,\"gap\":1,\"children\":[{\"type\":\"Row\",\"children\":[{\"type\":\"Text\",\"value\":{{ (item.name) | tojson }},\"size\":\"sm\",\"weight\":\"semibold\"},{\"type\":\"Spacer\"},{\"type\":\"Badge\",\"label\":{{ ((item.price.currency ~ \" \" ~ item.price.amount ~ \"/\" ~ item.price.per)) | tojson }},\"color\":\"info\",\"size\":\"sm\"}]},{\"type\":\"Row\",\"gap\":3,\"children\":[{\"type\":\"Row\",\"gap\":1,\"children\":[{\"type\":\"Icon\",\"name\":\"star-filled\",\"color\":\"yellow\",\"size\":\"sm\"},{\"type\":\"Text\",\"value\":{{ ((item.rating ~ \" (\" ~ item.reviews ~ \")\")) | tojson }},\"size\":\"sm\",\"color\":\"secondary\"}]},{\"type\":\"Spacer\"},{\"type\":\"Caption\",\"value\":{{ (item.distance) | tojson }},\"color\":\"secondary\"}]},{\"type\":\"Row\",\"wrap\":\"wrap\",\"gap\":1,\"children\":[{%- set _c -%}{%-for a in item.amenities -%}{%-set idx = loop.index0 -%},{\"type\":\"Badge\",\"key\":{{ ((item.id ~ \"-amenity-\" ~ idx)) | tojson }},\"label\":{{ (a) | tojson }},\"variant\":\"outline\",\"size\":\"sm\"}{%-endfor-%}{%- endset -%}{{- (_c[1:] if _c and _c[0] == ',' else _c) -}}]}]},{\"type\":\"Col\",\"align\":\"end\",\"gap\":2,\"children\":[{\"type\":\"Button\",\"label\":\"Book\",\"size\":\"sm\",\"color\":\"success\",\"onClickAction\":{\"type\":\"places.book\",\"payload\":{\"id\":{{ (item.id) | tojson }}}}},{\"type\":\"Button\",\"iconStart\":\"star\",\"size\":\"sm\",\"variant\":\"outline\",\"onClickAction\":{\"type\":\"places.save\",\"payload\":{\"id\":{{ (item.id) | tojson }}}}}]}]}{%-endfor-%}{%- endset -%}{{- (_c[1:] if _c and _c[0] == ',' else _c) -}}]}]}]}",
+  "jsonSchema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "properties": {
+      "type": {
+        "type": "string",
+        "const": "places"
+      },
+      "data": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "hotels",
+              "restaurants",
+              "places"
+            ]
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "rating": {
+                  "type": "number"
+                },
+                "reviews": {
+                  "type": "number"
+                },
+                "price": {
+                  "type": "object",
+                  "properties": {
+                    "amount": {
+                      "type": "number"
+                    },
+                    "currency": {
+                      "type": "string"
+                    },
+                    "per": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "amount",
+                    "currency",
+                    "per"
+                  ],
+                  "additionalProperties": false
+                },
+                "distance": {
+                  "type": "string"
+                },
+                "image": {
+                  "type": "string"
+                },
+                "amenities": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "coordinates": {
+                  "type": "object",
+                  "properties": {
+                    "lat": {
+                      "type": "number"
+                    },
+                    "lng": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "lat",
+                    "lng"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "rating",
+                "reviews",
+                "price",
+                "distance",
+                "image",
+                "amenities",
+                "coordinates"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "filters": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "price",
+                "rating",
+                "distance"
+              ]
+            }
+          }
+        },
+        "required": [
+          "title",
+          "category",
+          "items",
+          "filters"
+        ],
+        "additionalProperties": false
+      },
+      "actions": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "enum": [
+            "show_map",
+            "filter",
+            "book",
+            "save"
+          ]
+        }
+      }
+    },
+    "required": [
+      "type",
+      "data",
+      "actions"
+    ],
+    "additionalProperties": false
+  },
+  "outputJsonPreview": {
+    "type": "Card",
+    "size": "md",
+    "padding": 0,
+    "theme": "light",
+    "children": [
+      {
+        "type": "Col",
+        "gap": 0,
+        "children": [
+          {
+            "type": "Box",
+            "background": {
+              "light": "teal-600",
+              "dark": "teal-700"
+            },
+            "padding": {
+              "x": 4,
+              "y": 3
+            },
+            "children": [
+              {
+                "type": "Row",
+                "align": "center",
+                "gap": 3,
+                "children": [
+                  {
+                    "type": "Col",
+                    "gap": 1,
+                    "children": [
+                      {
+                        "type": "Caption",
+                        "value": "hotels",
+                        "color": {
+                          "light": "white",
+                          "dark": "white"
+                        }
+                      },
+                      {
+                        "type": "Title",
+                        "value": "Hotels Near King Fahd Gate",
+                        "size": "md",
+                        "color": {
+                          "light": "white",
+                          "dark": "white"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Spacer"
+                  },
+                  {
+                    "type": "Row",
+                    "gap": 2,
+                    "children": [
+                      {
+                        "type": "Button",
+                        "label": "Map",
+                        "iconStart": "maps",
+                        "variant": "soft",
+                        "color": "info",
+                        "onClickAction": {
+                          "type": "places.show_map",
+                          "payload": {
+                            "items": [
+                              {
+                                "id": "hotel-1",
+                                "name": "Hilton Suites Makkah",
+                                "rating": 4.5,
+                                "reviews": 1250,
+                                "price": {
+                                  "amount": 250,
+                                  "currency": "USD",
+                                  "per": "night"
+                                },
+                                "distance": "50m from Gate",
+                                "image": "/images/hotels/hilton.jpg",
+                                "amenities": [
+                                  "wifi",
+                                  "breakfast",
+                                  "gym"
+                                ],
+                                "coordinates": {
+                                  "lat": 21.4225,
+                                  "lng": 39.8262
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      },
+                      {
+                        "type": "Button",
+                        "label": "Filters",
+                        "iconStart": "settings-slider",
+                        "variant": "outline",
+                        "color": "secondary",
+                        "onClickAction": {
+                          "type": "places.filter",
+                          "payload": {
+                            "filters": [
+                              "price",
+                              "rating",
+                              "distance"
+                            ],
+                            "category": "hotels"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "Col",
+            "padding": {
+              "x": 4,
+              "y": 2
+            },
+            "gap": 2,
+            "background": {
+              "light": "teal-100",
+              "dark": "teal-100"
+            },
+            "children": [
+              {
+                "type": "Row",
+                "wrap": "wrap",
+                "gap": 2,
+                "children": [
+                  {
+                    "type": "Button",
+                    "key": "price-0",
+                    "label": "price",
+                    "size": "xs",
+                    "variant": "soft",
+                    "color": "info",
+                    "onClickAction": {
+                      "type": "places.filter",
+                      "payload": {
+                        "key": "price",
+                        "category": "hotels"
+                      }
+                    }
+                  },
+                  {
+                    "type": "Button",
+                    "key": "rating-1",
+                    "label": "rating",
+                    "size": "xs",
+                    "variant": "soft",
+                    "color": "info",
+                    "onClickAction": {
+                      "type": "places.filter",
+                      "payload": {
+                        "key": "rating",
+                        "category": "hotels"
+                      }
+                    }
+                  },
+                  {
+                    "type": "Button",
+                    "key": "distance-2",
+                    "label": "distance",
+                    "size": "xs",
+                    "variant": "soft",
+                    "color": "info",
+                    "onClickAction": {
+                      "type": "places.filter",
+                      "payload": {
+                        "key": "distance",
+                        "category": "hotels"
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "Divider"
+          },
+          {
+            "type": "ListView",
+            "children": [
+              {
+                "type": "ListViewItem",
+                "key": "hotel-1",
+                "align": "stretch",
+                "gap": 3,
+                "onClickAction": {
+                  "type": "places.select",
+                  "payload": {
+                    "id": "hotel-1"
+                  }
+                },
+                "children": [
+                  {
+                    "type": "Image",
+                    "src": "/images/hotels/hilton.jpg",
+                    "alt": "Hilton Suites Makkah",
+                    "size": 64,
+                    "radius": "lg",
+                    "fit": "cover"
+                  },
+                  {
+                    "type": "Col",
+                    "flex": 1,
+                    "gap": 1,
+                    "children": [
+                      {
+                        "type": "Row",
+                        "children": [
+                          {
+                            "type": "Text",
+                            "value": "Hilton Suites Makkah",
+                            "size": "sm",
+                            "weight": "semibold"
+                          },
+                          {
+                            "type": "Spacer"
+                          },
+                          {
+                            "type": "Badge",
+                            "label": "USD 250/night",
+                            "color": "info",
+                            "size": "sm"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Row",
+                        "gap": 3,
+                        "children": [
+                          {
+                            "type": "Row",
+                            "gap": 1,
+                            "children": [
+                              {
+                                "type": "Icon",
+                                "name": "star-filled",
+                                "color": "yellow",
+                                "size": "sm"
+                              },
+                              {
+                                "type": "Text",
+                                "value": "4.5 (1250)",
+                                "size": "sm",
+                                "color": "secondary"
+                              }
+                            ]
+                          },
+                          {
+                            "type": "Spacer"
+                          },
+                          {
+                            "type": "Caption",
+                            "value": "50m from Gate",
+                            "color": "secondary"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Row",
+                        "wrap": "wrap",
+                        "gap": 1,
+                        "children": [
+                          {
+                            "type": "Badge",
+                            "key": "hotel-1-amenity-0",
+                            "label": "wifi",
+                            "variant": "outline",
+                            "size": "sm"
+                          },
+                          {
+                            "type": "Badge",
+                            "key": "hotel-1-amenity-1",
+                            "label": "breakfast",
+                            "variant": "outline",
+                            "size": "sm"
+                          },
+                          {
+                            "type": "Badge",
+                            "key": "hotel-1-amenity-2",
+                            "label": "gym",
+                            "variant": "outline",
+                            "size": "sm"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Col",
+                    "align": "end",
+                    "gap": 2,
+                    "children": [
+                      {
+                        "type": "Button",
+                        "label": "Book",
+                        "size": "sm",
+                        "color": "success",
+                        "onClickAction": {
+                          "type": "places.book",
+                          "payload": {
+                            "id": "hotel-1"
+                          }
+                        }
+                      },
+                      {
+                        "type": "Button",
+                        "iconStart": "star",
+                        "size": "sm",
+                        "variant": "outline",
+                        "onClickAction": {
+                          "type": "places.save",
+                          "payload": {
+                            "id": "hotel-1"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "encodedWidget": "eyJpZCI6IjVkNTAwMjdmLWVjYmYtNGQ1MS1iNDRhLTM0YTI1NWNmYzY4MiIsIm5hbWUiOiJQbGFjZXMgd2lkZ2V0IiwidmlldyI6IjxDYXJkIHNpemU9XCJtZFwiIHBhZGRpbmc9ezB9IHRoZW1lPVwibGlnaHRcIj5cbiAgPENvbCBnYXA9ezB9PlxuICAgIDxCb3hcbiAgICAgIGJhY2tncm91bmQ9e3sgbGlnaHQ6IFwidGVhbC02MDBcIiwgZGFyazogXCJ0ZWFsLTcwMFwiIH19XG4gICAgICBwYWRkaW5nPXt7IHg6IDQsIHk6IDMgfX1cbiAgICA-XG4gICAgICA8Um93IGFsaWduPVwiY2VudGVyXCIgZ2FwPXszfT5cbiAgICAgICAgPENvbCBnYXA9ezF9PlxuICAgICAgICAgIDxDYXB0aW9uXG4gICAgICAgICAgICB2YWx1ZT17ZGF0YS5jYXRlZ29yeX1cbiAgICAgICAgICAgIGNvbG9yPXt7IGxpZ2h0OiBcIndoaXRlXCIsIGRhcms6IFwid2hpdGVcIiB9fVxuICAgICAgICAgIC8-XG4gICAgICAgICAgPFRpdGxlXG4gICAgICAgICAgICB2YWx1ZT17ZGF0YS50aXRsZX1cbiAgICAgICAgICAgIHNpemU9XCJtZFwiXG4gICAgICAgICAgICBjb2xvcj17eyBsaWdodDogXCJ3aGl0ZVwiLCBkYXJrOiBcIndoaXRlXCIgfX1cbiAgICAgICAgICAvPlxuICAgICAgICA8L0NvbD5cbiAgICAgICAgPFNwYWNlciAvPlxuICAgICAgICA8Um93IGdhcD17Mn0-XG4gICAgICAgICAgPEJ1dHRvblxuICAgICAgICAgICAgbGFiZWw9XCJNYXBcIlxuICAgICAgICAgICAgaWNvblN0YXJ0PVwibWFwc1wiXG4gICAgICAgICAgICB2YXJpYW50PVwic29mdFwiXG4gICAgICAgICAgICBjb2xvcj1cImluZm9cIlxuICAgICAgICAgICAgb25DbGlja0FjdGlvbj17e1xuICAgICAgICAgICAgICB0eXBlOiBcInBsYWNlcy5zaG93X21hcFwiLFxuICAgICAgICAgICAgICBwYXlsb2FkOiB7IGl0ZW1zOiBkYXRhLml0ZW1zIH0sXG4gICAgICAgICAgICB9fVxuICAgICAgICAgIC8-XG4gICAgICAgICAgPEJ1dHRvblxuICAgICAgICAgICAgbGFiZWw9XCJGaWx0ZXJzXCJcbiAgICAgICAgICAgIGljb25TdGFydD1cInNldHRpbmdzLXNsaWRlclwiXG4gICAgICAgICAgICB2YXJpYW50PVwib3V0bGluZVwiXG4gICAgICAgICAgICBjb2xvcj1cInNlY29uZGFyeVwiXG4gICAgICAgICAgICBvbkNsaWNrQWN0aW9uPXt7XG4gICAgICAgICAgICAgIHR5cGU6IFwicGxhY2VzLmZpbHRlclwiLFxuICAgICAgICAgICAgICBwYXlsb2FkOiB7IGZpbHRlcnM6IGRhdGEuZmlsdGVycywgY2F0ZWdvcnk6IGRhdGEuY2F0ZWdvcnkgfSxcbiAgICAgICAgICAgIH19XG4gICAgICAgICAgLz5cbiAgICAgICAgPC9Sb3c-XG4gICAgICA8L1Jvdz5cbiAgICA8L0JveD5cblxuICAgIDxDb2xcbiAgICAgIHBhZGRpbmc9e3sgeDogNCwgeTogMiB9fVxuICAgICAgZ2FwPXsyfVxuICAgICAgYmFja2dyb3VuZD17eyBsaWdodDogXCJ0ZWFsLTEwMFwiLCBkYXJrOiBcInRlYWwtMTAwXCIgfX1cbiAgICA-XG4gICAgICA8Um93IHdyYXA9XCJ3cmFwXCIgZ2FwPXsyfT5cbiAgICAgICAge2RhdGEuZmlsdGVycy5tYXAoKGYsIGkpID0-IChcbiAgICAgICAgICA8QnV0dG9uXG4gICAgICAgICAgICBrZXk9e2Ake2Z9LSR7aX1gfVxuICAgICAgICAgICAgbGFiZWw9e2Z9XG4gICAgICAgICAgICBzaXplPVwieHNcIlxuICAgICAgICAgICAgdmFyaWFudD1cInNvZnRcIlxuICAgICAgICAgICAgY29sb3I9XCJpbmZvXCJcbiAgICAgICAgICAgIG9uQ2xpY2tBY3Rpb249e3tcbiAgICAgICAgICAgICAgdHlwZTogXCJwbGFjZXMuZmlsdGVyXCIsXG4gICAgICAgICAgICAgIHBheWxvYWQ6IHsga2V5OiBmLCBjYXRlZ29yeTogZGF0YS5jYXRlZ29yeSB9LFxuICAgICAgICAgICAgfX1cbiAgICAgICAgICAvPlxuICAgICAgICApKX1cbiAgICAgIDwvUm93PlxuICAgIDwvQ29sPlxuXG4gICAgPERpdmlkZXIgLz5cblxuICAgIDxMaXN0Vmlldz5cbiAgICAgIHtkYXRhLml0ZW1zLm1hcCgoaXRlbSkgPT4gKFxuICAgICAgICA8TGlzdFZpZXdJdGVtXG4gICAgICAgICAga2V5PXtpdGVtLmlkfVxuICAgICAgICAgIGFsaWduPVwic3RyZXRjaFwiXG4gICAgICAgICAgZ2FwPXszfVxuICAgICAgICAgIG9uQ2xpY2tBY3Rpb249e3sgdHlwZTogXCJwbGFjZXMuc2VsZWN0XCIsIHBheWxvYWQ6IHsgaWQ6IGl0ZW0uaWQgfSB9fVxuICAgICAgICA-XG4gICAgICAgICAgPEltYWdlXG4gICAgICAgICAgICBzcmM9e2l0ZW0uaW1hZ2V9XG4gICAgICAgICAgICBhbHQ9e2l0ZW0ubmFtZX1cbiAgICAgICAgICAgIHNpemU9ezY0fVxuICAgICAgICAgICAgcmFkaXVzPVwibGdcIlxuICAgICAgICAgICAgZml0PVwiY292ZXJcIlxuICAgICAgICAgIC8-XG5cbiAgICAgICAgICA8Q29sIGZsZXg9ezF9IGdhcD17MX0-XG4gICAgICAgICAgICA8Um93PlxuICAgICAgICAgICAgICA8VGV4dCB2YWx1ZT17aXRlbS5uYW1lfSBzaXplPVwic21cIiB3ZWlnaHQ9XCJzZW1pYm9sZFwiIC8-XG4gICAgICAgICAgICAgIDxTcGFjZXIgLz5cbiAgICAgICAgICAgICAgPEJhZGdlXG4gICAgICAgICAgICAgICAgbGFiZWw9e2Ake2l0ZW0ucHJpY2UuY3VycmVuY3l9ICR7aXRlbS5wcmljZS5hbW91bnR9LyR7aXRlbS5wcmljZS5wZXJ9YH1cbiAgICAgICAgICAgICAgICBjb2xvcj1cImluZm9cIlxuICAgICAgICAgICAgICAgIHNpemU9XCJzbVwiXG4gICAgICAgICAgICAgIC8-XG4gICAgICAgICAgICA8L1Jvdz5cblxuICAgICAgICAgICAgPFJvdyBnYXA9ezN9PlxuICAgICAgICAgICAgICA8Um93IGdhcD17MX0-XG4gICAgICAgICAgICAgICAgPEljb24gbmFtZT1cInN0YXItZmlsbGVkXCIgY29sb3I9XCJ5ZWxsb3dcIiBzaXplPVwic21cIiAvPlxuICAgICAgICAgICAgICAgIDxUZXh0XG4gICAgICAgICAgICAgICAgICB2YWx1ZT17YCR7aXRlbS5yYXRpbmd9ICgke2l0ZW0ucmV2aWV3c30pYH1cbiAgICAgICAgICAgICAgICAgIHNpemU9XCJzbVwiXG4gICAgICAgICAgICAgICAgICBjb2xvcj1cInNlY29uZGFyeVwiXG4gICAgICAgICAgICAgICAgLz5cbiAgICAgICAgICAgICAgPC9Sb3c-XG4gICAgICAgICAgICAgIDxTcGFjZXIgLz5cbiAgICAgICAgICAgICAgPENhcHRpb24gdmFsdWU9e2l0ZW0uZGlzdGFuY2V9IGNvbG9yPVwic2Vjb25kYXJ5XCIgLz5cbiAgICAgICAgICAgIDwvUm93PlxuXG4gICAgICAgICAgICA8Um93IHdyYXA9XCJ3cmFwXCIgZ2FwPXsxfT5cbiAgICAgICAgICAgICAge2l0ZW0uYW1lbml0aWVzLm1hcCgoYSwgaWR4KSA9PiAoXG4gICAgICAgICAgICAgICAgPEJhZGdlXG4gICAgICAgICAgICAgICAgICBrZXk9e2Ake2l0ZW0uaWR9LWFtZW5pdHktJHtpZHh9YH1cbiAgICAgICAgICAgICAgICAgIGxhYmVsPXthfVxuICAgICAgICAgICAgICAgICAgdmFyaWFudD1cIm91dGxpbmVcIlxuICAgICAgICAgICAgICAgICAgc2l6ZT1cInNtXCJcbiAgICAgICAgICAgICAgICAvPlxuICAgICAgICAgICAgICApKX1cbiAgICAgICAgICAgIDwvUm93PlxuICAgICAgICAgIDwvQ29sPlxuXG4gICAgICAgICAgPENvbCBhbGlnbj1cImVuZFwiIGdhcD17Mn0-XG4gICAgICAgICAgICA8QnV0dG9uXG4gICAgICAgICAgICAgIGxhYmVsPVwiQm9va1wiXG4gICAgICAgICAgICAgIHNpemU9XCJzbVwiXG4gICAgICAgICAgICAgIGNvbG9yPVwic3VjY2Vzc1wiXG4gICAgICAgICAgICAgIG9uQ2xpY2tBY3Rpb249e3sgdHlwZTogXCJwbGFjZXMuYm9va1wiLCBwYXlsb2FkOiB7IGlkOiBpdGVtLmlkIH0gfX1cbiAgICAgICAgICAgIC8-XG4gICAgICAgICAgICA8QnV0dG9uXG4gICAgICAgICAgICAgIGljb25TdGFydD1cInN0YXJcIlxuICAgICAgICAgICAgICBzaXplPVwic21cIlxuICAgICAgICAgICAgICB2YXJpYW50PVwib3V0bGluZVwiXG4gICAgICAgICAgICAgIG9uQ2xpY2tBY3Rpb249e3sgdHlwZTogXCJwbGFjZXMuc2F2ZVwiLCBwYXlsb2FkOiB7IGlkOiBpdGVtLmlkIH0gfX1cbiAgICAgICAgICAgIC8-XG4gICAgICAgICAgPC9Db2w-XG4gICAgICAgIDwvTGlzdFZpZXdJdGVtPlxuICAgICAgKSl9XG4gICAgPC9MaXN0Vmlldz5cbiAgPC9Db2w-XG48L0NhcmQ-IiwiZGVmYXVsdFN0YXRlIjp7InR5cGUiOiJwbGFjZXMiLCJkYXRhIjp7InRpdGxlIjoiSG90ZWxzIE5lYXIgS2luZyBGYWhkIEdhdGUiLCJjYXRlZ29yeSI6ImhvdGVscyIsIml0ZW1zIjpbeyJpZCI6ImhvdGVsLTEiLCJuYW1lIjoiSGlsdG9uIFN1aXRlcyBNYWtrYWgiLCJyYXRpbmciOjQuNSwicmV2aWV3cyI6MTI1MCwicHJpY2UiOnsiYW1vdW50IjoyNTAsImN1cnJlbmN5IjoiVVNEIiwicGVyIjoibmlnaHQifSwiZGlzdGFuY2UiOiI1MG0gZnJvbSBHYXRlIiwiaW1hZ2UiOiIvaW1hZ2VzL2hvdGVscy9oaWx0b24uanBnIiwiYW1lbml0aWVzIjpbIndpZmkiLCJicmVha2Zhc3QiLCJneW0iXSwiY29vcmRpbmF0ZXMiOnsibGF0IjoyMS40MjI1LCJsbmciOjM5LjgyNjJ9fV0sImZpbHRlcnMiOlsicHJpY2UiLCJyYXRpbmciLCJkaXN0YW5jZSJdfSwiYWN0aW9ucyI6WyJzaG93X21hcCIsImZpbHRlciIsImJvb2siLCJzYXZlIl19LCJzdGF0ZXMiOltdLCJzY2hlbWEiOiJpbXBvcnQgeyB6IH0gZnJvbSBcInpvZFwiXG5cbmNvbnN0IENvb3JkaW5hdGVzID0gei5zdHJpY3RPYmplY3Qoe1xuICBsYXQ6IHoubnVtYmVyKCksXG4gIGxuZzogei5udW1iZXIoKSxcbn0pXG5cbmNvbnN0IFByaWNlID0gei5zdHJpY3RPYmplY3Qoe1xuICBhbW91bnQ6IHoubnVtYmVyKCksXG4gIGN1cnJlbmN5OiB6LnN0cmluZygpLFxuICBwZXI6IHouc3RyaW5nKCksXG59KVxuXG5jb25zdCBQbGFjZUl0ZW0gPSB6LnN0cmljdE9iamVjdCh7XG4gIGlkOiB6LnN0cmluZygpLFxuICBuYW1lOiB6LnN0cmluZygpLFxuICByYXRpbmc6IHoubnVtYmVyKCksXG4gIHJldmlld3M6IHoubnVtYmVyKCksXG4gIHByaWNlOiBQcmljZSxcbiAgZGlzdGFuY2U6IHouc3RyaW5nKCksXG4gIGltYWdlOiB6LnN0cmluZygpLFxuICBhbWVuaXRpZXM6IHouYXJyYXkoei5zdHJpbmcoKSksXG4gIGNvb3JkaW5hdGVzOiBDb29yZGluYXRlcyxcbn0pXG5cbmNvbnN0IFBsYWNlc0RhdGEgPSB6LnN0cmljdE9iamVjdCh7XG4gIHRpdGxlOiB6LnN0cmluZygpLFxuICBjYXRlZ29yeTogei5lbnVtKFtcImhvdGVsc1wiLCBcInJlc3RhdXJhbnRzXCIsIFwicGxhY2VzXCJdKSxcbiAgaXRlbXM6IHouYXJyYXkoUGxhY2VJdGVtKSxcbiAgZmlsdGVyczogei5hcnJheSh6LmVudW0oW1wicHJpY2VcIiwgXCJyYXRpbmdcIiwgXCJkaXN0YW5jZVwiXSkpLFxufSlcblxuY29uc3QgV2lkZ2V0U3RhdGUgPSB6LnN0cmljdE9iamVjdCh7XG4gIHR5cGU6IHoubGl0ZXJhbChcInBsYWNlc1wiKSxcbiAgZGF0YTogUGxhY2VzRGF0YSxcbiAgYWN0aW9uczogei5hcnJheSh6LmVudW0oW1wic2hvd19tYXBcIiwgXCJmaWx0ZXJcIiwgXCJib29rXCIsIFwic2F2ZVwiXSkpLFxufSlcblxuZXhwb3J0IGRlZmF1bHQgV2lkZ2V0U3RhdGUiLCJqc29uU2NoZW1hIjp7fSwic2NoZW1hTW9kZSI6InpvZCIsInNjaGVtYVZhbGlkaXR5IjoidmFsaWQiLCJ2aWV3VmFsaWRpdHkiOiJ2YWxpZCIsImRlZmF1bHRTdGF0ZVZhbGlkaXR5IjoidmFsaWQifQ"
+}

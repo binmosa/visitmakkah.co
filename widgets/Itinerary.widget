@@ -1,0 +1,454 @@
+{
+  "version": "1.0",
+  "name": "Itinerary Card",
+  "template": "{\"type\":\"Card\",\"size\":\"md\",\"padding\":0,\"children\":[{\"type\":\"Box\",\"background\":{\"light\":\"#CCFBF1\",\"dark\":\"#0F766E\"},\"padding\":{\"x\":4,\"y\":3},\"children\":[{\"type\":\"Row\",\"gap\":3,\"align\":\"center\",\"children\":[{\"type\":\"Box\",\"size\":36,\"background\":\"#0F766E\",\"radius\":\"sm\",\"align\":\"center\",\"justify\":\"center\",\"children\":[{\"type\":\"Icon\",\"name\":\"maps\",\"color\":\"white\"}]},{\"type\":\"Col\",\"children\":[{\"type\":\"Title\",\"value\":{{ (title) | tojson }},\"size\":\"sm\",\"color\":\"#0F766E\"},{\"type\":\"Caption\",\"value\":{{ ((\"Day \" ~ selectedDay ~ \" of \" ~ totalDays)) | tojson }},\"color\":{\"light\":\"#0F766E\",\"dark\":\"#CCFBF1\"}}]},{\"type\":\"Spacer\"},{\"type\":\"Select\",\"name\":\"itinerary.day\",\"options\":{{ (dayOptions) | tojson }},\"defaultValue\":{{ (selectedDay) | tojson }},\"variant\":\"soft\",\"size\":\"sm\",\"pill\":true,\"onChangeAction\":{\"type\":\"itinerary.changeDay\"}}]}]},{\"type\":\"Col\",\"padding\":{\"x\":4,\"y\":4},\"gap\":3,\"children\":[{\"type\":\"Divider\"},{\"type\":\"Row\",\"children\":[{\"type\":\"Button\",\"label\":\"Save\",\"style\":\"primary\",\"color\":\"success\",\"onClickAction\":{\"type\":\"itinerary.save\"}},{\"type\":\"Button\",\"label\":\"Regenerate\",\"variant\":\"outline\",\"iconStart\":\"reload\",\"onClickAction\":{\"type\":\"itinerary.regenerate\"}}]}]}]}",
+  "jsonSchema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "properties": {
+      "title": {
+        "type": "string"
+      },
+      "totalDays": {
+        "type": "number"
+      },
+      "selectedDay": {
+        "type": "string"
+      },
+      "dayOptions": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "label": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            },
+            "disabled": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "label",
+            "value"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "days": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "dayNumber": {
+              "type": "number"
+            },
+            "dateLabel": {
+              "type": "string"
+            },
+            "title": {
+              "type": "string"
+            },
+            "activities": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "time": {
+                    "type": "string"
+                  },
+                  "activity": {
+                    "type": "string"
+                  },
+                  "icon": {
+                    "type": "string",
+                    "enum": [
+                      "analytics",
+                      "atom",
+                      "bolt",
+                      "book-open",
+                      "book-closed",
+                      "calendar",
+                      "chart",
+                      "check",
+                      "check-circle",
+                      "check-circle-filled",
+                      "chevron-left",
+                      "chevron-right",
+                      "circle-question",
+                      "compass",
+                      "cube",
+                      "document",
+                      "dots-horizontal",
+                      "empty-circle",
+                      "globe",
+                      "keys",
+                      "lab",
+                      "images",
+                      "info",
+                      "lifesaver",
+                      "lightbulb",
+                      "mail",
+                      "map-pin",
+                      "maps",
+                      "name",
+                      "notebook",
+                      "notebook-pencil",
+                      "page-blank",
+                      "phone",
+                      "plus",
+                      "profile",
+                      "profile-card",
+                      "star",
+                      "star-filled",
+                      "search",
+                      "sparkle",
+                      "sparkle-double",
+                      "square-code",
+                      "square-image",
+                      "square-text",
+                      "suitcase",
+                      "settings-slider",
+                      "user",
+                      "write",
+                      "write-alt",
+                      "write-alt2",
+                      "reload",
+                      "play",
+                      "mobile",
+                      "desktop",
+                      "external-link"
+                    ]
+                  }
+                },
+                "required": [
+                  "time",
+                  "activity",
+                  "icon"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [
+            "id",
+            "dayNumber",
+            "dateLabel",
+            "title",
+            "activities"
+          ],
+          "additionalProperties": false
+        }
+      }
+    },
+    "required": [
+      "title",
+      "totalDays",
+      "selectedDay",
+      "dayOptions",
+      "days"
+    ],
+    "additionalProperties": false
+  },
+  "outputJsonPreview": {
+    "type": "Card",
+    "size": "md",
+    "padding": 0,
+    "children": [
+      {
+        "type": "Box",
+        "background": {
+          "light": "#CCFBF1",
+          "dark": "#0F766E"
+        },
+        "padding": {
+          "x": 4,
+          "y": 3
+        },
+        "children": [
+          {
+            "type": "Row",
+            "gap": 3,
+            "align": "center",
+            "children": [
+              {
+                "type": "Box",
+                "size": 36,
+                "background": "#0F766E",
+                "radius": "sm",
+                "align": "center",
+                "justify": "center",
+                "children": [
+                  {
+                    "type": "Icon",
+                    "name": "maps",
+                    "color": "white"
+                  }
+                ]
+              },
+              {
+                "type": "Col",
+                "children": [
+                  {
+                    "type": "Title",
+                    "value": "7-Day Umrah Itinerary",
+                    "size": "sm",
+                    "color": "#0F766E"
+                  },
+                  {
+                    "type": "Caption",
+                    "value": "Day 1 of 7",
+                    "color": {
+                      "light": "#0F766E",
+                      "dark": "#CCFBF1"
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "Spacer"
+              },
+              {
+                "type": "Select",
+                "name": "itinerary.day",
+                "options": [
+                  {
+                    "label": "Day 1",
+                    "value": "1"
+                  },
+                  {
+                    "label": "Day 2",
+                    "value": "2",
+                    "disabled": true
+                  },
+                  {
+                    "label": "Day 3",
+                    "value": "3",
+                    "disabled": true
+                  },
+                  {
+                    "label": "Day 4",
+                    "value": "4",
+                    "disabled": true
+                  },
+                  {
+                    "label": "Day 5",
+                    "value": "5",
+                    "disabled": true
+                  },
+                  {
+                    "label": "Day 6",
+                    "value": "6",
+                    "disabled": true
+                  },
+                  {
+                    "label": "Day 7",
+                    "value": "7",
+                    "disabled": true
+                  }
+                ],
+                "defaultValue": "1",
+                "variant": "soft",
+                "size": "sm",
+                "pill": true,
+                "onChangeAction": {
+                  "type": "itinerary.changeDay"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "Col",
+        "padding": {
+          "x": 4,
+          "y": 4
+        },
+        "gap": 3,
+        "children": [
+          {
+            "type": "Col",
+            "key": "1",
+            "gap": 3,
+            "children": [
+              {
+                "type": "Row",
+                "children": [
+                  {
+                    "type": "Text",
+                    "value": "Arrival Day",
+                    "size": "sm",
+                    "weight": "semibold",
+                    "color": "emphasis"
+                  },
+                  {
+                    "type": "Spacer"
+                  },
+                  {
+                    "type": "Caption",
+                    "value": "Mar 15, 2024"
+                  }
+                ]
+              },
+              {
+                "type": "ListView",
+                "children": [
+                  {
+                    "type": "ListViewItem",
+                    "key": "1-14:00",
+                    "gap": 3,
+                    "align": "stretch",
+                    "children": [
+                      {
+                        "type": "Box",
+                        "background": "alpha-10",
+                        "radius": "sm",
+                        "padding": 2,
+                        "children": [
+                          {
+                            "type": "Icon",
+                            "name": "suitcase",
+                            "size": "lg",
+                            "color": "#0F766E"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Col",
+                        "gap": 0,
+                        "children": [
+                          {
+                            "type": "Text",
+                            "value": "Arrive at Jeddah Airport",
+                            "size": "sm",
+                            "weight": "semibold"
+                          },
+                          {
+                            "type": "Caption",
+                            "value": "14:00",
+                            "color": "secondary"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "ListViewItem",
+                    "key": "1-16:00",
+                    "gap": 3,
+                    "align": "stretch",
+                    "children": [
+                      {
+                        "type": "Box",
+                        "background": "alpha-10",
+                        "radius": "sm",
+                        "padding": 2,
+                        "children": [
+                          {
+                            "type": "Icon",
+                            "name": "map-pin",
+                            "size": "lg",
+                            "color": "#0F766E"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Col",
+                        "gap": 0,
+                        "children": [
+                          {
+                            "type": "Text",
+                            "value": "Transfer to Makkah",
+                            "size": "sm",
+                            "weight": "semibold"
+                          },
+                          {
+                            "type": "Caption",
+                            "value": "16:00",
+                            "color": "secondary"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "ListViewItem",
+                    "key": "1-19:00",
+                    "gap": 3,
+                    "align": "stretch",
+                    "children": [
+                      {
+                        "type": "Box",
+                        "background": "alpha-10",
+                        "radius": "sm",
+                        "padding": 2,
+                        "children": [
+                          {
+                            "type": "Icon",
+                            "name": "profile-card",
+                            "size": "lg",
+                            "color": "#0F766E"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Col",
+                        "gap": 0,
+                        "children": [
+                          {
+                            "type": "Text",
+                            "value": "Check into hotel",
+                            "size": "sm",
+                            "weight": "semibold"
+                          },
+                          {
+                            "type": "Caption",
+                            "value": "19:00",
+                            "color": "secondary"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "Divider"
+          },
+          {
+            "type": "Row",
+            "children": [
+              {
+                "type": "Button",
+                "label": "Save",
+                "style": "primary",
+                "color": "success",
+                "onClickAction": {
+                  "type": "itinerary.save"
+                }
+              },
+              {
+                "type": "Button",
+                "label": "Regenerate",
+                "variant": "outline",
+                "iconStart": "reload",
+                "onClickAction": {
+                  "type": "itinerary.regenerate"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "encodedWidget": "eyJpZCI6ImY1ZjRkYmIzLTJhNDctNGMxZS1iMzE4LTcyNDQ5ZGI0ZDVjNyIsIm5hbWUiOiJJdGluZXJhcnkgQ2FyZCIsInZpZXciOiI8Q2FyZCBzaXplPVwibWRcIiBwYWRkaW5nPXswfT5cbiAgPEJveFxuICAgIGJhY2tncm91bmQ9e3sgbGlnaHQ6IFwiI0NDRkJGMVwiLCBkYXJrOiBcIiMwRjc2NkVcIiB9fVxuICAgIHBhZGRpbmc9e3sgeDogNCwgeTogMyB9fVxuICA-XG4gICAgPFJvdyBnYXA9ezN9IGFsaWduPVwiY2VudGVyXCI-XG4gICAgICA8Qm94XG4gICAgICAgIHNpemU9ezM2fVxuICAgICAgICBiYWNrZ3JvdW5kPVwiIzBGNzY2RVwiXG4gICAgICAgIHJhZGl1cz1cInNtXCJcbiAgICAgICAgYWxpZ249XCJjZW50ZXJcIlxuICAgICAgICBqdXN0aWZ5PVwiY2VudGVyXCJcbiAgICAgID5cbiAgICAgICAgPEljb24gbmFtZT1cIm1hcHNcIiBjb2xvcj1cIndoaXRlXCIgLz5cbiAgICAgIDwvQm94PlxuICAgICAgPENvbD5cbiAgICAgICAgPFRpdGxlIHZhbHVlPXt0aXRsZX0gc2l6ZT1cInNtXCIgY29sb3I9XCIjMEY3NjZFXCIgLz5cbiAgICAgICAgPENhcHRpb25cbiAgICAgICAgICB2YWx1ZT17YERheSAke3NlbGVjdGVkRGF5fSBvZiAke3RvdGFsRGF5c31gfVxuICAgICAgICAgIGNvbG9yPXt7IGxpZ2h0OiBcIiMwRjc2NkVcIiwgZGFyazogXCIjQ0NGQkYxXCIgfX1cbiAgICAgICAgLz5cbiAgICAgIDwvQ29sPlxuICAgICAgPFNwYWNlciAvPlxuICAgICAgPFNlbGVjdFxuICAgICAgICBuYW1lPVwiaXRpbmVyYXJ5LmRheVwiXG4gICAgICAgIG9wdGlvbnM9e2RheU9wdGlvbnN9XG4gICAgICAgIGRlZmF1bHRWYWx1ZT17c2VsZWN0ZWREYXl9XG4gICAgICAgIHZhcmlhbnQ9XCJzb2Z0XCJcbiAgICAgICAgc2l6ZT1cInNtXCJcbiAgICAgICAgcGlsbFxuICAgICAgICBvbkNoYW5nZUFjdGlvbj17eyB0eXBlOiBcIml0aW5lcmFyeS5jaGFuZ2VEYXlcIiB9fVxuICAgICAgLz5cbiAgICA8L1Jvdz5cbiAgPC9Cb3g-XG4gIDxDb2wgcGFkZGluZz17eyB4OiA0LCB5OiA0IH19IGdhcD17M30-XG4gICAge2RheXMubWFwKChkKSA9PlxuICAgICAgZC5pZCA9PT0gc2VsZWN0ZWREYXkgPyAoXG4gICAgICAgIDxDb2wga2V5PXtkLmlkfSBnYXA9ezN9PlxuICAgICAgICAgIDxSb3c-XG4gICAgICAgICAgICA8VGV4dFxuICAgICAgICAgICAgICB2YWx1ZT17ZC50aXRsZX1cbiAgICAgICAgICAgICAgc2l6ZT1cInNtXCJcbiAgICAgICAgICAgICAgd2VpZ2h0PVwic2VtaWJvbGRcIlxuICAgICAgICAgICAgICBjb2xvcj1cImVtcGhhc2lzXCJcbiAgICAgICAgICAgIC8-XG4gICAgICAgICAgICA8U3BhY2VyIC8-XG4gICAgICAgICAgICA8Q2FwdGlvbiB2YWx1ZT17ZC5kYXRlTGFiZWx9IC8-XG4gICAgICAgICAgPC9Sb3c-XG4gICAgICAgICAgPExpc3RWaWV3PlxuICAgICAgICAgICAge2QuYWN0aXZpdGllcy5tYXAoKGEpID0-IChcbiAgICAgICAgICAgICAgPExpc3RWaWV3SXRlbSBrZXk9e2Ake2QuaWR9LSR7YS50aW1lfWB9IGdhcD17M30gYWxpZ249XCJzdHJldGNoXCI-XG4gICAgICAgICAgICAgICAgPEJveCBiYWNrZ3JvdW5kPVwiYWxwaGEtMTBcIiByYWRpdXM9XCJzbVwiIHBhZGRpbmc9ezJ9PlxuICAgICAgICAgICAgICAgICAgPEljb24gbmFtZT17YS5pY29ufSBzaXplPVwibGdcIiBjb2xvcj1cIiMwRjc2NkVcIiAvPlxuICAgICAgICAgICAgICAgIDwvQm94PlxuICAgICAgICAgICAgICAgIDxDb2wgZ2FwPXswfT5cbiAgICAgICAgICAgICAgICAgIDxUZXh0IHZhbHVlPXthLmFjdGl2aXR5fSBzaXplPVwic21cIiB3ZWlnaHQ9XCJzZW1pYm9sZFwiIC8-XG4gICAgICAgICAgICAgICAgICA8Q2FwdGlvbiB2YWx1ZT17YS50aW1lfSBjb2xvcj1cInNlY29uZGFyeVwiIC8-XG4gICAgICAgICAgICAgICAgPC9Db2w-XG4gICAgICAgICAgICAgIDwvTGlzdFZpZXdJdGVtPlxuICAgICAgICAgICAgKSl9XG4gICAgICAgICAgPC9MaXN0Vmlldz5cbiAgICAgICAgPC9Db2w-XG4gICAgICApIDogbnVsbCxcbiAgICApfVxuXG4gICAgPERpdmlkZXIgLz5cbiAgICA8Um93PlxuICAgICAgPEJ1dHRvblxuICAgICAgICBsYWJlbD1cIlNhdmVcIlxuICAgICAgICBzdHlsZT1cInByaW1hcnlcIlxuICAgICAgICBjb2xvcj1cInN1Y2Nlc3NcIlxuICAgICAgICBvbkNsaWNrQWN0aW9uPXt7IHR5cGU6IFwiaXRpbmVyYXJ5LnNhdmVcIiB9fVxuICAgICAgLz5cbiAgICAgIDxCdXR0b25cbiAgICAgICAgbGFiZWw9XCJSZWdlbmVyYXRlXCJcbiAgICAgICAgdmFyaWFudD1cIm91dGxpbmVcIlxuICAgICAgICBpY29uU3RhcnQ9XCJyZWxvYWRcIlxuICAgICAgICBvbkNsaWNrQWN0aW9uPXt7IHR5cGU6IFwiaXRpbmVyYXJ5LnJlZ2VuZXJhdGVcIiB9fVxuICAgICAgLz5cbiAgICA8L1Jvdz5cbiAgPC9Db2w-XG48L0NhcmQ-IiwiZGVmYXVsdFN0YXRlIjp7InRpdGxlIjoiNy1EYXkgVW1yYWggSXRpbmVyYXJ5IiwidG90YWxEYXlzIjo3LCJzZWxlY3RlZERheSI6IjEiLCJkYXlPcHRpb25zIjpbeyJsYWJlbCI6IkRheSAxIiwidmFsdWUiOiIxIn0seyJsYWJlbCI6IkRheSAyIiwidmFsdWUiOiIyIiwiZGlzYWJsZWQiOnRydWV9LHsibGFiZWwiOiJEYXkgMyIsInZhbHVlIjoiMyIsImRpc2FibGVkIjp0cnVlfSx7ImxhYmVsIjoiRGF5IDQiLCJ2YWx1ZSI6IjQiLCJkaXNhYmxlZCI6dHJ1ZX0seyJsYWJlbCI6IkRheSA1IiwidmFsdWUiOiI1IiwiZGlzYWJsZWQiOnRydWV9LHsibGFiZWwiOiJEYXkgNiIsInZhbHVlIjoiNiIsImRpc2FibGVkIjp0cnVlfSx7ImxhYmVsIjoiRGF5IDciLCJ2YWx1ZSI6IjciLCJkaXNhYmxlZCI6dHJ1ZX1dLCJkYXlzIjpbeyJpZCI6IjEiLCJkYXlOdW1iZXIiOjEsImRhdGVMYWJlbCI6Ik1hciAxNSwgMjAyNCIsInRpdGxlIjoiQXJyaXZhbCBEYXkiLCJhY3Rpdml0aWVzIjpbeyJ0aW1lIjoiMTQ6MDAiLCJhY3Rpdml0eSI6IkFycml2ZSBhdCBKZWRkYWggQWlycG9ydCIsImljb24iOiJzdWl0Y2FzZSJ9LHsidGltZSI6IjE2OjAwIiwiYWN0aXZpdHkiOiJUcmFuc2ZlciB0byBNYWtrYWgiLCJpY29uIjoibWFwLXBpbiJ9LHsidGltZSI6IjE5OjAwIiwiYWN0aXZpdHkiOiJDaGVjayBpbnRvIGhvdGVsIiwiaWNvbiI6InByb2ZpbGUtY2FyZCJ9XX1dfSwic3RhdGVzIjpbXSwic2NoZW1hIjoiaW1wb3J0IHsgeiB9IGZyb20gXCJ6b2RcIlxuXG5jb25zdCBJY29uTmFtZSA9IHouZW51bShbXG4gIFwiYW5hbHl0aWNzXCIsXG4gIFwiYXRvbVwiLFxuICBcImJvbHRcIixcbiAgXCJib29rLW9wZW5cIixcbiAgXCJib29rLWNsb3NlZFwiLFxuICBcImNhbGVuZGFyXCIsXG4gIFwiY2hhcnRcIixcbiAgXCJjaGVja1wiLFxuICBcImNoZWNrLWNpcmNsZVwiLFxuICBcImNoZWNrLWNpcmNsZS1maWxsZWRcIixcbiAgXCJjaGV2cm9uLWxlZnRcIixcbiAgXCJjaGV2cm9uLXJpZ2h0XCIsXG4gIFwiY2lyY2xlLXF1ZXN0aW9uXCIsXG4gIFwiY29tcGFzc1wiLFxuICBcImN1YmVcIixcbiAgXCJkb2N1bWVudFwiLFxuICBcImRvdHMtaG9yaXpvbnRhbFwiLFxuICBcImVtcHR5LWNpcmNsZVwiLFxuICBcImdsb2JlXCIsXG4gIFwia2V5c1wiLFxuICBcImxhYlwiLFxuICBcImltYWdlc1wiLFxuICBcImluZm9cIixcbiAgXCJsaWZlc2F2ZXJcIixcbiAgXCJsaWdodGJ1bGJcIixcbiAgXCJtYWlsXCIsXG4gIFwibWFwLXBpblwiLFxuICBcIm1hcHNcIixcbiAgXCJuYW1lXCIsXG4gIFwibm90ZWJvb2tcIixcbiAgXCJub3RlYm9vay1wZW5jaWxcIixcbiAgXCJwYWdlLWJsYW5rXCIsXG4gIFwicGhvbmVcIixcbiAgXCJwbHVzXCIsXG4gIFwicHJvZmlsZVwiLFxuICBcInByb2ZpbGUtY2FyZFwiLFxuICBcInN0YXJcIixcbiAgXCJzdGFyLWZpbGxlZFwiLFxuICBcInNlYXJjaFwiLFxuICBcInNwYXJrbGVcIixcbiAgXCJzcGFya2xlLWRvdWJsZVwiLFxuICBcInNxdWFyZS1jb2RlXCIsXG4gIFwic3F1YXJlLWltYWdlXCIsXG4gIFwic3F1YXJlLXRleHRcIixcbiAgXCJzdWl0Y2FzZVwiLFxuICBcInNldHRpbmdzLXNsaWRlclwiLFxuICBcInVzZXJcIixcbiAgXCJ3cml0ZVwiLFxuICBcIndyaXRlLWFsdFwiLFxuICBcIndyaXRlLWFsdDJcIixcbiAgXCJyZWxvYWRcIixcbiAgXCJwbGF5XCIsXG4gIFwibW9iaWxlXCIsXG4gIFwiZGVza3RvcFwiLFxuICBcImV4dGVybmFsLWxpbmtcIixcbl0pXG5cbmNvbnN0IEFjdGl2aXR5ID0gei5zdHJpY3RPYmplY3Qoe1xuICB0aW1lOiB6LnN0cmluZygpLFxuICBhY3Rpdml0eTogei5zdHJpbmcoKSxcbiAgaWNvbjogSWNvbk5hbWUsXG59KVxuXG5jb25zdCBEYXkgPSB6LnN0cmljdE9iamVjdCh7XG4gIGlkOiB6LnN0cmluZygpLFxuICBkYXlOdW1iZXI6IHoubnVtYmVyKCksXG4gIGRhdGVMYWJlbDogei5zdHJpbmcoKSxcbiAgdGl0bGU6IHouc3RyaW5nKCksXG4gIGFjdGl2aXRpZXM6IHouYXJyYXkoQWN0aXZpdHkpLFxufSlcblxuY29uc3QgU2VsZWN0T3B0aW9uID0gei5zdHJpY3RPYmplY3Qoe1xuICBsYWJlbDogei5zdHJpbmcoKSxcbiAgdmFsdWU6IHouc3RyaW5nKCksXG4gIGRpc2FibGVkOiB6LmJvb2xlYW4oKS5vcHRpb25hbCgpLFxufSlcblxuY29uc3QgV2lkZ2V0U3RhdGUgPSB6LnN0cmljdE9iamVjdCh7XG4gIHRpdGxlOiB6LnN0cmluZygpLFxuICB0b3RhbERheXM6IHoubnVtYmVyKCksXG4gIHNlbGVjdGVkRGF5OiB6LnN0cmluZygpLFxuICBkYXlPcHRpb25zOiB6LmFycmF5KFNlbGVjdE9wdGlvbiksXG4gIGRheXM6IHouYXJyYXkoRGF5KSxcbn0pXG5cbmV4cG9ydCBkZWZhdWx0IFdpZGdldFN0YXRlIiwianNvblNjaGVtYSI6e30sInNjaGVtYU1vZGUiOiJ6b2QiLCJzY2hlbWFWYWxpZGl0eSI6InZhbGlkIiwidmlld1ZhbGlkaXR5IjoidmFsaWQiLCJkZWZhdWx0U3RhdGVWYWxpZGl0eSI6InZhbGlkIn0"
+}

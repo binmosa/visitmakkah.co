@@ -94,7 +94,7 @@ Merge the widget area with ChatKit to create a unified, seamless AI experience. 
       }
     ]
   },
-  "actions": ["save", "regenerate", "share", "export_pdf"]
+  "actions": ["save", "regenerate"]
 }
 ```
 

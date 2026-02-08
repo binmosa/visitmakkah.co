@@ -1,0 +1,250 @@
+{
+  "version": "1.0",
+  "name": "Dua Widget",
+  "template": "{\"type\":\"Card\",\"size\":\"md\",\"padding\":0,\"children\":[{\"type\":\"Box\",\"background\":{{ (palette.headerBg) | tojson }},\"padding\":{\"x\":4,\"y\":4},\"children\":[{\"type\":\"Col\",\"gap\":1,\"children\":[{\"type\":\"Caption\",\"value\":{{ (data.occasion) | tojson }},\"color\":\"white\"},{\"type\":\"Title\",\"value\":{{ (data.title) | tojson }},\"size\":\"md\",\"color\":\"white\"}]}]},{\"type\":\"Col\",\"padding\":{\"x\":4,\"y\":3},\"gap\":3,\"children\":[{\"type\":\"Title\",\"value\":{{ (data.arabic) | tojson }},\"size\":\"lg\",\"color\":{{ (palette.darkTeal) | tojson }}},{\"type\":\"Text\",\"value\":{{ (data.transliteration) | tojson }},\"size\":\"sm\",\"italic\":true,\"color\":\"secondary\"},{\"type\":\"Text\",\"value\":{{ (data.translation) | tojson }},\"size\":\"sm\",\"color\":\"emphasis\"},{\"type\":\"Row\",\"gap\":2,\"children\":[{\"type\":\"Box\",\"background\":{{ (palette.lightTeal) | tojson }},\"radius\":\"sm\",\"padding\":1,\"children\":[{\"type\":\"Icon\",\"name\":\"book-open\",\"size\":\"sm\",\"color\":{{ (palette.darkTeal) | tojson }}}]},{\"type\":\"Caption\",\"value\":{{ (data.reference) | tojson }},\"color\":\"secondary\"}]}]},{\"type\":\"Divider\",\"flush\":true},{\"type\":\"Row\",\"padding\":{\"x\":4,\"y\":3},\"gap\":3,\"children\":[{\"type\":\"Button\",\"label\":\"Play audio\",\"style\":\"primary\",\"iconStart\":\"play\",\"onClickAction\":{\"type\":\"dua.play_audio\",\"payload\":{\"src\":{{ (data.audioUrl) | tojson }},\"title\":{{ (data.title) | tojson }}}}},{\"type\":\"Spacer\"},{\"type\":\"Button\",\"iconStart\":\"star\",\"variant\":\"outline\",\"uniform\":true,\"onClickAction\":{\"type\":\"dua.bookmark\",\"payload\":{\"title\":{{ (data.title) | tojson }}}}},{\"type\":\"Button\",\"iconStart\":\"external-link\",\"variant\":\"outline\",\"uniform\":true,\"onClickAction\":{\"type\":\"dua.share\",\"payload\":{\"title\":{{ (data.title) | tojson }},\"url\":{{ (data.audioUrl) | tojson }}}}},{\"type\":\"Button\",\"iconStart\":\"square-text\",\"variant\":\"outline\",\"uniform\":true,\"onClickAction\":{\"type\":\"dua.copy\",\"payload\":{\"text\":{{ ((data.title ~ \"\\n\" ~ data.occasion ~ \"\\n\" ~ data.arabic ~ \"\\n\" ~ data.transliteration ~ \"\\n\" ~ data.translation ~ \"\\n\" ~ data.reference)) | tojson }}}}}]}]}",
+  "jsonSchema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "properties": {
+      "type": {
+        "type": "string",
+        "const": "dua"
+      },
+      "data": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "occasion": {
+            "type": "string"
+          },
+          "arabic": {
+            "type": "string"
+          },
+          "transliteration": {
+            "type": "string"
+          },
+          "translation": {
+            "type": "string"
+          },
+          "audioUrl": {
+            "type": "string"
+          },
+          "reference": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "occasion",
+          "arabic",
+          "transliteration",
+          "translation",
+          "audioUrl",
+          "reference"
+        ],
+        "additionalProperties": false
+      },
+      "actions": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "enum": [
+            "play_audio",
+            "bookmark",
+            "share",
+            "copy"
+          ]
+        }
+      },
+      "palette": {
+        "type": "object",
+        "properties": {
+          "headerBg": {
+            "type": "string"
+          },
+          "darkTeal": {
+            "type": "string"
+          },
+          "lightTeal": {
+            "type": "string"
+          },
+          "gray": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "headerBg",
+          "darkTeal",
+          "lightTeal",
+          "gray"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "required": [
+      "type",
+      "data",
+      "actions",
+      "palette"
+    ],
+    "additionalProperties": false
+  },
+  "outputJsonPreview": {
+    "type": "Card",
+    "size": "md",
+    "padding": 0,
+    "children": [
+      {
+        "type": "Box",
+        "background": "linear-gradient(135deg, #ffffff 0%, #ccfbf1 30%, #2dd4bf 65%, #0f766e 100%)",
+        "padding": {
+          "x": 4,
+          "y": 4
+        },
+        "children": [
+          {
+            "type": "Col",
+            "gap": 1,
+            "children": [
+              {
+                "type": "Caption",
+                "value": "While performing Tawaf",
+                "color": "white"
+              },
+              {
+                "type": "Title",
+                "value": "Dua for Tawaf",
+                "size": "md",
+                "color": "white"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "Col",
+        "padding": {
+          "x": 4,
+          "y": 3
+        },
+        "gap": 3,
+        "children": [
+          {
+            "type": "Title",
+            "value": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً...",
+            "size": "lg",
+            "color": "#0f766e"
+          },
+          {
+            "type": "Text",
+            "value": "Rabbana atina fid-dunya hasanatan...",
+            "size": "sm",
+            "italic": true,
+            "color": "secondary"
+          },
+          {
+            "type": "Text",
+            "value": "Our Lord, give us good in this world...",
+            "size": "sm",
+            "color": "emphasis"
+          },
+          {
+            "type": "Row",
+            "gap": 2,
+            "children": [
+              {
+                "type": "Box",
+                "background": "#ccfbf1",
+                "radius": "sm",
+                "padding": 1,
+                "children": [
+                  {
+                    "type": "Icon",
+                    "name": "book-open",
+                    "size": "sm",
+                    "color": "#0f766e"
+                  }
+                ]
+              },
+              {
+                "type": "Caption",
+                "value": "Quran 2:201",
+                "color": "secondary"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "Divider",
+        "flush": true
+      },
+      {
+        "type": "Row",
+        "padding": {
+          "x": 4,
+          "y": 3
+        },
+        "gap": 3,
+        "children": [
+          {
+            "type": "Button",
+            "label": "Play audio",
+            "style": "primary",
+            "iconStart": "play",
+            "onClickAction": {
+              "type": "dua.play_audio",
+              "payload": {
+                "src": "/audio/dua-tawaf.mp3",
+                "title": "Dua for Tawaf"
+              }
+            }
+          },
+          {
+            "type": "Spacer"
+          },
+          {
+            "type": "Button",
+            "iconStart": "star",
+            "variant": "outline",
+            "uniform": true,
+            "onClickAction": {
+              "type": "dua.bookmark",
+              "payload": {
+                "title": "Dua for Tawaf"
+              }
+            }
+          },
+          {
+            "type": "Button",
+            "iconStart": "external-link",
+            "variant": "outline",
+            "uniform": true,
+            "onClickAction": {
+              "type": "dua.share",
+              "payload": {
+                "title": "Dua for Tawaf",
+                "url": "/audio/dua-tawaf.mp3"
+              }
+            }
+          },
+          {
+            "type": "Button",
+            "iconStart": "square-text",
+            "variant": "outline",
+            "uniform": true,
+            "onClickAction": {
+              "type": "dua.copy",
+              "payload": {
+                "text": "Dua for Tawaf\nWhile performing Tawaf\nرَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً...\nRabbana atina fid-dunya hasanatan...\nOur Lord, give us good in this world...\nQuran 2:201"
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "encodedWidget": "eyJpZCI6IjgzODA2MDc0LTM1OTUtNDE1Ni04ODI5LTRiMjc1MDJhNGNiNyIsIm5hbWUiOiJEdWEgV2lkZ2V0IiwidmlldyI6IjxDYXJkIHNpemU9XCJtZFwiIHBhZGRpbmc9ezB9PlxuICA8Qm94IGJhY2tncm91bmQ9e3BhbGV0dGUuaGVhZGVyQmd9IHBhZGRpbmc9e3sgeDogNCwgeTogNCB9fT5cbiAgICA8Q29sIGdhcD17MX0-XG4gICAgICA8Q2FwdGlvbiB2YWx1ZT17ZGF0YS5vY2Nhc2lvbn0gY29sb3I9XCJ3aGl0ZVwiIC8-XG4gICAgICA8VGl0bGUgdmFsdWU9e2RhdGEudGl0bGV9IHNpemU9XCJtZFwiIGNvbG9yPVwid2hpdGVcIiAvPlxuICAgIDwvQ29sPlxuICA8L0JveD5cblxuICA8Q29sIHBhZGRpbmc9e3sgeDogNCwgeTogMyB9fSBnYXA9ezN9PlxuICAgIDxUaXRsZSB2YWx1ZT17ZGF0YS5hcmFiaWN9IHNpemU9XCJsZ1wiIGNvbG9yPXtwYWxldHRlLmRhcmtUZWFsfSAvPlxuICAgIDxUZXh0IHZhbHVlPXtkYXRhLnRyYW5zbGl0ZXJhdGlvbn0gc2l6ZT1cInNtXCIgaXRhbGljIGNvbG9yPVwic2Vjb25kYXJ5XCIgLz5cbiAgICA8VGV4dCB2YWx1ZT17ZGF0YS50cmFuc2xhdGlvbn0gc2l6ZT1cInNtXCIgY29sb3I9XCJlbXBoYXNpc1wiIC8-XG5cbiAgICA8Um93IGdhcD17Mn0-XG4gICAgICA8Qm94IGJhY2tncm91bmQ9e3BhbGV0dGUubGlnaHRUZWFsfSByYWRpdXM9XCJzbVwiIHBhZGRpbmc9ezF9PlxuICAgICAgICA8SWNvbiBuYW1lPVwiYm9vay1vcGVuXCIgc2l6ZT1cInNtXCIgY29sb3I9e3BhbGV0dGUuZGFya1RlYWx9IC8-XG4gICAgICA8L0JveD5cbiAgICAgIDxDYXB0aW9uIHZhbHVlPXtkYXRhLnJlZmVyZW5jZX0gY29sb3I9XCJzZWNvbmRhcnlcIiAvPlxuICAgIDwvUm93PlxuICA8L0NvbD5cblxuICA8RGl2aWRlciBmbHVzaCAvPlxuXG4gIDxSb3cgcGFkZGluZz17eyB4OiA0LCB5OiAzIH19IGdhcD17M30-XG4gICAgPEJ1dHRvblxuICAgICAgbGFiZWw9XCJQbGF5IGF1ZGlvXCJcbiAgICAgIHN0eWxlPVwicHJpbWFyeVwiXG4gICAgICBpY29uU3RhcnQ9XCJwbGF5XCJcbiAgICAgIG9uQ2xpY2tBY3Rpb249e3tcbiAgICAgICAgdHlwZTogXCJkdWEucGxheV9hdWRpb1wiLFxuICAgICAgICBwYXlsb2FkOiB7IHNyYzogZGF0YS5hdWRpb1VybCwgdGl0bGU6IGRhdGEudGl0bGUgfSxcbiAgICAgIH19XG4gICAgLz5cbiAgICA8U3BhY2VyIC8-XG4gICAgPEJ1dHRvblxuICAgICAgaWNvblN0YXJ0PVwic3RhclwiXG4gICAgICB2YXJpYW50PVwib3V0bGluZVwiXG4gICAgICB1bmlmb3JtXG4gICAgICBvbkNsaWNrQWN0aW9uPXt7IHR5cGU6IFwiZHVhLmJvb2ttYXJrXCIsIHBheWxvYWQ6IHsgdGl0bGU6IGRhdGEudGl0bGUgfSB9fVxuICAgIC8-XG4gICAgPEJ1dHRvblxuICAgICAgaWNvblN0YXJ0PVwiZXh0ZXJuYWwtbGlua1wiXG4gICAgICB2YXJpYW50PVwib3V0bGluZVwiXG4gICAgICB1bmlmb3JtXG4gICAgICBvbkNsaWNrQWN0aW9uPXt7XG4gICAgICAgIHR5cGU6IFwiZHVhLnNoYXJlXCIsXG4gICAgICAgIHBheWxvYWQ6IHsgdGl0bGU6IGRhdGEudGl0bGUsIHVybDogZGF0YS5hdWRpb1VybCB9LFxuICAgICAgfX1cbiAgICAvPlxuICAgIDxCdXR0b25cbiAgICAgIGljb25TdGFydD1cInNxdWFyZS10ZXh0XCJcbiAgICAgIHZhcmlhbnQ9XCJvdXRsaW5lXCJcbiAgICAgIHVuaWZvcm1cbiAgICAgIG9uQ2xpY2tBY3Rpb249e3tcbiAgICAgICAgdHlwZTogXCJkdWEuY29weVwiLFxuICAgICAgICBwYXlsb2FkOiB7XG4gICAgICAgICAgdGV4dDogYCR7ZGF0YS50aXRsZX1cXG4ke2RhdGEub2NjYXNpb259XFxuJHtkYXRhLmFyYWJpY31cXG4ke2RhdGEudHJhbnNsaXRlcmF0aW9ufVxcbiR7ZGF0YS50cmFuc2xhdGlvbn1cXG4ke2RhdGEucmVmZXJlbmNlfWAsXG4gICAgICAgIH0sXG4gICAgICB9fVxuICAgIC8-XG4gIDwvUm93PlxuPC9DYXJkPiIsImRlZmF1bHRTdGF0ZSI6eyJ0eXBlIjoiZHVhIiwiZGF0YSI6eyJ0aXRsZSI6IkR1YSBmb3IgVGF3YWYiLCJvY2Nhc2lvbiI6IldoaWxlIHBlcmZvcm1pbmcgVGF3YWYiLCJhcmFiaWMiOiLYsdmO2KjZjtmR2YbZjtinINii2KrZkNmG2Y7YpyDZgdmQ2Yog2KfZhNiv2Y_ZkdmG2ZLZitmO2Kcg2K3Zjtiz2Y7ZhtmO2KnZiy4uLiIsInRyYW5zbGl0ZXJhdGlvbiI6IlJhYmJhbmEgYXRpbmEgZmlkLWR1bnlhIGhhc2FuYXRhbi4uLiIsInRyYW5zbGF0aW9uIjoiT3VyIExvcmQsIGdpdmUgdXMgZ29vZCBpbiB0aGlzIHdvcmxkLi4uIiwiYXVkaW9VcmwiOiIvYXVkaW8vZHVhLXRhd2FmLm1wMyIsInJlZmVyZW5jZSI6IlF1cmFuIDI6MjAxIn0sImFjdGlvbnMiOlsicGxheV9hdWRpbyIsImJvb2ttYXJrIiwic2hhcmUiLCJjb3B5Il0sInBhbGV0dGUiOnsiaGVhZGVyQmciOiJsaW5lYXItZ3JhZGllbnQoMTM1ZGVnLCAjZmZmZmZmIDAlLCAjY2NmYmYxIDMwJSwgIzJkZDRiZiA2NSUsICMwZjc2NmUgMTAwJSkiLCJkYXJrVGVhbCI6IiMwZjc2NmUiLCJsaWdodFRlYWwiOiIjY2NmYmYxIiwiZ3JheSI6IiNmMWY1ZjkifX0sInN0YXRlcyI6W10sInNjaGVtYSI6ImltcG9ydCB7IHogfSBmcm9tIFwiem9kXCJcblxuY29uc3QgRHVhRGF0YSA9IHouc3RyaWN0T2JqZWN0KHtcbiAgdGl0bGU6IHouc3RyaW5nKCksXG4gIG9jY2FzaW9uOiB6LnN0cmluZygpLFxuICBhcmFiaWM6IHouc3RyaW5nKCksXG4gIHRyYW5zbGl0ZXJhdGlvbjogei5zdHJpbmcoKSxcbiAgdHJhbnNsYXRpb246IHouc3RyaW5nKCksXG4gIGF1ZGlvVXJsOiB6LnN0cmluZygpLFxuICByZWZlcmVuY2U6IHouc3RyaW5nKCksXG59KVxuXG5jb25zdCBXaWRnZXRTdGF0ZSA9IHouc3RyaWN0T2JqZWN0KHtcbiAgdHlwZTogei5saXRlcmFsKFwiZHVhXCIpLFxuICBkYXRhOiBEdWFEYXRhLFxuICBhY3Rpb25zOiB6LmFycmF5KHouZW51bShbXCJwbGF5X2F1ZGlvXCIsIFwiYm9va21hcmtcIiwgXCJzaGFyZVwiLCBcImNvcHlcIl0pKSxcbiAgcGFsZXR0ZTogei5zdHJpY3RPYmplY3Qoe1xuICAgIGhlYWRlckJnOiB6LnN0cmluZygpLFxuICAgIGRhcmtUZWFsOiB6LnN0cmluZygpLFxuICAgIGxpZ2h0VGVhbDogei5zdHJpbmcoKSxcbiAgICBncmF5OiB6LnN0cmluZygpLFxuICB9KSxcbn0pXG5cbmV4cG9ydCBkZWZhdWx0IFdpZGdldFN0YXRlIiwianNvblNjaGVtYSI6e30sInNjaGVtYU1vZGUiOiJ6b2QiLCJzY2hlbWFWYWxpZGl0eSI6InZhbGlkIiwidmlld1ZhbGlkaXR5IjoidmFsaWQiLCJkZWZhdWx0U3RhdGVWYWxpZGl0eSI6InZhbGlkIn0"
+}
