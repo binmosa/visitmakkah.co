@@ -239,15 +239,15 @@ export default async function RamadanYearPage({ params }: PageProps) {
 
         {/* CTA */}
         <div className="mt-12 p-8 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl text-white text-center">
-          <h2 className="text-2xl font-bold mb-4">Ready to Plan Your Ramadan Journey?</h2>
+          <h2 className="text-2xl font-bold mb-4">Plan Your Ramadan {year} Journey</h2>
           <p className="mb-6 opacity-90">
-            Use our AI-powered trip planner to create your personalized Ramadan itinerary.
+            Get personalized guidance from our AI assistant. Visa, flights, hotels, and a custom Ramadan itinerary — built just for you.
           </p>
           <Link
-            href="/smart-tools"
+            href={`/?ramadan=${year}`}
             className="inline-block bg-white text-emerald-600 font-semibold px-6 py-3 rounded-lg hover:bg-emerald-50 transition-colors"
           >
-            Start Planning →
+            Start Planning with AI →
           </Link>
         </div>
 
