@@ -13,6 +13,9 @@ interface AIChatPanelProps {
     contextIcon?: HugeiconsProps['icon']
     placeholder?: string
     suggestedQuestions?: string[]
+    // Classification metadata for agent routing
+    classification?: 'prepare' | 'learn' | 'explore' | 'blog'
+    action?: string // The sub-menu action (e.g., 'build-itinerary', 'find-food')
 }
 
 export default function AIChatPanel({
@@ -22,10 +25,17 @@ export default function AIChatPanel({
     contextIcon,
     placeholder = 'Ask me anything...',
     suggestedQuestions = [],
+    classification,
+    action,
 }: AIChatPanelProps) {
     // Track whether user has chosen to start chatting
     const [chatStarted, setChatStarted] = useState(false)
     const [initialQuestion, setInitialQuestion] = useState<string | null>(null)
+
+    // Auto-derive classification from context if not provided
+    const derivedClassification = classification || deriveClassification(context)
+    // Auto-derive action from context if not provided
+    const derivedAction = action || context
 
     // Handle starting chat
     const handleStartChat = useCallback((question?: string) => {
@@ -55,8 +65,26 @@ export default function AIChatPanel({
             contextLabel={contextLabel}
             contextIcon={contextIcon}
             initialQuestion={initialQuestion}
+            classification={derivedClassification}
+            action={derivedAction}
+            actionLabel={contextLabel}
         />
     )
+}
+
+// Derive classification from context/action
+function deriveClassification(context: string): 'prepare' | 'learn' | 'explore' | 'blog' {
+    const prepareActions = ['prepare', 'build-itinerary', 'get-visa', 'pack-my-bag', 'calculate-budget']
+    const learnActions = ['learn', 'umrah-guide', 'hajj-guide', 'step-by-step', 'duas-prayers']
+    const exploreActions = ['explore', 'find-hotels', 'find-food', 'check-crowds', 'navigate', 'local-tips']
+
+    if (prepareActions.includes(context)) return 'prepare'
+    if (learnActions.includes(context)) return 'learn'
+    if (exploreActions.includes(context)) return 'explore'
+    if (context === 'blog') return 'blog'
+
+    // Default to prepare if unknown
+    return 'prepare'
 }
 
 // Welcome screen - no API calls, just UI
@@ -147,11 +175,17 @@ function ActiveChatPanel({
     contextLabel,
     contextIcon,
     initialQuestion,
+    classification,
+    action,
+    actionLabel,
 }: {
     context: string
     contextLabel: string
     contextIcon?: HugeiconsProps['icon']
     initialQuestion: string | null
+    classification: 'prepare' | 'learn' | 'explore' | 'blog'
+    action: string
+    actionLabel: string
 }) {
     const { user } = useUserJourney()
     const visitorId = useId()
@@ -188,6 +222,14 @@ function ActiveChatPanel({
                                 journeyType: user.journeyType,
                                 isFirstTime: user.isFirstTime,
                                 travelGroup: user.travelGroup,
+                                gender: user.gender,
+                                country: user.country,
+                            },
+                            // Classification metadata for agent routing
+                            routing: {
+                                classification, // 'prepare' | 'learn' | 'explore' | 'blog'
+                                action,         // e.g., 'build-itinerary', 'find-food'
+                                actionLabel,    // e.g., 'Build My Itinerary', 'Find Food'
                             },
                             initialQuestion, // Pass initial question to potentially include in context
                         }),
