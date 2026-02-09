@@ -1,113 +1,293 @@
-import { NextRequest } from 'next/server'
-import OpenAI from 'openai'
+/**
+ * Chat API Route v2
+ *
+ * Main chat endpoint using Vercel AI SDK with OpenAI.
+ * Features:
+ * - Context-aware responses based on navigation action
+ * - User profile personalization
+ * - Two-stage flow: refinement check + main response
+ * - Widget markers for rich UI rendering
+ * - Supabase conversation persistence
+ *
+ * Required packages:
+ *   npm install ai @ai-sdk/openai zod
+ */
 
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-})
+import { streamText } from 'ai'
+import { openai } from '@ai-sdk/openai'
+import { getContextConfig } from '@/config/ai-context'
+import { saveMessage, getConversationHistory } from '@/lib/chat-service'
 
-// System prompts for different contexts
-const SYSTEM_PROMPTS: Record<string, string> = {
-    // Your Journey
-    'hajj': `You are a knowledgeable Hajj guide assistant for Visit Makkah. Help pilgrims understand the rituals, requirements, and spiritual significance of Hajj. Provide accurate Islamic guidance based on authentic sources. Be respectful, patient, and supportive. Keep responses concise but informative.`,
-    'umrah': `You are a knowledgeable Umrah guide assistant for Visit Makkah. Help pilgrims understand the steps of Umrah, from Ihram to completion. Provide practical tips and spiritual guidance. Be respectful and supportive. Keep responses concise but informative.`,
-    'rituals': `You are a ritual guide assistant for Visit Makkah. Explain Islamic rituals like Tawaf, Sa'i, and other worship practices with accuracy and respect. Provide step-by-step guidance and common mistakes to avoid. Keep responses concise but informative.`,
-    'spiritual': `You are a spiritual preparation guide for Visit Makkah. Help pilgrims prepare spiritually for their journey, suggest duas, and provide guidance on maximizing the spiritual benefits of their visit. Be warm and encouraging. Keep responses concise but informative.`,
-
-    // Plan
-    'plan': `You are a trip planning assistant for Visit Makkah. Help users plan their pilgrimage journey including timelines, logistics, and preparations. Be practical and organized in your advice. Keep responses concise but informative.`,
-    'timeline-builder': `You are a timeline planning assistant for Visit Makkah. Help users create detailed day-by-day itineraries for their Hajj or Umrah trip. Consider prayer times, crowd patterns, and rest periods. Keep responses concise but informative.`,
-    'visa-steps': `You are a visa and documentation assistant for Visit Makkah. Help users understand Saudi visa requirements, application processes, and required documents for Hajj and Umrah. Provide accurate, up-to-date information. Keep responses concise but informative.`,
-    'packing': `You are a packing guide assistant for Visit Makkah. Help users prepare their packing list for Hajj or Umrah, including Ihram clothes, medications, and essential items. Be thorough but practical. Keep responses concise but informative.`,
-    'transport': `You are a transportation guide for Visit Makkah. Help users understand travel options between cities, airports, and holy sites in Saudi Arabia. Provide practical tips on taxis, buses, and trains. Keep responses concise but informative.`,
-
-    // Stay & Food
-    'stay-and-food': `You are a accommodation and dining guide for Visit Makkah. Help users find suitable hotels near Masjid al-Haram and recommend restaurants. Consider budget, location, and special needs. Keep responses concise but informative.`,
-    'hotels': `You are a hotel recommendation assistant for Visit Makkah. Help users find hotels based on proximity to specific Haram gates, budget, and amenities. Provide practical booking tips. Keep responses concise but informative.`,
-    'restaurants': `You are a restaurant guide for Visit Makkah. Recommend halal dining options in Makkah, from local cuisine to international chains. Consider dietary needs and budgets. Keep responses concise but informative.`,
-    'women-friendly': `You are a guide for women visitors to Makkah. Recommend women-friendly areas, services, and facilities. Provide practical tips for solo women travelers and families. Be respectful and helpful. Keep responses concise but informative.`,
-    'late-night': `You are a late-night services guide for Visit Makkah. Help users find restaurants, pharmacies, and services open during late hours and after night prayers. Keep responses concise but informative.`,
-
-    // Smart Tools
-    'smart-tools': `You are a smart assistant for Visit Makkah. Help users with trip planning, calculations, and practical tools for their pilgrimage. Be efficient and helpful. Keep responses concise but informative.`,
-    'trip-planner': `You are an AI trip planner for Visit Makkah. Help users create comprehensive trip plans considering their dates, budget, and preferences. Be organized and thorough. Keep responses concise but informative.`,
-    'budget-tool': `You are a budget planning assistant for Visit Makkah. Help users estimate costs, create budgets, and find money-saving tips for their pilgrimage. Provide realistic cost breakdowns. Keep responses concise but informative.`,
-    'packing-list': `You are a packing list generator for Visit Makkah. Help users create customized packing lists based on their trip duration, season, and special needs. Be thorough but practical. Keep responses concise but informative.`,
-    'distance-calculator': `You are a distance and time calculator for Visit Makkah. Help users understand walking distances and times between hotels, Haram gates, and key locations. Provide practical navigation tips. Keep responses concise but informative.`,
-
-    // Local Tips
-    'local-tips': `You are a local insider guide for Visit Makkah. Share tips and tricks that locals know about navigating Makkah, avoiding crowds, and making the most of the visit. Be friendly and helpful. Keep responses concise but informative.`,
-    'seasonal-hacks': `You are a seasonal travel guide for Visit Makkah. Help users prepare for different seasons and weather conditions in Makkah. Provide practical tips for summer heat and winter visits. Keep responses concise but informative.`,
-    'ramadan-advice': `You are a Ramadan travel guide for Visit Makkah. Help users plan their visit during Ramadan, including iftar spots, Tarawih prayers, and I'tikaf. Provide spiritual and practical guidance. Keep responses concise but informative.`,
-    'hajj-crowd-flow': `You are a crowd management guide for Visit Makkah. Help users understand crowd patterns, best times for Tawaf, and strategies to avoid peak congestion. Provide practical timing tips. Keep responses concise but informative.`,
-    'insider-routes': `You are an insider navigation guide for Visit Makkah. Share lesser-known routes, shortcuts, and efficient paths to reach Masjid al-Haram and other locations. Be helpful and practical. Keep responses concise but informative.`,
-
-    // Default
-    'default': `You are a helpful assistant for Visit Makkah, a platform helping English-speaking pilgrims plan their journey to Makkah for Hajj and Umrah. Provide accurate, respectful, and practical guidance. Keep responses concise but informative.`,
+// User profile from onboarding
+interface UserProfile {
+  journeyStage: string | null
+  journeyType: string | null
+  isFirstTime: boolean | null
+  gender: string | null
+  country: string | null
+  travelGroup: string | null
+  departureDate: string | null
+  returnDate: string | null
+  daysUntilDeparture: number | null
 }
 
-export async function POST(request: NextRequest) {
-    try {
-        const body = await request.json()
-        const { messages, context, userProfile } = body
+// Request body type
+interface ChatRequest {
+  messages: Array<{ role: 'user' | 'assistant'; content: string }>
+  contextAction: string
+  userProfile?: UserProfile
+  topicId?: string
+}
 
-        // Get system prompt based on context
-        const systemPrompt = SYSTEM_PROMPTS[context] || SYSTEM_PROMPTS['default']
+// Build comprehensive system prompt
+function buildSystemPrompt(contextAction: string, userProfile?: UserProfile): string {
+  const config = getContextConfig(contextAction)
 
-        // Build user context string
-        let userContext = ''
-        if (userProfile) {
-            const parts = []
-            if (userProfile.journeyType) parts.push(`Journey: ${userProfile.journeyType}`)
-            if (userProfile.journeyStage) parts.push(`Stage: ${userProfile.journeyStage}`)
-            if (userProfile.isFirstTime) parts.push('First-time visitor')
-            if (userProfile.travelGroup) parts.push(`Traveling: ${userProfile.travelGroup}`)
-            if (userProfile.travelDates?.startDate) {
-                parts.push(`Travel date: ${userProfile.travelDates.startDate}`)
-            }
-            if (parts.length > 0) {
-                userContext = `\n\nUser context: ${parts.join(', ')}`
-            }
-        }
+  let prompt = `You are a helpful AI assistant for Visit Makkah, specializing in Umrah and Hajj pilgrimage guidance.
 
-        // Create chat completion with streaming
-        const stream = await openai.chat.completions.create({
-            model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
-            messages: [
-                { role: 'system', content: systemPrompt + userContext },
-                ...messages,
-            ],
-            stream: true,
-            max_tokens: 1000,
-            temperature: 0.7,
-        })
+## Your Role
+- Provide accurate, respectful guidance on Islamic pilgrimage
+- Be culturally sensitive and knowledgeable about Islamic practices
+- Give practical, actionable advice for travelers
+- Always maintain a warm, supportive tone
 
-        // Create a readable stream for the response
-        const encoder = new TextEncoder()
-        const readableStream = new ReadableStream({
-            async start(controller) {
-                for await (const chunk of stream) {
-                    const content = chunk.choices[0]?.delta?.content || ''
-                    if (content) {
-                        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content })}\n\n`))
-                    }
-                }
-                controller.enqueue(encoder.encode('data: [DONE]\n\n'))
-                controller.close()
-            },
-        })
+## Current Context
+The user is on the "${config.actionLabel}" page.
+- Primary knowledge domain: ${config.action}
+- Suggested widget type: ${config.primaryWidget}
 
-        return new Response(readableStream, {
-            headers: {
-                'Content-Type': 'text/event-stream',
-                'Cache-Control': 'no-cache',
-                'Connection': 'keep-alive',
-            },
-        })
-    } catch (error) {
-        console.error('Chat API error:', error)
-        return Response.json(
-            { error: 'Failed to process chat request' },
-            { status: 500 }
-        )
+${config.systemPromptAddition}
+
+## Important Guidelines
+1. You can query multiple knowledge bases if the user's question spans different topics
+2. You can render multiple widgets in a single response if helpful
+3. Always cite sources when providing information from the knowledge base
+4. Be sensitive to different Islamic schools of thought (madhabs)
+5. Provide both Arabic text and transliterations for duas and prayers
+6. Keep responses concise but thorough
+
+## Widget Format
+When providing structured data that benefits from visual presentation, use this exact format:
+
+<<<WIDGET:type>>>
+{
+  "key": "value"
+}
+<<<END_WIDGET>>>
+
+Available widget types:
+- itinerary: Multi-day travel plans with activities
+- checklist: Interactive checklists with categories
+- budget: Cost breakdowns with totals
+- guide: Step-by-step instructional guides
+- dua: Prayers with Arabic, transliteration, translation
+- ritual: Ritual instructions with steps and duas
+- places: Location cards (hotels, restaurants, landmarks)
+- crowd: Crowd level indicators and forecasts
+- navigation: Directions and routes
+- tips: Tips and advice cards
+
+**Widget Usage Rules:**
+- Only use widgets when they genuinely improve the response
+- Simple text answers don't need widgets
+- You can include multiple widgets in one response
+- Always include explanatory text around widgets
+- Ensure JSON is valid and complete
+`
+
+  // Add user personalization
+  if (userProfile) {
+    prompt += `\n## User Profile\n`
+
+    if (userProfile.journeyType) {
+      prompt += `- Journey type: ${userProfile.journeyType}\n`
     }
+    if (userProfile.isFirstTime !== null) {
+      prompt += `- First time pilgrim: ${userProfile.isFirstTime ? 'Yes' : 'No'}\n`
+    }
+    if (userProfile.gender) {
+      prompt += `- Gender: ${userProfile.gender}\n`
+    }
+    if (userProfile.country) {
+      prompt += `- Country: ${userProfile.country}\n`
+    }
+    if (userProfile.travelGroup) {
+      prompt += `- Traveling: ${userProfile.travelGroup}\n`
+    }
+    if (userProfile.departureDate) {
+      prompt += `- Departure date: ${userProfile.departureDate}\n`
+    }
+    if (userProfile.daysUntilDeparture !== null && userProfile.daysUntilDeparture > 0) {
+      prompt += `- Days until departure: ${userProfile.daysUntilDeparture}\n`
+    }
+
+    prompt += `\nPersonalize your responses based on this profile:
+- First-timers need more detailed explanations
+- Women may need specific guidance on dress code and designated areas
+- Consider the user's country for visa and travel requirements
+- Adjust urgency based on how soon they're traveling\n`
+  }
+
+  return prompt
+}
+
+// Check if question needs refinement (Stage 1)
+function checkNeedsRefinement(
+  messages: ChatRequest['messages'],
+  contextAction: string
+): string | null {
+  const lastMessage = messages[messages.length - 1]
+  if (lastMessage?.role !== 'user') return null
+
+  const userQuestion = lastMessage.content.toLowerCase().trim()
+
+  // Skip refinement for longer, well-formed questions
+  if (userQuestion.length > 30) return null
+  if (userQuestion.includes('?') && userQuestion.length > 15) return null
+
+  // Patterns that need refinement
+  const refinementPatterns: Array<{ pattern: RegExp; response: string }> = [
+    {
+      pattern: /^(umrah|hajj)(\s+plan)?$/i,
+      response: `I'd love to help you plan your ${userQuestion.includes('hajj') ? 'Hajj' : 'Umrah'}! To create a personalized plan, could you tell me:
+
+1. How many days/nights are you planning to stay?
+2. Are you traveling alone, with family, or in a group?
+3. Is this your first time?`,
+    },
+    {
+      pattern: /^(hotel|hotels|accommodation|where to stay)$/i,
+      response: `I can help you find the perfect accommodation! To give you the best recommendations:
+
+1. What's your budget range (economy, mid-range, or luxury)?
+2. How important is walking distance to Haram?
+3. Do you need any specific amenities (family rooms, wheelchair access, etc.)?`,
+    },
+    {
+      pattern: /^(visa|visa guide|get visa)$/i,
+      response: `I'll help you with visa information! To provide accurate guidance, which country will you be applying from?`,
+    },
+    {
+      pattern: /^(pack|packing|what to pack)$/i,
+      response: `I'll help you prepare a comprehensive packing list! A few questions:
+
+1. Are you going for Umrah or Hajj?
+2. What month are you traveling?
+3. Are you male or female? (for appropriate Ihram/clothing recommendations)`,
+    },
+    {
+      pattern: /^(budget|cost|how much)$/i,
+      response: `I can help you estimate your pilgrimage budget! To give you an accurate breakdown:
+
+1. Are you planning Umrah or Hajj?
+2. How many days will you be staying?
+3. What's your preferred accommodation level (economy, mid-range, or luxury)?`,
+    },
+  ]
+
+  for (const { pattern, response } of refinementPatterns) {
+    if (pattern.test(userQuestion)) {
+      return response
+    }
+  }
+
+  return null
+}
+
+export async function POST(request: Request) {
+  try {
+    const body = (await request.json()) as ChatRequest
+    const { messages, contextAction = 'general', userProfile, topicId } = body
+
+    // Validate input
+    if (!messages || !Array.isArray(messages) || messages.length === 0) {
+      return new Response(JSON.stringify({ error: 'Messages array is required' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    }
+
+    // Stage 1: Check if refinement is needed
+    const refinementQuestion = checkNeedsRefinement(messages, contextAction)
+    if (refinementQuestion) {
+      // Return refinement as a simple non-streaming response
+      return new Response(
+        JSON.stringify({
+          role: 'assistant',
+          content: refinementQuestion,
+          isRefinement: true,
+        }),
+        {
+          headers: { 'Content-Type': 'application/json' },
+        }
+      )
+    }
+
+    // Load conversation history if topic exists
+    let conversationHistory = messages
+    if (topicId) {
+      try {
+        const history = await getConversationHistory(topicId)
+        if (history.length > 0) {
+          conversationHistory = history
+        }
+      } catch (e) {
+        console.warn('Failed to load conversation history:', e)
+      }
+    }
+
+    // Build system prompt
+    const systemPrompt = buildSystemPrompt(contextAction, userProfile)
+
+    // Stage 2: Main AI response with streaming
+    const result = streamText({
+      model: openai('gpt-4o'),
+      system: systemPrompt,
+      messages: conversationHistory,
+      temperature: 0.7,
+      maxOutputTokens: 4000,
+      // Tools will be added when RAG is integrated
+      onFinish: async ({ text }) => {
+        // Save to Supabase (non-blocking)
+        if (topicId) {
+          const lastUserMessage = messages[messages.length - 1]
+          if (lastUserMessage?.role === 'user') {
+            try {
+              await saveMessage(topicId, 'user', lastUserMessage.content)
+              await saveMessage(topicId, 'assistant', text)
+            } catch (e) {
+              console.error('Failed to save messages:', e)
+            }
+          }
+        }
+      },
+    })
+
+    return result.toTextStreamResponse()
+  } catch (error) {
+    console.error('Chat API error:', error)
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to process chat request',
+        details: error instanceof Error ? error.message : 'Unknown error',
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    )
+  }
+}
+
+export async function GET() {
+  return new Response(
+    JSON.stringify({
+      status: 'ok',
+      version: '2.0',
+      features: ['streaming', 'widgets', 'refinement', 'personalization'],
+    }),
+    {
+      headers: { 'Content-Type': 'application/json' },
+    }
+  )
 }

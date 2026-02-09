@@ -1,7 +1,7 @@
 'use client'
 
 import HubNavMenu from '@/components/HubNavSlider'
-import AIChatPanel from '@/components/AIPanel/AIChatPanel'
+import AIChatPanelV2 from '@/components/AIPanel/AIChatPanelV2'
 import { TNavigationItem, getAISuggestions } from '@/data/navigation'
 import { useUserJourney } from '@/context/UserJourneyContext'
 import { usePathname, useSearchParams } from 'next/navigation'
@@ -207,13 +207,12 @@ const HubLayoutInner = ({
 
             {/* AI Chat Panel - Full Width */}
             <div className="h-[500px] sm:h-[550px] lg:h-[650px]">
-                <AIChatPanel
+                <AIChatPanelV2
                     key={activeItemId || context}
-                    context={subTopic || context}
+                    contextAction={subTopic || context}
                     contextLabel={activeItem?.name || title}
                     contextDescription={activeItem?.description}
                     contextIcon={ActiveItemIcon}
-                    placeholder={`Ask about ${activeItem?.name || title}...`}
                     suggestedQuestions={suggestedQuestions}
                 />
             </div>
