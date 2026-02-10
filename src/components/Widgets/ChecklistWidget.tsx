@@ -17,10 +17,20 @@ interface ChecklistWidgetProps {
 
 export default function ChecklistWidget({ data }: ChecklistWidgetProps) {
   const checklist = data as ChecklistWidgetData
-  const [items, setItems] = useState<Record<string, boolean>>({})
-  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set([checklist?.categories?.[0]?.name]))
 
-  if (!checklist?.categories?.length) {
+  // Add IDs to items if missing
+  const categoriesWithIds = checklist?.categories?.map((cat, catIndex) => ({
+    ...cat,
+    items: cat.items?.map((item, itemIndex) => ({
+      ...item,
+      id: item.id || `${catIndex}-${itemIndex}`,
+    })) || []
+  })) || []
+
+  const [items, setItems] = useState<Record<string, boolean>>({})
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set([categoriesWithIds[0]?.name]))
+
+  if (!categoriesWithIds.length) {
     return null
   }
 
@@ -41,7 +51,7 @@ export default function ChecklistWidget({ data }: ChecklistWidgetProps) {
   }
 
   // Calculate progress
-  const totalItems = checklist.categories.reduce((sum, cat) => sum + cat.items.length, 0)
+  const totalItems = categoriesWithIds.reduce((sum, cat) => sum + cat.items.length, 0)
   const checkedItems = Object.values(items).filter(Boolean).length
   const progress = totalItems > 0 ? Math.round((checkedItems / totalItems) * 100) : 0
 
@@ -81,7 +91,7 @@ export default function ChecklistWidget({ data }: ChecklistWidgetProps) {
 
       {/* Categories */}
       <div className="divide-y divide-neutral-200 dark:divide-neutral-700">
-        {checklist.categories.map((category) => (
+        {categoriesWithIds.map((category) => (
           <CategorySection
             key={category.name}
             category={category}

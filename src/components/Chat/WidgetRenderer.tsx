@@ -5,10 +5,12 @@
  *
  * Dynamically renders the appropriate widget component based on type.
  * Uses dynamic imports for code splitting.
+ * Normalizes data before passing to widgets for consistent structure.
  */
 
 import dynamic from 'next/dynamic'
 import type { WidgetType } from '@/types/widgets'
+import { normalizeWidgetData, validateWidgetData } from '@/lib/widget-normalizer'
 
 // Loading placeholder for widgets
 function WidgetLoading() {
@@ -72,17 +74,24 @@ interface WidgetRendererProps {
 }
 
 export function WidgetRenderer({ type, data, className = '' }: WidgetRendererProps) {
+  // Normalize the data to ensure consistent structure
+  const normalizedData = normalizeWidgetData(type as WidgetType, data)
+
   // Check if this is a valid widget type
   const WidgetComponent = widgetComponents[type as WidgetType]
 
   if (!WidgetComponent) {
-    console.warn(`Unknown widget type: ${type}`)
+    return <WidgetError type={type} />
+  }
+
+  // Validate the normalized data
+  if (!validateWidgetData(type as WidgetType, normalizedData)) {
     return <WidgetError type={type} />
   }
 
   return (
     <div className={`my-4 ${className}`}>
-      <WidgetComponent data={data} />
+      <WidgetComponent data={normalizedData} />
     </div>
   )
 }

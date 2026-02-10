@@ -4,18 +4,38 @@
  * BudgetWidget Component
  *
  * Displays budget breakdowns with categories and totals.
+ * Expects normalized data from widget-normalizer.
  */
 
 import { DollarCircleIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import type { BudgetWidgetData, BudgetItem } from '@/types/widgets'
+
+// Normalized types
+interface NormalizedBudgetItem {
+  id: string
+  category: string
+  description: string
+  amount: number
+  currency: string
+  isOptional?: boolean
+  notes?: string
+}
+
+interface NormalizedBudget {
+  title: string
+  currency: string
+  total: number
+  breakdown: NormalizedBudgetItem[]
+  savingsTips?: string[]
+  notes?: string
+}
 
 interface BudgetWidgetProps {
   data: unknown
 }
 
 export default function BudgetWidget({ data }: BudgetWidgetProps) {
-  const budget = data as BudgetWidgetData
+  const budget = data as NormalizedBudget
 
   if (!budget?.breakdown?.length) {
     return null
@@ -50,8 +70,8 @@ export default function BudgetWidget({ data }: BudgetWidgetProps) {
 
       {/* Breakdown */}
       <div className="divide-y divide-neutral-100 dark:divide-neutral-800">
-        {budget.breakdown.map((item, index) => (
-          <BudgetRow key={index} item={item} currency={budget.currency} />
+        {budget.breakdown.map((item) => (
+          <BudgetRow key={item.id} item={item} currency={budget.currency} />
         ))}
       </div>
 
@@ -93,7 +113,7 @@ export default function BudgetWidget({ data }: BudgetWidgetProps) {
 }
 
 interface BudgetRowProps {
-  item: BudgetItem
+  item: NormalizedBudgetItem
   currency: string
 }
 

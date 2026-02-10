@@ -4,20 +4,51 @@
  * ItineraryWidget Component
  *
  * Displays multi-day travel itineraries with activities, times, and tips.
+ * Expects normalized data from widget-normalizer.
  */
 
 import { useState } from 'react'
-import { Calendar03Icon, Location01Icon, Clock01Icon, ArrowDown01Icon } from '@hugeicons/core-free-icons'
+import { Calendar03Icon, Location01Icon, ArrowDown01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import type { ItineraryWidgetData, ItineraryDay } from '@/types/widgets'
+
+// Normalized types from widget-normalizer
+interface NormalizedActivity {
+  id: string
+  time: string
+  title: string
+  description: string
+  location?: string
+  type?: string
+  tips?: string[]
+}
+
+interface NormalizedDay {
+  id: string
+  day: number
+  title: string
+  date?: string
+  location: string
+  summary?: string
+  activities: NormalizedActivity[]
+}
+
+interface NormalizedItinerary {
+  title: string
+  summary?: string
+  duration: { nights: number; days: number }
+  journeyType?: string
+  days: NormalizedDay[]
+  tips?: string[]
+  estimatedBudget?: { currency: string; min: number; max: number }
+}
 
 interface ItineraryWidgetProps {
   data: unknown
 }
 
 export default function ItineraryWidget({ data }: ItineraryWidgetProps) {
-  const itinerary = data as ItineraryWidgetData
-  const [expandedDay, setExpandedDay] = useState<number | null>(0)
+  const itinerary = data as NormalizedItinerary
+  const [expandedDay, setExpandedDay] = useState<string | null>(itinerary?.days?.[0]?.id || null)
 
   if (!itinerary?.days?.length) {
     return null
@@ -49,10 +80,10 @@ export default function ItineraryWidget({ data }: ItineraryWidgetProps) {
       <div className="divide-y divide-neutral-200 dark:divide-neutral-700">
         {itinerary.days.map((day) => (
           <DayAccordion
-            key={day.day}
+            key={day.id}
             day={day}
-            isExpanded={expandedDay === day.day}
-            onToggle={() => setExpandedDay(expandedDay === day.day ? null : day.day)}
+            isExpanded={expandedDay === day.id}
+            onToggle={() => setExpandedDay(expandedDay === day.id ? null : day.id)}
           />
         ))}
       </div>
@@ -74,7 +105,7 @@ export default function ItineraryWidget({ data }: ItineraryWidgetProps) {
 }
 
 interface DayAccordionProps {
-  day: ItineraryDay
+  day: NormalizedDay
   isExpanded: boolean
   onToggle: () => void
 }
@@ -112,7 +143,7 @@ function DayAccordion({ day, isExpanded, onToggle }: DayAccordionProps) {
           )}
           <div className="space-y-3">
             {day.activities.map((activity, index) => (
-              <div key={index} className="flex gap-3">
+              <div key={activity.id} className="flex gap-3">
                 <div className="flex flex-col items-center">
                   <span className="text-xs font-medium text-primary-600 dark:text-primary-400">
                     {activity.time}

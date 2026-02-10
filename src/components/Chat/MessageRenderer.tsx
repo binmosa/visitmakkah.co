@@ -4,27 +4,64 @@
  * MessageRenderer Component
  *
  * Renders AI message content including text and inline widgets.
- * Parses widget markers and renders appropriate components.
+ * Handles streaming by showing placeholders for incomplete widgets.
  */
 
 import { useMemo } from 'react'
-import { parseWidgets, type ContentSegment } from '@/lib/widget-parser'
+import { parseStreamingContent, type ContentSegment } from '@/lib/widget-parser'
 import { WidgetRenderer } from './WidgetRenderer'
+import { StreamingWidgetPlaceholder } from './StreamingWidgetPlaceholder'
 
 interface MessageRendererProps {
   content: string
   className?: string
+  isStreaming?: boolean
 }
 
-export function MessageRenderer({ content, className = '' }: MessageRendererProps) {
-  // Parse content to extract text and widgets
-  const { segments } = useMemo(() => parseWidgets(content), [content])
+export function MessageRenderer({ content, className = '', isStreaming = false }: MessageRendererProps) {
+  // Parse content with streaming awareness
+  const { completeSegments, incompleteText, isComplete, incompleteWidgetType } = useMemo(() => {
+    const result = parseStreamingContent(content)
+
+    // Try to extract the widget type from incomplete text
+    let widgetType: string | undefined
+    if (result.incompleteText) {
+      const typeMatch = result.incompleteText.match(/<<<WIDGET:(\w+)>>>/)
+      if (typeMatch) {
+        widgetType = typeMatch[1]
+      }
+    }
+
+    return {
+      ...result,
+      incompleteWidgetType: widgetType,
+    }
+  }, [content])
+
+  // Filter out any text segments that contain raw widget markers or JSON-like content
+  const filteredSegments = useMemo(() => {
+    return completeSegments.filter(segment => {
+      if (segment.type === 'text') {
+        // Hide text that looks like it's part of widget markup
+        const text = segment.content.trim()
+        if (text.startsWith('{') || text.startsWith('"') || text.includes('<<<')) {
+          return false
+        }
+      }
+      return true
+    })
+  }, [completeSegments])
 
   return (
     <div className={`space-y-4 ${className}`}>
-      {segments.map((segment, index) => (
+      {filteredSegments.map((segment, index) => (
         <SegmentRenderer key={index} segment={segment} />
       ))}
+
+      {/* Show placeholder when widget is being streamed */}
+      {incompleteText && incompleteText.includes('<<<WIDGET:') && (
+        <StreamingWidgetPlaceholder widgetType={incompleteWidgetType} />
+      )}
     </div>
   )
 }

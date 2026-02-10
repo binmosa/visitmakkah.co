@@ -4,18 +4,41 @@
  * GuideWidget Component
  *
  * Displays step-by-step instructional guides.
+ * Expects normalized data from widget-normalizer.
  */
 
 import { Clock01Icon, AlertCircleIcon, InformationCircleIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import type { GuideWidgetData, GuideStep } from '@/types/widgets'
+
+// Normalized step type (from widget-normalizer)
+interface NormalizedStep {
+  id: string
+  number: number
+  title: string
+  description: string
+  duration?: string
+  tips?: string[]
+  warnings?: string[]
+}
+
+// Normalized guide data type
+interface NormalizedGuideData {
+  title: string
+  description: string
+  category: string
+  difficulty?: 'easy' | 'moderate' | 'challenging' | 'beginner'
+  duration?: string
+  steps: NormalizedStep[]
+  prerequisites?: string[]
+  tips?: string[]
+}
 
 interface GuideWidgetProps {
   data: unknown
 }
 
 export default function GuideWidget({ data }: GuideWidgetProps) {
-  const guide = data as GuideWidgetData
+  const guide = data as NormalizedGuideData
 
   if (!guide?.steps?.length) {
     return null
@@ -82,7 +105,7 @@ export default function GuideWidget({ data }: GuideWidgetProps) {
       {/* Steps */}
       <div className="divide-y divide-neutral-100 dark:divide-neutral-800">
         {guide.steps.map((step) => (
-          <StepCard key={step.number} step={step} />
+          <StepCard key={step.id} step={step} />
         ))}
       </div>
 
@@ -113,7 +136,7 @@ export default function GuideWidget({ data }: GuideWidgetProps) {
 }
 
 interface StepCardProps {
-  step: GuideStep
+  step: NormalizedStep
 }
 
 function StepCard({ step }: StepCardProps) {

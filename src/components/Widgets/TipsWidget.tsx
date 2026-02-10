@@ -4,18 +4,36 @@
  * TipsWidget Component
  *
  * Displays tips and advice cards.
+ * Expects normalized data from widget-normalizer.
  */
 
 import { BulbIcon, AlertCircleIcon, StarIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import type { TipsWidgetData, TipItem } from '@/types/widgets'
+
+// Normalized types
+interface NormalizedTip {
+  id: string
+  title: string
+  content: string
+  category: string
+  icon?: string
+  priority?: 'must-know' | 'helpful' | 'bonus'
+}
+
+interface NormalizedTipsData {
+  title: string
+  description?: string
+  audience?: 'all' | 'first-timers' | 'women' | 'elderly' | 'families'
+  tips: NormalizedTip[]
+  categories?: string[]
+}
 
 interface TipsWidgetProps {
   data: unknown
 }
 
 export default function TipsWidget({ data }: TipsWidgetProps) {
-  const tips = data as TipsWidgetData
+  const tips = data as NormalizedTipsData
 
   if (!tips?.tips?.length) {
     return null
@@ -55,8 +73,8 @@ export default function TipsWidget({ data }: TipsWidgetProps) {
 
       {/* Tips List */}
       <div className="divide-y divide-neutral-100 dark:divide-neutral-800">
-        {tips.tips.map((tip, index) => (
-          <TipCard key={index} tip={tip} />
+        {tips.tips.map((tip) => (
+          <TipCard key={tip.id} tip={tip} />
         ))}
       </div>
     </div>
@@ -64,7 +82,7 @@ export default function TipsWidget({ data }: TipsWidgetProps) {
 }
 
 interface TipCardProps {
-  tip: TipItem
+  tip: NormalizedTip
 }
 
 function TipCard({ tip }: TipCardProps) {

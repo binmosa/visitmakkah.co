@@ -4,18 +4,38 @@
  * CrowdWidget Component
  *
  * Displays crowd level indicators and forecasts.
+ * Expects normalized data from widget-normalizer.
  */
 
 import { UserGroupIcon, Clock01Icon, AlertCircleIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import type { CrowdWidgetData, CrowdPeriod } from '@/types/widgets'
+
+// Normalized types
+interface NormalizedCrowdPeriod {
+  id: string
+  time: string
+  level: 'low' | 'moderate' | 'high' | 'very-high'
+  description?: string
+  recommendation?: string
+}
+
+interface NormalizedCrowd {
+  title: string
+  location: string
+  currentLevel?: 'low' | 'moderate' | 'high' | 'very-high'
+  lastUpdated?: string
+  forecast: NormalizedCrowdPeriod[]
+  bestTimes?: string[]
+  tips?: string[]
+  seasonalNote?: string
+}
 
 interface CrowdWidgetProps {
   data: unknown
 }
 
 export default function CrowdWidget({ data }: CrowdWidgetProps) {
-  const crowd = data as CrowdWidgetData
+  const crowd = data as NormalizedCrowd
 
   if (!crowd?.forecast?.length) {
     return null
@@ -86,8 +106,8 @@ export default function CrowdWidget({ data }: CrowdWidgetProps) {
           Crowd Forecast
         </p>
         <div className="space-y-3">
-          {crowd.forecast.map((period, index) => (
-            <CrowdPeriodRow key={index} period={period} />
+          {crowd.forecast.map((period) => (
+            <CrowdPeriodRow key={period.id} period={period} />
           ))}
         </div>
       </div>
@@ -154,7 +174,7 @@ export default function CrowdWidget({ data }: CrowdWidgetProps) {
 }
 
 interface CrowdPeriodRowProps {
-  period: CrowdPeriod
+  period: NormalizedCrowdPeriod
 }
 
 function CrowdPeriodRow({ period }: CrowdPeriodRowProps) {

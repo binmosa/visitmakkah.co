@@ -4,18 +4,41 @@
  * NavigationWidget Component
  *
  * Displays directions and navigation routes.
+ * Expects normalized data from widget-normalizer.
  */
 
 import { Navigation02Icon, Clock01Icon, Location01Icon, Route01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import type { NavigationWidgetData, NavigationStep } from '@/types/widgets'
+
+// Normalized types
+interface NormalizedNavStep {
+  id: string
+  number: number
+  instruction: string
+  distance?: string
+  duration?: string
+  landmark?: string
+  mode?: 'walk' | 'drive' | 'bus' | 'train'
+}
+
+interface NormalizedNavigation {
+  title: string
+  from: string
+  to: string
+  totalDistance?: string
+  totalDuration?: string
+  mode: 'walk' | 'drive' | 'public' | 'mixed'
+  steps: NormalizedNavStep[]
+  alternatives?: { mode: string; duration: string; cost?: string }[]
+  tips?: string[]
+}
 
 interface NavigationWidgetProps {
   data: unknown
 }
 
 export default function NavigationWidget({ data }: NavigationWidgetProps) {
-  const nav = data as NavigationWidgetData
+  const nav = data as NormalizedNavigation
 
   if (!nav?.steps?.length) {
     return null
@@ -86,7 +109,7 @@ export default function NavigationWidget({ data }: NavigationWidgetProps) {
         <div className="relative">
           {nav.steps.map((step, index) => (
             <NavigationStepRow
-              key={index}
+              key={step.id}
               step={step}
               isLast={index === nav.steps.length - 1}
             />
@@ -143,7 +166,7 @@ export default function NavigationWidget({ data }: NavigationWidgetProps) {
 }
 
 interface NavigationStepRowProps {
-  step: NavigationStep
+  step: NormalizedNavStep
   isLast: boolean
 }
 

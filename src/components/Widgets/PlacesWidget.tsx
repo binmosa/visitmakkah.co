@@ -4,18 +4,43 @@
  * PlacesWidget Component
  *
  * Displays location cards for hotels, restaurants, and landmarks.
+ * Expects normalized data from widget-normalizer.
  */
 
 import { Location01Icon, StarIcon, Navigation02Icon, Call02Icon, Globe02Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import type { PlacesWidgetData, PlaceItem } from '@/types/widgets'
+
+// Normalized types
+interface NormalizedPlace {
+  id: string
+  name: string
+  arabicName?: string
+  description: string
+  category: 'hotel' | 'restaurant' | 'landmark' | 'service' | 'transport'
+  location: {
+    area: string
+    distanceToHaram?: string
+    coordinates?: { lat: number; lng: number } | null
+  }
+  rating?: number | null
+  priceRange?: string | null
+  amenities?: string[]
+  tips?: string[]
+  contact?: { phone?: string; website?: string } | null
+}
+
+interface NormalizedPlaces {
+  title: string
+  description?: string
+  places: NormalizedPlace[]
+}
 
 interface PlacesWidgetProps {
   data: unknown
 }
 
 export default function PlacesWidget({ data }: PlacesWidgetProps) {
-  const places = data as PlacesWidgetData
+  const places = data as NormalizedPlaces
 
   if (!places?.places?.length) {
     return null
@@ -35,8 +60,8 @@ export default function PlacesWidget({ data }: PlacesWidgetProps) {
 
       {/* Places Grid */}
       <div className="divide-y divide-neutral-200 dark:divide-neutral-700">
-        {places.places.map((place, index) => (
-          <PlaceCard key={index} place={place} />
+        {places.places.map((place) => (
+          <PlaceCard key={place.id} place={place} />
         ))}
       </div>
     </div>
@@ -44,7 +69,7 @@ export default function PlacesWidget({ data }: PlacesWidgetProps) {
 }
 
 interface PlaceCardProps {
-  place: PlaceItem
+  place: NormalizedPlace
 }
 
 function PlaceCard({ place }: PlaceCardProps) {

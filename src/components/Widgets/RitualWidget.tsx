@@ -4,19 +4,51 @@
  * RitualWidget Component
  *
  * Displays ritual instructions with steps and duas.
+ * Expects normalized data from widget-normalizer.
  */
 
 import { useState } from 'react'
 import { Mosque01Icon, Location01Icon, Clock01Icon, AlertCircleIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import type { RitualWidgetData, RitualStep } from '@/types/widgets'
+
+// Normalized types from widget-normalizer
+interface NormalizedDua {
+  arabic: string
+  transliteration: string
+  translation: string
+}
+
+interface NormalizedRitualStep {
+  id: string
+  number: number
+  title: string
+  arabicTitle?: string
+  description: string
+  dua?: NormalizedDua | null
+  location?: string
+  duration?: string
+  tips?: string[]
+  commonMistakes?: string[]
+}
+
+interface NormalizedRitual {
+  title: string
+  arabicTitle?: string
+  description: string
+  type?: string
+  isFard?: boolean
+  steps: NormalizedRitualStep[]
+  prerequisites?: string[]
+  tips?: string[]
+  commonMistakes?: string[]
+}
 
 interface RitualWidgetProps {
   data: unknown
 }
 
 export default function RitualWidget({ data }: RitualWidgetProps) {
-  const ritual = data as RitualWidgetData
+  const ritual = data as NormalizedRitual
   const [activeStep, setActiveStep] = useState(0)
 
   if (!ritual?.steps?.length) {
@@ -81,9 +113,9 @@ export default function RitualWidget({ data }: RitualWidgetProps) {
       {/* Step Progress */}
       <div className="border-b border-neutral-200 px-4 py-3 dark:border-neutral-700">
         <div className="flex items-center gap-2">
-          {ritual.steps.map((_, index) => (
+          {ritual.steps.map((step, index) => (
             <button
-              key={index}
+              key={step.id}
               onClick={() => setActiveStep(index)}
               className={`flex size-8 items-center justify-center rounded-full text-sm font-bold transition-colors ${
                 index === activeStep
@@ -151,7 +183,7 @@ export default function RitualWidget({ data }: RitualWidgetProps) {
 }
 
 interface RitualStepCardProps {
-  step: RitualStep
+  step: NormalizedRitualStep
 }
 
 function RitualStepCard({ step }: RitualStepCardProps) {

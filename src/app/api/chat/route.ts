@@ -67,32 +67,62 @@ ${config.systemPromptAddition}
 6. Keep responses concise but thorough
 
 ## Widget Format
-When providing structured data that benefits from visual presentation, use this exact format:
+When providing structured data, use this EXACT format with the specific JSON schemas shown:
 
+**Format:**
+\`\`\`
 <<<WIDGET:type>>>
-{
-  "key": "value"
-}
+{JSON data here}
+<<<END_WIDGET>>>
+\`\`\`
+
+**IMPORTANT: You MUST use widgets for structured responses. Here are the schemas:**
+
+### 1. tips - For advice and tips (USE THIS OFTEN)
+<<<WIDGET:tips>>>
+{"title":"Essential Tips","description":"Key advice for pilgrims","audience":"all","tips":[{"title":"Stay Hydrated","content":"Drink plenty of water, especially during Tawaf.","icon":"💧","priority":"must-know","category":"Health"},{"title":"Comfortable Footwear","content":"Wear comfortable shoes as you'll walk a lot.","icon":"👟","priority":"helpful"}]}
 <<<END_WIDGET>>>
 
-Available widget types:
-- itinerary: Multi-day travel plans with activities
-- checklist: Interactive checklists with categories
-- budget: Cost breakdowns with totals
-- guide: Step-by-step instructional guides
-- dua: Prayers with Arabic, transliteration, translation
-- ritual: Ritual instructions with steps and duas
-- places: Location cards (hotels, restaurants, landmarks)
-- crowd: Crowd level indicators and forecasts
-- navigation: Directions and routes
-- tips: Tips and advice cards
+### 2. checklist - For packing lists or task lists
+<<<WIDGET:checklist>>>
+{"title":"Umrah Packing Checklist","description":"Essential items to pack","categories":[{"name":"Documents","icon":"📄","items":[{"text":"Passport (valid 6+ months)","required":true,"checked":false},{"text":"Visa printout","required":true,"checked":false}]},{"name":"Clothing","icon":"👔","items":[{"text":"Ihram (2 white cloths for men)","required":true,"checked":false}]}]}
+<<<END_WIDGET>>>
+
+### 3. guide - For step-by-step instructions
+<<<WIDGET:guide>>>
+{"title":"How to Perform Tawaf","description":"Complete guide to circumambulating the Kaaba","difficulty":"beginner","estimatedTime":"45-60 minutes","steps":[{"stepNumber":1,"title":"Start at Black Stone","description":"Begin at the corner with the Black Stone (Hajar al-Aswad)","tips":["Face the Kaaba with it on your left"]},{"stepNumber":2,"title":"Make Intention","description":"Make niyyah (intention) for Tawaf"}]}
+<<<END_WIDGET>>>
+
+### 4. dua - For prayers and supplications
+<<<WIDGET:dua>>>
+{"title":"Dua When Seeing the Kaaba","occasion":"First sight of the Kaaba","arabic":"اللَّهُمَّ زِدْ هَذَا الْبَيْتَ تَشْرِيفًا وَتَعْظِيمًا","transliteration":"Allahumma zid hadha al-bayta tashrifan wa ta'zeeman","translation":"O Allah, increase this House in honor and reverence","source":"Hadith","notes":"Recite this dua when you first see the Kaaba"}
+<<<END_WIDGET>>>
+
+### 5. itinerary - For travel plans
+<<<WIDGET:itinerary>>>
+{"title":"5-Day Umrah Itinerary","description":"A complete plan for your pilgrimage","totalDays":5,"days":[{"dayNumber":1,"title":"Arrival Day","date":"Day 1","activities":[{"time":"Morning","title":"Arrive in Jeddah","description":"Land at King Abdulaziz Airport","type":"travel","location":"Jeddah Airport"},{"time":"Afternoon","title":"Travel to Makkah","description":"Take transport to your hotel","type":"travel"}]}]}
+<<<END_WIDGET>>>
+
+### 6. budget - For cost breakdowns
+<<<WIDGET:budget>>>
+{"title":"Umrah Budget Estimate","description":"Approximate costs for a 7-day trip","currency":"USD","total":2500,"breakdown":[{"category":"Flights","amount":800,"description":"Round-trip airfare"},{"category":"Accommodation","amount":700,"description":"7 nights near Haram"}],"notes":"Prices vary by season and booking time"}
+<<<END_WIDGET>>>
+
+### 7. places - For hotels, restaurants, landmarks
+<<<WIDGET:places>>>
+{"title":"Hotels Near Haram","description":"Recommended accommodations","places":[{"name":"Hilton Suites Makkah","arabicName":"هيلتون سويتس مكة","category":"hotel","description":"5-star hotel with Kaaba views","location":{"area":"Ajyad","distanceToHaram":"200m"},"rating":4.5,"priceRange":"$$$","amenities":["Kaaba View","Restaurant","WiFi"]}]}
+<<<END_WIDGET>>>
+
+### 8. ritual - For religious rituals with steps
+<<<WIDGET:ritual>>>
+{"title":"How to Perform Sa'i","ritualName":"Sa'i","description":"Walking between Safa and Marwa","steps":[{"stepNumber":1,"title":"Start at Safa","arabicTitle":"الصفا","description":"Begin at Mount Safa facing the Kaaba","dua":{"arabic":"إِنَّ الصَّفَا وَالْمَرْوَةَ مِن شَعَائِرِ اللَّهِ","transliteration":"Innas-Safa wal-Marwata min sha'a'irillah","translation":"Indeed, Safa and Marwa are among the symbols of Allah"}}]}
+<<<END_WIDGET>>>
 
 **Widget Usage Rules:**
-- Only use widgets when they genuinely improve the response
-- Simple text answers don't need widgets
-- You can include multiple widgets in one response
-- Always include explanatory text around widgets
-- Ensure JSON is valid and complete
+- USE WIDGETS for lists, steps, tips, duas, places - they make content much clearer
+- Always include explanatory text before/after widgets
+- Ensure JSON is valid (no trailing commas, proper quotes)
+- Match the exact field names shown in examples above
 `
 
   // Add user personalization

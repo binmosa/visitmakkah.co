@@ -35,6 +35,7 @@ export default function AIChatPanelV2({
   suggestedQuestions,
 }: AIChatPanelV2Props) {
   const [chatStarted, setChatStarted] = useState(false)
+  const [initialQuestion, setInitialQuestion] = useState<string | undefined>()
 
   // Get config for this action
   const config = getContextConfig(contextAction)
@@ -43,6 +44,7 @@ export default function AIChatPanelV2({
   const questions = suggestedQuestions || config.suggestedPrompts
 
   const handleStartChat = useCallback((question?: string) => {
+    setInitialQuestion(question)
     setChatStarted(true)
   }, [])
 
@@ -64,6 +66,7 @@ export default function AIChatPanelV2({
       contextLabel={label}
       contextIcon={contextIcon}
       suggestedQuestions={questions}
+      initialQuestion={initialQuestion}
     />
   )
 }
@@ -162,6 +165,7 @@ interface ActiveChatProps {
   contextLabel: string
   contextIcon?: HugeiconsProps['icon']
   suggestedQuestions: string[]
+  initialQuestion?: string
 }
 
 function ActiveChat({
@@ -169,13 +173,14 @@ function ActiveChat({
   contextLabel,
   contextIcon,
   suggestedQuestions,
+  initialQuestion,
 }: ActiveChatProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
+  const initialQuestionSent = useRef(false)
 
   const {
     messages,
-    parsedMessages,
     input,
     setInput,
     handleSubmit,
@@ -185,6 +190,14 @@ function ActiveChat({
   } = useAIChat({
     contextAction,
   })
+
+  // Send initial question on mount (only once)
+  useEffect(() => {
+    if (initialQuestion && !initialQuestionSent.current) {
+      initialQuestionSent.current = true
+      sendMessage(initialQuestion)
+    }
+  }, [initialQuestion, sendMessage])
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
@@ -210,36 +223,37 @@ function ActiveChat({
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4">
-        {messages.length === 0 ? (
+        {messages.length === 0 && !initialQuestion && !isLoading ? (
           <EmptyState
             suggestions={suggestedQuestions}
             onSuggestionClick={handleSuggestionClick}
           />
         ) : (
           <div className="space-y-4">
-            {parsedMessages.map((msg) => (
-              <div
-                key={msg.id}
-                className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-              >
+            {messages.map((msg, index) => {
+              const isLastMessage = index === messages.length - 1
+              const isStreamingMessage = isLastMessage && isLoading && msg.role === 'assistant'
+
+              return (
                 <div
-                  className={`max-w-[85%] rounded-2xl px-4 py-3 ${
-                    msg.role === 'user'
-                      ? 'bg-primary-600 text-white'
-                      : 'bg-neutral-100 dark:bg-neutral-800'
-                  }`}
+                  key={msg.id}
+                  className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   {msg.role === 'user' ? (
-                    <p className="text-sm">{msg.segments[0]?.type === 'text' ? msg.segments[0].content : ''}</p>
+                    <div className="max-w-[85%] rounded-2xl bg-primary-600 px-4 py-3 text-white">
+                      <p className="text-sm">{msg.content}</p>
+                    </div>
                   ) : (
-                    <MessageRenderer content={msg.segments.map(s => s.type === 'text' ? s.content : '').join('')} />
+                    <div className="max-w-[85%]">
+                      <MessageRenderer content={msg.content} isStreaming={isStreamingMessage} />
+                    </div>
                   )}
                 </div>
-              </div>
-            ))}
+              )
+            })}
 
-            {/* Loading indicator */}
-            {isLoading && (
+            {/* Loading indicator - only show when waiting for first response */}
+            {isLoading && (messages.length === 0 || messages[messages.length - 1]?.role === 'user') && (
               <div className="flex justify-start">
                 <div className="flex items-center gap-2 rounded-2xl bg-neutral-100 px-4 py-3 dark:bg-neutral-800">
                   <HugeiconsIcon
