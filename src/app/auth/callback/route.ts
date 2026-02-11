@@ -25,6 +25,6 @@ export async function GET(request: NextRequest) {
         }
     }
 
-    // Redirect to dashboard after successful auth
-    return NextResponse.redirect(new URL('/dashboard', requestUrl.origin))
+    // Redirect to home after successful auth (personalized dashboard)
+    return NextResponse.redirect(new URL('/', requestUrl.origin))
 }
