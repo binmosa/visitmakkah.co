@@ -265,10 +265,17 @@ export const contextConfigs: Record<string, ContextConfig> = {
 }
 
 /**
- * All available vector stores
- * The AI can query any of these based on the user's question
+ * Main vector store for RAG (Retrieval Augmented Generation)
+ * All knowledge documents are uploaded to this single store
+ */
+export const mainVectorStore = process.env.OPENAI_VECTOR_STORE_MAIN
+
+/**
+ * Legacy vector store IDs (kept for reference, not actively used)
+ * The main vector store now contains all knowledge
  */
 export const vectorStores = {
+  main: process.env.OPENAI_VECTOR_STORE_MAIN,
   itinerary: process.env.VECTOR_STORE_ITINERARY || 'vs_itinerary',
   visa: process.env.VECTOR_STORE_VISA || 'vs_visa',
   packing: process.env.VECTOR_STORE_PACKING || 'vs_packing',
@@ -287,8 +294,8 @@ export function getContextConfig(action: string): ContextConfig {
 }
 
 /**
- * Get all vector store IDs as an array
+ * Get all vector store IDs as an array (filters out undefined values)
  */
 export function getAllVectorStoreIds(): string[] {
-  return Object.values(vectorStores)
+  return Object.values(vectorStores).filter((id): id is string => id !== undefined)
 }

@@ -59,12 +59,13 @@ The user is on the "${config.actionLabel}" page.
 ${config.systemPromptAddition}
 
 ## Important Guidelines
-1. You can query multiple knowledge bases if the user's question spans different topics
-2. You can render multiple widgets in a single response if helpful
-3. Always cite sources when providing information from the knowledge base
-4. Be sensitive to different Islamic schools of thought (madhabs)
-5. Provide both Arabic text and transliterations for duas and prayers
-6. Keep responses concise but thorough
+1. Use the knowledge tool to search for accurate information before answering
+2. If no relevant information is retrieved from the knowledge base, say you are unsure instead of guessing
+3. You can render multiple widgets in a single response if helpful
+4. Always cite sources when providing information from the knowledge base
+5. Be sensitive to different Islamic schools of thought (madhabs)
+6. Provide both Arabic text and transliterations for duas and prayers
+7. Keep responses concise but thorough
 
 ## Widget Format
 When providing structured data, use this EXACT format with the specific JSON schemas shown:
@@ -269,14 +270,20 @@ export async function POST(request: Request) {
     // Build system prompt
     const systemPrompt = buildSystemPrompt(contextAction, userProfile)
 
-    // Stage 2: Main AI response with streaming
+    // Stage 2: Main AI response with streaming (with RAG via file_search)
     const result = streamText({
-      model: openai('gpt-4o'),
+      model: openai.responses('gpt-4o'),
       system: systemPrompt,
       messages: conversationHistory,
       temperature: 0.7,
       maxOutputTokens: 4000,
-      // Tools will be added when RAG is integrated
+      tools: {
+        knowledge: openai.tools.fileSearch({
+          vectorStoreIds: [process.env.OPENAI_VECTOR_STORE_MAIN!],
+          maxNumResults: 10,
+        }),
+      },
+      toolChoice: 'auto',
       onFinish: async ({ text }) => {
         // Save to Supabase (non-blocking)
         if (topicId) {
