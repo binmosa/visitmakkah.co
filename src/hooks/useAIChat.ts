@@ -121,29 +121,26 @@ export function useAIChat({
   const isHydrated = useRef(false)
   const isLoadingConversation = useRef(false)
 
-  // Load conversation from Supabase on mount (with localStorage as fallback)
+  // Load conversation ONLY when explicitly requested via conversationId (from saved/history page)
+  // For normal action item clicks, always start a fresh conversation
   useEffect(() => {
     if (!persistConversation || isLoadingConversation.current) return
+
+    // Only load history if conversationId is explicitly provided (from saved/history page)
+    if (!conversationId) {
+      // Fresh conversation - clear any old topic ID for this context
+      clearTopicId(contextAction)
+      isHydrated.current = true
+      return
+    }
+
     isLoadingConversation.current = true
 
     async function loadFromSupabase() {
       try {
-        const deviceId = getDeviceId()
-        const storedTopicId = loadTopicId(contextAction)
-
-        // Try to load from Supabase
+        // Load specific conversation from history
         const params = new URLSearchParams()
-
-        // Priority: conversationId (from history) > storedTopicId > contextAction lookup
-        if (conversationId) {
-          // Loading specific conversation from history
-          params.set('topicId', conversationId)
-        } else if (storedTopicId) {
-          params.set('topicId', storedTopicId)
-        } else {
-          params.set('contextAction', contextAction)
-          params.set('deviceId', deviceId)
-        }
+        params.set('topicId', conversationId!)
 
         const response = await fetch(`/api/chat/conversation?${params}`)
         if (response.ok) {
@@ -160,7 +157,7 @@ export function useAIChat({
             }))
             setMessages(loadedMessages)
 
-            // Mark as loaded from history (especially important when conversationId was provided)
+            // Mark as loaded from history
             setHasLoadedHistory(true)
 
             // Also update localStorage cache
@@ -176,24 +173,10 @@ export function useAIChat({
               createdAt: Date.now(),
               updatedAt: Date.now(),
             })
-
-            isHydrated.current = true
-            return
           }
         }
       } catch (e) {
-        console.warn('Failed to load from Supabase, trying localStorage:', e)
-      }
-
-      // Fallback to localStorage
-      const savedConversation = loadConversation(contextAction)
-      if (savedConversation && savedConversation.messages.length > 0) {
-        const loadedMessages: Message[] = savedConversation.messages.map((m) => ({
-          id: m.id,
-          role: m.role,
-          content: m.content,
-        }))
-        setMessages(loadedMessages)
+        console.warn('Failed to load conversation from history:', e)
       }
       isHydrated.current = true
     }
