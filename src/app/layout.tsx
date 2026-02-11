@@ -7,28 +7,31 @@ import ThemeProvider from './theme-provider'
 import { AuthProvider } from '@/context/AuthContext'
 import { SITE_CONFIG } from '@/data/site-config'
 
-// Body font
+// Body font - reduced weights for performance
 const inter = Inter({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-inter',
-  weight: ['300', '400', '500', '600', '700'],
+  weight: ['400', '500', '600'],
+  preload: true,
 })
 
-// Headings font
+// Headings font - reduced weights for performance
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-plus-jakarta-sans',
-  weight: ['400', '500', '600', '700', '800'],
+  weight: ['600', '700'],
+  preload: true,
 })
 
-// Arabic font
+// Arabic font - reduced weights, loaded only when needed
 const notoSansArabic = Noto_Sans_Arabic({
   subsets: ['arabic'],
   display: 'swap',
   variable: '--font-noto-sans-arabic',
-  weight: ['300', '400', '500', '600', '700'],
+  weight: ['400', '600'],
+  preload: false, // Don't preload Arabic - not critical path
 })
 
 // ============================================
@@ -101,23 +104,38 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${inter.variable} ${plusJakartaSans.variable} ${notoSansArabic.variable}`}
     >
       <head>
-        {/* DNS prefetch for external domains - improves connection time */}
+        {/* Preconnect to critical domains - establishes early connections */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://cdn.sanity.io" />
+        {/* DNS prefetch for analytics (non-critical) */}
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://www.google-analytics.com" />
-        <link rel="dns-prefetch" href="https://cdn.sanity.io" />
-        {/* Preload critical assets */}
-        <link rel="preload" href="/images/islamic-pattern.svg" as="image" type="image/svg+xml" />
       </head>
       <body className="font-body bg-white text-base text-neutral-900 dark:bg-neutral-900 dark:text-neutral-200">
+        {/* Prevent dark mode flash - runs before React hydration */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  if (localStorage.getItem('theme') === 'dark-mode') {
+                    document.documentElement.classList.add('dark');
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
         {/* ============================================
-            Google Analytics 4 (GA4) - Deferred for performance
-            Measurement ID: G-W8M2508LHE
+            Google Analytics 4 (GA4) - Load after page interactive
+            Only loads after hydration to not block LCP
             ============================================ */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-W8M2508LHE"
-          strategy="lazyOnload"
+          strategy="afterInteractive"
         />
-        <Script id="google-analytics" strategy="lazyOnload">
+        <Script id="google-analytics" strategy="afterInteractive">
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
@@ -125,15 +143,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             gtag('config', 'G-W8M2508LHE', {
               page_title: document.title,
               page_location: window.location.href,
+              send_page_view: false
             });
           `}
         </Script>
-
-        {/* OpenAI ChatKit Script - Lazy loaded for performance */}
-        <Script
-          src="https://cdn.platform.openai.com/deployments/chatkit/chatkit.js"
-          strategy="lazyOnload"
-        />
 
         {/* ============================================
             JSON-LD Structured Data - Organization

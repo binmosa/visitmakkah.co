@@ -7,6 +7,14 @@ const nextConfig = {
     optimizeCss: true, // Enable CSS optimization
   },
 
+  // Compiler optimizations
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production' ? { exclude: ['error', 'warn'] } : false,
+  },
+
+  // Reduce bundle size by externalizing packages
+  serverExternalPackages: ['@sanity/client'],
+
   // ============================================
   // IMAGE OPTIMIZATION
   // ============================================

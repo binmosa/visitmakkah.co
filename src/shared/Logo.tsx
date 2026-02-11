@@ -32,7 +32,7 @@ const Logo: React.FC<Props> = ({ className, variant = 'full', size }) => {
 
   return (
     <Link href="/" className={clsx('inline-block shrink-0', className, size || defaultSize)}>
-      {/* Light mode logo */}
+      {/* Light mode logo - LCP element, high priority */}
       <Image
         src="/logos/primary-logo.svg"
         alt="visitMakkah"
@@ -40,6 +40,7 @@ const Logo: React.FC<Props> = ({ className, variant = 'full', size }) => {
         height={50}
         className="h-full w-auto dark:hidden"
         priority
+        fetchPriority="high"
       />
       {/* Dark mode logo */}
       <Image
@@ -49,6 +50,7 @@ const Logo: React.FC<Props> = ({ className, variant = 'full', size }) => {
         height={50}
         className="hidden h-full w-auto dark:block"
         priority
+        fetchPriority="high"
       />
     </Link>
   )
