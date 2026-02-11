@@ -17,6 +17,7 @@ import { SparklesIcon, Message01Icon, SentIcon, Loading03Icon } from '@hugeicons
 import { HugeiconsIcon, type HugeiconsProps } from '@hugeicons/react'
 import { useAIChat } from '@/hooks/useAIChat'
 import { MessageRenderer } from '@/components/Chat/MessageRenderer'
+import { MessageFeedback } from '@/components/Chat/MessageFeedback'
 import { getContextConfig } from '@/config/ai-context'
 
 interface AIChatPanelV2Props {
@@ -264,6 +265,10 @@ function ActiveChat({
                   ) : (
                     <div className="max-w-[85%]">
                       <MessageRenderer content={msg.content} isStreaming={isStreamingMessage} contextAction={contextAction} />
+                      {/* Feedback buttons - only show when message is complete */}
+                      {!isStreamingMessage && msg.content && (
+                        <MessageFeedback messageId={msg.id} contextAction={contextAction} />
+                      )}
                     </div>
                   )}
                 </div>
