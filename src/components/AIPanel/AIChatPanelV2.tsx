@@ -265,8 +265,8 @@ function ActiveChat({
                   ) : (
                     <div className="max-w-[85%]">
                       <MessageRenderer content={msg.content} isStreaming={isStreamingMessage} contextAction={contextAction} />
-                      {/* Feedback buttons - only show when message is complete */}
-                      {!isStreamingMessage && msg.content && (
+                      {/* Feedback buttons - show after streaming completes */}
+                      {!isLoading && (
                         <MessageFeedback messageId={msg.id} contextAction={contextAction} />
                       )}
                     </div>

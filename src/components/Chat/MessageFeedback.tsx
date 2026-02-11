@@ -56,7 +56,8 @@ export function MessageFeedback({ messageId, contextAction }: MessageFeedbackPro
   }
 
   return (
-    <div className="mt-2 flex items-center gap-1">
+    <div className="mt-3 flex items-center gap-2 border-t border-neutral-100 pt-3 dark:border-neutral-800">
+      <span className="text-xs text-neutral-400 dark:text-neutral-500">Was this helpful?</span>
       <button
         onClick={() => handleFeedback('positive')}
         disabled={isSubmitting}
@@ -65,7 +66,7 @@ export function MessageFeedback({ messageId, contextAction }: MessageFeedbackPro
             ? 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400'
             : 'text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600 dark:text-neutral-500 dark:hover:bg-neutral-800 dark:hover:text-neutral-300'
         }`}
-        title="Helpful"
+        title="Yes, helpful"
       >
         <ThumbsUp className="size-4" />
       </button>
@@ -77,7 +78,7 @@ export function MessageFeedback({ messageId, contextAction }: MessageFeedbackPro
             ? 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400'
             : 'text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600 dark:text-neutral-500 dark:hover:bg-neutral-800 dark:hover:text-neutral-300'
         }`}
-        title="Not helpful"
+        title="No, not helpful"
       >
         <ThumbsDown className="size-4" />
       </button>
