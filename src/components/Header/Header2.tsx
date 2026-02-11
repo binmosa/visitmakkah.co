@@ -13,16 +13,17 @@ interface Props {
 
 const Header2: FC<Props> = ({ bottomBorder, className }) => {
   return (
-    <>
+    // Sticky wrapper for mobile - header and nav stay fixed while scrolling
+    <div className="sticky top-0 z-40 shadow-sm lg:relative lg:z-20 lg:shadow-none">
       <div
         className={clsx(
-          'header-2 relative z-20 border-neutral-200 bg-white dark:border-neutral-700 dark:bg-[#134e4a]',
+          'header-2 relative border-neutral-200 bg-white dark:border-neutral-700 dark:bg-[#134e4a]',
           bottomBorder && 'border-b lg:border-b',
           !bottomBorder && 'lg:border-b-0',
           className
         )}
       >
-        <div className="container flex h-20 justify-between">
+        <div className="container flex h-14 justify-between sm:h-16 lg:h-20">
           <div className="flex flex-1 items-center gap-x-4 sm:gap-x-5 lg:gap-x-7">
             <Logo />
           </div>
@@ -39,7 +40,7 @@ const Header2: FC<Props> = ({ bottomBorder, className }) => {
       </div>
       {/* Mobile Navigation Tabs - visible only on mobile */}
       <MobileNavTabs />
-    </>
+    </div>
   )
 }
 

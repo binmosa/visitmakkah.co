@@ -71,10 +71,10 @@ export default function ProactiveAIWidget() {
         } else if (user.journeyStage === 'in_makkah') {
             suggestions.push({
                 id: 'in-makkah-help',
-                message: 'You\'re in Makkah! Would you like real-time crowd information and the best times for Tawaf today?',
+                message: 'You\'re in Makkah! Need help navigating to Haram or finding nearby restaurants?',
                 actions: [
-                    { label: 'Check Crowd Levels', href: '/explore?action=check-crowds' },
-                    { label: 'View Prayer Times' },
+                    { label: 'Navigate to Haram', href: '/explore?action=navigate' },
+                    { label: 'Find Food Nearby', href: '/explore?action=find-food' },
                 ],
             })
         }

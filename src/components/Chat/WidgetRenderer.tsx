@@ -9,6 +9,7 @@
  * Includes save button for users to save widgets to their collection.
  */
 
+import { useMemo } from 'react'
 import dynamic from 'next/dynamic'
 import type { WidgetType } from '@/types/widgets'
 import { normalizeWidgetData, validateWidgetData } from '@/lib/widget-normalizer'
@@ -75,8 +76,18 @@ interface WidgetRendererProps {
 }
 
 export function WidgetRenderer({ type, data, className = '', contextAction, showSaveButton = true }: WidgetRendererProps) {
-  // Normalize the data to ensure consistent structure
-  const normalizedData = normalizeWidgetData(type as WidgetType, data)
+  // Memoize normalized data to prevent re-normalization on every render
+  // This ensures widget state (like activeStep in RitualWidget) persists
+  const normalizedData = useMemo(
+    () => normalizeWidgetData(type as WidgetType, data),
+    [type, data]
+  )
+
+  // Memoize validation to prevent recalculation
+  const isValid = useMemo(
+    () => validateWidgetData(type as WidgetType, normalizedData),
+    [type, normalizedData]
+  )
 
   // Check if this is a valid widget type
   const WidgetComponent = widgetComponents[type as WidgetType]
@@ -86,13 +97,20 @@ export function WidgetRenderer({ type, data, className = '', contextAction, show
   }
 
   // Validate the normalized data
-  if (!validateWidgetData(type as WidgetType, normalizedData)) {
+  if (!isValid) {
     return <WidgetError type={type} />
   }
 
-  // Extract title for save button
+  // Extract title for save button and stable key
   const widgetTitle = (normalizedData as Record<string, unknown>).title as string || `${type} widget`
   const widgetDescription = (normalizedData as Record<string, unknown>).description as string | undefined
+
+  // Generate a stable key based on widget type and title to prevent re-mounting
+  // This ensures stateful widgets (like RitualWidget with step navigation) persist their state
+  const widgetKey = useMemo(
+    () => `${type}-${widgetTitle.replace(/\s+/g, '-').toLowerCase()}`,
+    [type, widgetTitle]
+  )
 
   return (
     <div className={`my-4 ${className}`}>
@@ -109,7 +127,7 @@ export function WidgetRenderer({ type, data, className = '', contextAction, show
           />
         </div>
       )}
-      <WidgetComponent data={normalizedData} contextAction={contextAction} />
+      <WidgetComponent key={widgetKey} data={normalizedData} contextAction={contextAction} />
     </div>
   )
 }

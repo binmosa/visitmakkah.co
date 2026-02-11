@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import clsx from 'clsx'
@@ -26,10 +26,21 @@ const navIcons: Record<string, typeof ClipboardIcon> = {
 export default function MobileNavTabs() {
   const pathname = usePathname()
   const [navItems, setNavItems] = useState<TNavigationItem[]>([])
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     getNavigation().then(setNavItems)
   }, [])
+
+  // Scroll active item into view when pathname changes
+  useEffect(() => {
+    if (scrollContainerRef.current && navItems.length > 0) {
+      const activeItem = scrollContainerRef.current.querySelector('[data-active="true"]')
+      if (activeItem) {
+        activeItem.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
+      }
+    }
+  }, [pathname, navItems])
 
   const isActive = (item: TNavigationItem) => {
     if (!item.href || item.href === '#') return false
@@ -39,15 +50,15 @@ export default function MobileNavTabs() {
   if (navItems.length === 0) return null
 
   return (
-    <div className="relative bg-white dark:bg-neutral-900 lg:hidden">
+    <div className="relative border-b border-neutral-100 bg-white dark:border-neutral-800 dark:bg-neutral-900 lg:hidden">
       {/* Fade edge indicators */}
-      <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-4 bg-gradient-to-r from-white to-transparent dark:from-neutral-900" />
-      <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-4 bg-gradient-to-l from-white to-transparent dark:from-neutral-900" />
+      <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-3 bg-gradient-to-r from-white to-transparent dark:from-neutral-900" />
+      <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-3 bg-gradient-to-l from-white to-transparent dark:from-neutral-900" />
 
       {/* Scrollable tabs container */}
       <div
-        className="hidden-scrollbar flex gap-1.5 overflow-x-auto overscroll-x-contain px-4 py-2.5"
-        style={{ WebkitOverflowScrolling: 'touch' }}
+        ref={scrollContainerRef}
+        className="no-scrollbar flex gap-2 overflow-x-auto overscroll-x-contain px-3 py-2"
       >
         {navItems.map((item) => {
           const IconComponent = navIcons[item.id] || ClipboardIcon
@@ -57,8 +68,9 @@ export default function MobileNavTabs() {
             <Link
               key={item.id}
               href={item.href || '#'}
+              data-active={active}
               className={clsx(
-                'flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all active:scale-95',
+                'flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-2 text-sm font-medium transition-all active:scale-95',
                 active
                   ? 'bg-primary-600 text-white shadow-sm dark:bg-primary-700'
                   : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700'

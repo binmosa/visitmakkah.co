@@ -216,25 +216,55 @@
 }
 
 /* // CUSTOM STYLES */
-@utility hidden-scrollbar {
-  -ms-overflow-style: none;
-  /* IE and Edge */
-  scrollbar-width: none;
 
-  /* Firefox */
+/* Global: Hide scrollbars on all horizontal scroll containers */
+.overflow-x-auto,
+.overflow-x-scroll {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+
   &::-webkit-scrollbar {
-    display: none;
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    background: transparent !important;
+  }
+}
+
+/* Utility class for hidden scrollbar */
+@utility hidden-scrollbar {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+
+  &::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
   }
 }
 
 /* Alias for hidden-scrollbar */
 @utility scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
 
   &::-webkit-scrollbar {
-    display: none;
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
   }
+}
+
+/* No-scrollbar class for direct application */
+.no-scrollbar {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 
 /* // CARD TITLE */

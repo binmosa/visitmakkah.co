@@ -65,7 +65,7 @@ const HubNavPill: FC<HubNavCardProps> = ({ item, isActive, isCurrentPage, onClic
     return (
         <button
             onClick={onClick}
-            className={`flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-all active:scale-95 ${isHighlighted
+            className={`flex shrink-0 snap-start items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-all active:scale-95 ${isHighlighted
                 ? 'border-primary-500 bg-primary-50 text-primary-700 dark:border-primary-400 dark:bg-primary-900/30 dark:text-primary-300'
                 : 'border-neutral-200 bg-white text-neutral-600 hover:border-primary-300 hover:bg-primary-50/50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:border-primary-600'
                 }`}
@@ -182,7 +182,7 @@ const HubNavMenu: FC<HubNavMenuProps> = ({ items, activeId, onItemClick, categor
                 </div>
                 <div
                     ref={scrollContainerRef}
-                    className="flex gap-1.5 overflow-x-auto px-6 py-1 hidden-scrollbar"
+                    className="no-scrollbar flex snap-x snap-mandatory gap-1.5 overflow-x-auto px-6 py-1"
                 >
                     {items.map((item, index) => (
                         <div key={item.id || index} data-id={item.id}>

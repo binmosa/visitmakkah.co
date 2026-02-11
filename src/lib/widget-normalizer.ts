@@ -9,10 +9,12 @@
 import type { WidgetType } from '@/types/widgets'
 
 /**
- * Generate a unique ID for array items
+ * Generate a stable ID for array items
+ * Uses prefix and index only - no Date.now() to ensure deterministic IDs
+ * This prevents widgets from re-mounting on every render
  */
 function generateId(prefix: string, index: number): string {
-  return `${prefix}-${index}-${Date.now()}`
+  return `${prefix}-${index}`
 }
 
 /**

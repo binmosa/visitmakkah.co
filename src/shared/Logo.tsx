@@ -12,7 +12,8 @@ interface Props {
 }
 
 const Logo: React.FC<Props> = ({ className, variant = 'full', size }) => {
-  const defaultSize = variant === 'icon' ? 'h-10 w-10' : 'h-10 w-auto'
+  // Smaller on mobile, scales up on larger screens
+  const defaultSize = variant === 'icon' ? 'h-8 w-8 sm:h-10 sm:w-10' : 'h-7 w-auto sm:h-8 lg:h-10'
 
   if (variant === 'icon') {
     return (

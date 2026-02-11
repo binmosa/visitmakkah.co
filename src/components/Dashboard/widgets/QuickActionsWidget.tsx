@@ -13,7 +13,6 @@ import {
     MapsIcon,
     Building03Icon,
     Restaurant01Icon,
-    UserGroup03Icon,
     // Tips icons
     Idea01Icon,
 } from '@hugeicons/core-free-icons'
@@ -81,14 +80,6 @@ const allQuickActions: QuickAction[] = [
         icon: Restaurant01Icon,
         color: 'from-red-500 to-red-600',
         relevantStages: ['booked', 'in_makkah'],
-    },
-    {
-        label: 'Check Crowds',
-        description: 'Best Tawaf times',
-        href: '/explore?action=check-crowds',
-        icon: UserGroup03Icon,
-        color: 'from-violet-500 to-violet-600',
-        relevantStages: ['in_makkah'],
     },
     {
         label: 'Navigate',
