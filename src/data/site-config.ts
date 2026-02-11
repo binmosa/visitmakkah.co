@@ -11,7 +11,7 @@ export const SITE_CONFIG = {
   
   // URLs
   url: 'https://visitmakkah.co',
-  ogImage: 'https://visitmakkah.co/og/default.jpg',
+  ogImage: 'https://visitmakkah.co/og/default.png',
   
   // SEO
   description:
