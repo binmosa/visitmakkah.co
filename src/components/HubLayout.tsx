@@ -96,6 +96,9 @@ const HubLayoutInner = ({
     const context = aiContext || contextFromPath
     const CategoryIcon = categoryIcons[context] || ClipboardIcon
 
+    // Get conversation ID from URL params (for continuing from history)
+    const conversationId = searchParams.get('conversation')
+
     // Find active item based on action query param or pathname
     useEffect(() => {
         const actionParam = searchParams.get('action')
@@ -208,12 +211,13 @@ const HubLayoutInner = ({
             {/* AI Chat Panel - Full Width */}
             <div className="h-[500px] sm:h-[550px] lg:h-[650px]">
                 <AIChatPanelV2
-                    key={activeItemId || context}
+                    key={conversationId || activeItemId || context}
                     contextAction={subTopic || context}
                     contextLabel={activeItem?.name || title}
                     contextDescription={activeItem?.description}
                     contextIcon={ActiveItemIcon}
                     suggestedQuestions={suggestedQuestions}
+                    conversationId={conversationId}
                 />
             </div>
         </div>

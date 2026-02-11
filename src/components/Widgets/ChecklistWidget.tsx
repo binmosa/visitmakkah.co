@@ -4,31 +4,51 @@
  * ChecklistWidget Component
  *
  * Displays interactive checklists with categories and progress tracking.
+ * Persists checked state across page refreshes using useWidgetState.
  */
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { CheckmarkSquare01Icon, Square01Icon, ArrowDown01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
+import { useWidgetState } from '@/hooks/useWidgetState'
 import type { ChecklistWidgetData, ChecklistCategory, ChecklistItem } from '@/types/widgets'
 
 interface ChecklistWidgetProps {
   data: unknown
+  contextAction?: string
 }
 
-export default function ChecklistWidget({ data }: ChecklistWidgetProps) {
+export default function ChecklistWidget({ data, contextAction }: ChecklistWidgetProps) {
   const checklist = data as ChecklistWidgetData
 
   // Add IDs to items if missing
-  const categoriesWithIds = checklist?.categories?.map((cat, catIndex) => ({
+  const categoriesWithIds = useMemo(() => checklist?.categories?.map((cat, catIndex) => ({
     ...cat,
     items: cat.items?.map((item, itemIndex) => ({
       ...item,
       id: item.id || `${catIndex}-${itemIndex}`,
     })) || []
-  })) || []
+  })) || [], [checklist?.categories])
 
-  const [items, setItems] = useState<Record<string, boolean>>({})
+  // Generate a unique widget ID based on the checklist title
+  const widgetId = useMemo(() => {
+    const title = checklist?.title || 'checklist'
+    return `checklist-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`
+  }, [checklist?.title])
+
+  // Use persistent state for checked items when contextAction is available
+  const [persistedItems, setPersistedItems] = useWidgetState<Record<string, boolean>>({
+    contextAction: contextAction || 'default',
+    widgetId,
+    initialState: {},
+  })
+
+  // For expanded categories, use regular state (no need to persist)
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set([categoriesWithIds[0]?.name]))
+
+  // Use persisted items if contextAction is provided
+  const items = persistedItems
+  const setItems = setPersistedItems
 
   if (!categoriesWithIds.length) {
     return null

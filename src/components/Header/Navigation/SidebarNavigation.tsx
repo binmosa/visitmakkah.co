@@ -22,6 +22,7 @@ import {
   Restaurant01Icon,
   UserGroup03Icon,
   CompassIcon,
+  FolderLibraryIcon,
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import clsx from 'clsx'
@@ -35,6 +36,7 @@ const navIcons: Record<string, typeof ClipboardIcon> = {
   'prepare': ClipboardIcon,
   'learn': BookOpen01Icon,
   'explore': MapsIcon,
+  'saved': FolderLibraryIcon,
   'blog': News01Icon,
   // Prepare children
   'prepare-itinerary': Route01Icon,

@@ -16,9 +16,10 @@ interface MessageRendererProps {
   content: string
   className?: string
   isStreaming?: boolean
+  contextAction?: string
 }
 
-export function MessageRenderer({ content, className = '', isStreaming = false }: MessageRendererProps) {
+export function MessageRenderer({ content, className = '', isStreaming = false, contextAction }: MessageRendererProps) {
   // Parse content with streaming awareness
   const { completeSegments, incompleteText, isComplete, incompleteWidgetType } = useMemo(() => {
     const result = parseStreamingContent(content)
@@ -55,7 +56,7 @@ export function MessageRenderer({ content, className = '', isStreaming = false }
   return (
     <div className={`space-y-4 ${className}`}>
       {filteredSegments.map((segment, index) => (
-        <SegmentRenderer key={index} segment={segment} />
+        <SegmentRenderer key={index} segment={segment} contextAction={contextAction} />
       ))}
 
       {/* Show placeholder when widget is being streamed */}
@@ -68,9 +69,10 @@ export function MessageRenderer({ content, className = '', isStreaming = false }
 
 interface SegmentRendererProps {
   segment: ContentSegment
+  contextAction?: string
 }
 
-function SegmentRenderer({ segment }: SegmentRendererProps) {
+function SegmentRenderer({ segment, contextAction }: SegmentRendererProps) {
   if (segment.type === 'text') {
     return <TextContent content={segment.content} />
   }
@@ -80,6 +82,7 @@ function SegmentRenderer({ segment }: SegmentRendererProps) {
       <WidgetRenderer
         type={segment.widgetType}
         data={segment.data}
+        contextAction={contextAction}
       />
     )
   }

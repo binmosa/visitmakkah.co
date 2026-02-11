@@ -25,6 +25,7 @@ interface AIChatPanelV2Props {
   contextDescription?: string
   contextIcon?: HugeiconsProps['icon']
   suggestedQuestions?: string[]
+  conversationId?: string | null // Load specific conversation from history
 }
 
 export default function AIChatPanelV2({
@@ -33,6 +34,7 @@ export default function AIChatPanelV2({
   contextDescription,
   contextIcon,
   suggestedQuestions,
+  conversationId,
 }: AIChatPanelV2Props) {
   const [chatStarted, setChatStarted] = useState(false)
   const [initialQuestion, setInitialQuestion] = useState<string | undefined>()
@@ -48,7 +50,10 @@ export default function AIChatPanelV2({
     setChatStarted(true)
   }, [])
 
-  if (!chatStarted) {
+  // Skip welcome screen if loading from conversation history
+  const shouldShowChat = chatStarted || !!conversationId
+
+  if (!shouldShowChat) {
     return (
       <WelcomeScreen
         contextLabel={label}
@@ -67,6 +72,7 @@ export default function AIChatPanelV2({
       contextIcon={contextIcon}
       suggestedQuestions={questions}
       initialQuestion={initialQuestion}
+      conversationId={conversationId}
     />
   )
 }
@@ -166,6 +172,7 @@ interface ActiveChatProps {
   contextIcon?: HugeiconsProps['icon']
   suggestedQuestions: string[]
   initialQuestion?: string
+  conversationId?: string | null
 }
 
 function ActiveChat({
@@ -174,6 +181,7 @@ function ActiveChat({
   contextIcon,
   suggestedQuestions,
   initialQuestion,
+  conversationId,
 }: ActiveChatProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
@@ -187,8 +195,10 @@ function ActiveChat({
     sendMessage,
     isLoading,
     error,
+    hasLoadedHistory,
   } = useAIChat({
     contextAction,
+    conversationId,
   })
 
   // Send initial question on mount (only once)
@@ -223,11 +233,19 @@ function ActiveChat({
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4">
-        {messages.length === 0 && !initialQuestion && !isLoading ? (
+        {messages.length === 0 && !initialQuestion && !isLoading && !conversationId ? (
           <EmptyState
             suggestions={suggestedQuestions}
             onSuggestionClick={handleSuggestionClick}
           />
+        ) : messages.length === 0 && conversationId && !hasLoadedHistory ? (
+          /* Show loading state when loading from history */
+          <div className="flex h-full items-center justify-center">
+            <div className="flex items-center gap-2 text-neutral-500 dark:text-neutral-400">
+              <HugeiconsIcon icon={Loading03Icon} className="size-5 animate-spin" strokeWidth={2} />
+              <span className="text-sm">Loading conversation...</span>
+            </div>
+          </div>
         ) : (
           <div className="space-y-4">
             {messages.map((msg, index) => {
@@ -245,7 +263,7 @@ function ActiveChat({
                     </div>
                   ) : (
                     <div className="max-w-[85%]">
-                      <MessageRenderer content={msg.content} isStreaming={isStreamingMessage} />
+                      <MessageRenderer content={msg.content} isStreaming={isStreamingMessage} contextAction={contextAction} />
                     </div>
                   )}
                 </div>

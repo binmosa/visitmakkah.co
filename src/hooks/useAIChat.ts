@@ -9,14 +9,23 @@
  * - User profile personalization
  * - Widget parsing and state management
  * - Streaming text responses
+ * - Conversation persistence to Supabase with localStorage cache
  */
 
 'use client'
 
-import { useState, useCallback, useMemo, useRef } from 'react'
+import { useState, useCallback, useMemo, useRef, useEffect } from 'react'
 import { parseWidgets, type ContentSegment } from '@/lib/widget-parser'
 import type { WidgetData, WidgetType } from '@/types/widgets'
 import { useUserJourney } from '@/context/UserJourneyContext'
+import {
+  loadConversation,
+  addMessageToConversation,
+  updateLastAssistantMessage,
+  clearConversation,
+  saveConversation,
+} from '@/lib/conversation-storage'
+import { getDeviceId } from '@/lib/data-service'
 
 interface Message {
   id: string
@@ -26,8 +35,32 @@ interface Message {
 
 interface UseAIChatOptions {
   contextAction: string
-  topicId?: string
+  contextLabel?: string
   onWidgetRendered?: (widget: WidgetData) => void
+  persistConversation?: boolean // Enable/disable persistence (default: true)
+  conversationId?: string | null // Optional: Load specific conversation by ID (from history)
+}
+
+// Storage key for topic IDs
+const TOPIC_STORAGE_PREFIX = 'vm_topic_'
+
+function getTopicStorageKey(contextAction: string): string {
+  return `${TOPIC_STORAGE_PREFIX}${contextAction}`
+}
+
+function loadTopicId(contextAction: string): string | null {
+  if (typeof window === 'undefined') return null
+  return localStorage.getItem(getTopicStorageKey(contextAction))
+}
+
+function saveTopicId(contextAction: string, topicId: string): void {
+  if (typeof window === 'undefined') return
+  localStorage.setItem(getTopicStorageKey(contextAction), topicId)
+}
+
+function clearTopicId(contextAction: string): void {
+  if (typeof window === 'undefined') return
+  localStorage.removeItem(getTopicStorageKey(contextAction))
 }
 
 interface UseAIChatReturn {
@@ -60,6 +93,9 @@ interface UseAIChatReturn {
 
   // Conversation management
   clearMessages: () => void
+
+  // History loading state
+  hasLoadedHistory: boolean // True if conversation was loaded from history
 }
 
 // Generate unique ID
@@ -69,15 +105,101 @@ function generateId() {
 
 export function useAIChat({
   contextAction,
-  topicId,
+  contextLabel,
   onWidgetRendered,
+  persistConversation = true,
+  conversationId,
 }: UseAIChatOptions): UseAIChatReturn {
   const { user, daysUntilDeparture } = useUserJourney()
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<Error | undefined>(undefined)
+  const [topicId, setTopicId] = useState<string | null>(null)
+  const [hasLoadedHistory, setHasLoadedHistory] = useState(false)
   const abortControllerRef = useRef<AbortController | null>(null)
+  const isHydrated = useRef(false)
+  const isLoadingConversation = useRef(false)
+
+  // Load conversation from Supabase on mount (with localStorage as fallback)
+  useEffect(() => {
+    if (!persistConversation || isLoadingConversation.current) return
+    isLoadingConversation.current = true
+
+    async function loadFromSupabase() {
+      try {
+        const deviceId = getDeviceId()
+        const storedTopicId = loadTopicId(contextAction)
+
+        // Try to load from Supabase
+        const params = new URLSearchParams()
+
+        // Priority: conversationId (from history) > storedTopicId > contextAction lookup
+        if (conversationId) {
+          // Loading specific conversation from history
+          params.set('topicId', conversationId)
+        } else if (storedTopicId) {
+          params.set('topicId', storedTopicId)
+        } else {
+          params.set('contextAction', contextAction)
+          params.set('deviceId', deviceId)
+        }
+
+        const response = await fetch(`/api/chat/conversation?${params}`)
+        if (response.ok) {
+          const data = await response.json()
+          if (data.topicId) {
+            setTopicId(data.topicId)
+            saveTopicId(contextAction, data.topicId)
+          }
+          if (data.messages && data.messages.length > 0) {
+            const loadedMessages: Message[] = data.messages.map((m: { id: string; role: 'user' | 'assistant'; content: string }) => ({
+              id: m.id,
+              role: m.role,
+              content: m.content,
+            }))
+            setMessages(loadedMessages)
+
+            // Mark as loaded from history (especially important when conversationId was provided)
+            setHasLoadedHistory(true)
+
+            // Also update localStorage cache
+            saveConversation({
+              id: data.topicId || `local_${contextAction}`,
+              contextAction,
+              messages: loadedMessages.map((m) => ({
+                id: m.id,
+                role: m.role,
+                content: m.content,
+                timestamp: Date.now(),
+              })),
+              createdAt: Date.now(),
+              updatedAt: Date.now(),
+            })
+
+            isHydrated.current = true
+            return
+          }
+        }
+      } catch (e) {
+        console.warn('Failed to load from Supabase, trying localStorage:', e)
+      }
+
+      // Fallback to localStorage
+      const savedConversation = loadConversation(contextAction)
+      if (savedConversation && savedConversation.messages.length > 0) {
+        const loadedMessages: Message[] = savedConversation.messages.map((m) => ({
+          id: m.id,
+          role: m.role,
+          content: m.content,
+        }))
+        setMessages(loadedMessages)
+      }
+      isHydrated.current = true
+    }
+
+    loadFromSupabase()
+  }, [contextAction, persistConversation, conversationId])
 
   // Build user profile for API
   const userProfile = useMemo(
@@ -95,6 +217,34 @@ export function useAIChat({
     [user, daysUntilDeparture]
   )
 
+  // Create a new topic in Supabase
+  const createNewTopic = useCallback(async (): Promise<string | null> => {
+    try {
+      const deviceId = getDeviceId()
+      const response = await fetch('/api/chat/conversation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contextAction,
+          contextLabel,
+          deviceId,
+        }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        if (data.topic?.id) {
+          setTopicId(data.topic.id)
+          saveTopicId(contextAction, data.topic.id)
+          return data.topic.id
+        }
+      }
+    } catch (e) {
+      console.warn('Failed to create topic:', e)
+    }
+    return null
+  }, [contextAction, contextLabel])
+
   // Send message to API with streaming
   const sendToAPI = useCallback(
     async (messagesToSend: Message[]) => {
@@ -104,6 +254,12 @@ export function useAIChat({
       // Create abort controller
       const abortController = new AbortController()
       abortControllerRef.current = abortController
+
+      // Create topic if needed (first message)
+      let currentTopicId = topicId
+      if (!currentTopicId && persistConversation) {
+        currentTopicId = await createNewTopic()
+      }
 
       try {
         const response = await fetch('/api/chat', {
@@ -115,7 +271,7 @@ export function useAIChat({
             messages: messagesToSend.map((m) => ({ role: m.role, content: m.content })),
             contextAction,
             userProfile,
-            topicId,
+            topicId: currentTopicId,
           }),
           signal: abortController.signal,
         })
@@ -135,6 +291,16 @@ export function useAIChat({
             content: data.content,
           }
           setMessages((prev) => [...prev, assistantMessage])
+
+          // Persist to localStorage
+          if (persistConversation) {
+            addMessageToConversation(contextAction, {
+              id: assistantMessage.id,
+              role: 'assistant',
+              content: assistantMessage.content,
+            })
+          }
+
           setIsLoading(false)
           return
         }
@@ -155,6 +321,15 @@ export function useAIChat({
           { id: assistantId, role: 'assistant', content: '' },
         ])
 
+        // Add placeholder to storage (will be updated)
+        if (persistConversation) {
+          addMessageToConversation(contextAction, {
+            id: assistantId,
+            role: 'assistant',
+            content: '',
+          })
+        }
+
         while (true) {
           const { done, value } = await reader.read()
           if (done) break
@@ -169,6 +344,11 @@ export function useAIChat({
             )
           )
         }
+
+        // Final persist of complete message
+        if (persistConversation) {
+          updateLastAssistantMessage(contextAction, assistantContent)
+        }
       } catch (err) {
         if (err instanceof Error && err.name === 'AbortError') {
           // Request was aborted, don't set error
@@ -180,7 +360,7 @@ export function useAIChat({
         abortControllerRef.current = null
       }
     },
-    [contextAction, userProfile, topicId]
+    [contextAction, userProfile, topicId, persistConversation, createNewTopic]
   )
 
   // Handle form submit
@@ -201,9 +381,18 @@ export function useAIChat({
       setMessages(newMessages)
       setInput('')
 
+      // Persist user message
+      if (persistConversation) {
+        addMessageToConversation(contextAction, {
+          id: userMessage.id,
+          role: 'user',
+          content: userMessage.content,
+        })
+      }
+
       sendToAPI(newMessages)
     },
-    [input, isLoading, messages, sendToAPI]
+    [input, isLoading, messages, sendToAPI, persistConversation, contextAction]
   )
 
   // Send message programmatically
@@ -220,9 +409,18 @@ export function useAIChat({
       const newMessages = [...messages, userMessage]
       setMessages(newMessages)
 
+      // Persist user message
+      if (persistConversation) {
+        addMessageToConversation(contextAction, {
+          id: userMessage.id,
+          role: 'user',
+          content: userMessage.content,
+        })
+      }
+
       sendToAPI(newMessages)
     },
-    [isLoading, messages, sendToAPI]
+    [isLoading, messages, sendToAPI, persistConversation, contextAction]
   )
 
   // Reload last response
@@ -248,7 +446,13 @@ export function useAIChat({
   const clearMessages = useCallback(() => {
     setMessages([])
     setError(undefined)
-  }, [])
+    setTopicId(null)
+    // Also clear from storage
+    if (persistConversation) {
+      clearConversation(contextAction)
+      clearTopicId(contextAction)
+    }
+  }, [persistConversation, contextAction])
 
   // Parse messages to extract widgets
   const parsedMessages = useMemo(() => {
@@ -300,7 +504,6 @@ export function useAIChat({
       dua: [],
       ritual: [],
       places: [],
-      crowd: [],
       navigation: [],
       tips: [],
     }
@@ -328,5 +531,6 @@ export function useAIChat({
     allWidgets,
     widgetsByType,
     clearMessages,
+    hasLoadedHistory,
   }
 }

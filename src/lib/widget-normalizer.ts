@@ -231,30 +231,6 @@ function normalizePlaces(data: Record<string, unknown>): Record<string, unknown>
 }
 
 /**
- * Normalize crowd widget data
- */
-function normalizeCrowd(data: Record<string, unknown>): Record<string, unknown> {
-  const forecast = Array.isArray(data.forecast) ? data.forecast : []
-
-  return {
-    title: data.title || 'Crowd Information',
-    location: data.location || 'Masjid al-Haram',
-    currentLevel: data.currentLevel || 'moderate',
-    lastUpdated: data.lastUpdated || new Date().toISOString(),
-    forecast: forecast.map((period: Record<string, unknown>, index: number) => ({
-      id: period.id || generateId('period', index),
-      time: period.time || '',
-      level: period.level || 'moderate',
-      description: period.description || '',
-      recommendation: period.recommendation || '',
-    })),
-    bestTimes: Array.isArray(data.bestTimes) ? data.bestTimes : [],
-    tips: Array.isArray(data.tips) ? data.tips : [],
-    seasonalNote: data.seasonalNote || '',
-  }
-}
-
-/**
  * Normalize navigation widget data
  */
 function normalizeNavigation(data: Record<string, unknown>): Record<string, unknown> {
@@ -308,8 +284,6 @@ export function normalizeWidgetData(type: WidgetType, rawData: unknown): Record<
       return normalizeRitual(data)
     case 'places':
       return normalizePlaces(data)
-    case 'crowd':
-      return normalizeCrowd(data)
     case 'navigation':
       return normalizeNavigation(data)
     default:
@@ -339,8 +313,6 @@ export function validateWidgetData(type: WidgetType, data: Record<string, unknow
       return !!(data.title && Array.isArray(data.steps))
     case 'places':
       return !!(data.title && Array.isArray(data.places))
-    case 'crowd':
-      return !!(data.title && data.location)
     case 'navigation':
       return !!(data.from && data.to)
     default:

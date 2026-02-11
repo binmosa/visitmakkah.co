@@ -69,7 +69,7 @@ const BlogPage = async () => {
         <div className="page-blog">
             <BlogPageHeader category={blogCategory} />
 
-            <div className="container pt-10 lg:pt-20">
+            <div className="container pb-10 lg:pb-16">
                 <div className="flex flex-wrap gap-x-2 gap-y-4">
                     {categories.length > 0 && <ModalCategories categories={categories} />}
                     {tags.length > 0 && <ModalTags tags={tags} />}

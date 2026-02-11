@@ -14,7 +14,6 @@ export type WidgetType =
   | 'dua'
   | 'ritual'
   | 'places'
-  | 'crowd'
   | 'navigation'
   | 'tips'
 
@@ -212,27 +211,6 @@ export interface PlacesWidgetData {
 }
 
 // ============================================
-// CROWD WIDGET
-// ============================================
-export interface CrowdPeriod {
-  time: string
-  level: 'low' | 'moderate' | 'high' | 'very-high'
-  description?: string
-  recommendation?: string
-}
-
-export interface CrowdWidgetData {
-  title: string
-  location: string
-  currentLevel?: 'low' | 'moderate' | 'high' | 'very-high'
-  lastUpdated?: string
-  forecast: CrowdPeriod[]
-  bestTimes: string[]
-  tips: string[]
-  seasonalNote?: string
-}
-
-// ============================================
 // NAVIGATION WIDGET
 // ============================================
 export interface NavigationStep {
@@ -290,7 +268,6 @@ export type WidgetData =
   | { type: 'dua'; data: DuaWidgetData }
   | { type: 'ritual'; data: RitualWidgetData }
   | { type: 'places'; data: PlacesWidgetData }
-  | { type: 'crowd'; data: CrowdWidgetData }
   | { type: 'navigation'; data: NavigationWidgetData }
   | { type: 'tips'; data: TipsWidgetData }
 
@@ -321,10 +298,6 @@ export function isRitualWidget(data: WidgetData): data is { type: 'ritual'; data
 
 export function isPlacesWidget(data: WidgetData): data is { type: 'places'; data: PlacesWidgetData } {
   return data.type === 'places'
-}
-
-export function isCrowdWidget(data: WidgetData): data is { type: 'crowd'; data: CrowdWidgetData } {
-  return data.type === 'crowd'
 }
 
 export function isNavigationWidget(data: WidgetData): data is { type: 'navigation'; data: NavigationWidgetData } {

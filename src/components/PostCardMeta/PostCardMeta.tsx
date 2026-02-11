@@ -15,11 +15,21 @@ interface Props {
 const PostCardMeta: FC<Props> = ({ className, meta, hiddenAvatar = false, avatarSize = 'size-7' }) => {
   const { date, author } = meta
 
+  if (!author) {
+    return (
+      <div className={clsx('post-card-meta flex flex-wrap items-center text-xs/6', className)}>
+        <span className="font-normal text-neutral-500 dark:text-neutral-400">
+          <LocalDate date={date} />
+        </span>
+      </div>
+    )
+  }
+
   return (
     <div className={clsx('post-card-meta flex flex-wrap items-center text-xs/6', className)}>
       <div className="relative flex items-center gap-x-2.5">
-        <Link href={`/author/${author.handle}`} className="absolute inset-0" />
-        {!hiddenAvatar && <Avatar className={avatarSize} src={author.avatar.src} />}
+        <Link href={`/blog?author=${author.handle}`} className="absolute inset-0" />
+        {!hiddenAvatar && author.avatar && <Avatar className={avatarSize} src={author.avatar.src} />}
         <span className="block font-semibold text-neutral-900 dark:text-neutral-300">{author.name}</span>
       </div>
       <>

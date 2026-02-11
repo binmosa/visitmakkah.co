@@ -154,7 +154,7 @@ export function createBlogCategory(posts: SanityPost[]): TCategory {
         id: 'blog',
         name: 'Local Insights',
         handle: 'blog',
-        description: 'Real experiences and insider knowledge from locals who know Makkah. Get authentic tips, hidden gems, and practical advice that you won\'t find in generic travel guides.',
+        description: 'Local insights and tips for your journey',
         color: 'emerald' as any,
         count: posts.length,
         date: new Date().toISOString().split('T')[0],

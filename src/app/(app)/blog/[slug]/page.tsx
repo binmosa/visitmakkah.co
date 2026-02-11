@@ -2,9 +2,9 @@ import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getPostBySlug, getAllPosts } from '@/lib/sanity'
 import { sanityPostToPostDetail, sanityPostToTPost, getPostSeoMeta } from '@/lib/sanity-adapters'
-import SingleHeaderContainer from '../../post/SingleHeaderContainer'
-import SingleRelatedPosts from '../../post/SingleRelatedPosts'
 import BlogPostContent from './BlogPostContent'
+import BlogPostHeader from './BlogPostHeader'
+import BlogRelatedPosts from './BlogRelatedPosts'
 
 interface PageProps {
     params: Promise<{ slug: string }>
@@ -81,12 +81,6 @@ export default async function BlogPostPage({ params }: PageProps) {
         .slice(0, 6)
         .map((p: any, i: number) => sanityPostToTPost(p, i))
 
-    // Get more from author (if author exists)
-    const authorPosts = (allPosts || [])
-        .filter((p: any) => p._id !== post._id && p.author?.slug?.current === post.author?.slug?.current)
-        .slice(0, 6)
-        .map((p: any, i: number) => sanityPostToTPost(p, i))
-
     // JSON-LD structured data for SEO
     const jsonLd = {
         '@context': 'https://schema.org',
@@ -122,21 +116,17 @@ export default async function BlogPostPage({ params }: PageProps) {
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
             />
 
-            <div className="single-post-page page-style-3 blog-post">
-                {/* Cast to any since we provide all fields used by style3 header */}
-                <SingleHeaderContainer post={postDetail as any} headerStyle="style3" />
+            <article className="blog-post">
+                <BlogPostHeader post={postDetail} />
 
-                <div className="container mt-12">
+                <div className="container py-10">
                     <BlogPostContent post={postDetail} />
                 </div>
 
                 {relatedPosts.length > 0 && (
-                    <SingleRelatedPosts
-                        relatedPosts={relatedPosts}
-                        moreFromAuthorPosts={authorPosts.length > 0 ? authorPosts : relatedPosts.slice(0, 3)}
-                    />
+                    <BlogRelatedPosts posts={relatedPosts} />
                 )}
-            </div>
+            </article>
         </>
     )
 }

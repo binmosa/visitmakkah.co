@@ -185,9 +185,6 @@ export function validateWidgetData(type: WidgetType, data: unknown): boolean {
     case 'places':
       return !!(d.title && d.places && Array.isArray(d.places))
 
-    case 'crowd':
-      return !!(d.title && d.location && d.forecast && Array.isArray(d.forecast))
-
     case 'navigation':
       return !!(d.from && d.to && d.steps && Array.isArray(d.steps))
 

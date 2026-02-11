@@ -155,14 +155,6 @@ export async function getNavigation(): Promise<TNavigationItem[]> {
           actionVerb: 'eat at',
         },
         {
-          id: 'explore-crowds',
-          href: '/explore/check-crowds',
-          name: 'Check Crowds',
-          description: 'Best times for Tawaf',
-          icon: 'FaUsers',
-          actionVerb: 'avoid',
-        },
-        {
           id: 'explore-navigate',
           href: '/explore/navigate',
           name: 'Navigate to Haram',
@@ -179,6 +171,16 @@ export async function getNavigation(): Promise<TNavigationItem[]> {
           actionVerb: 'discover',
         },
       ],
+    },
+    {
+      id: 'saved',
+      href: '/saved',
+      name: 'Saved',
+      description: 'Your saved guides & history',
+      icon: 'FaFolderOpen',
+      relevantStages: ['planning', 'booked', 'in_makkah', 'returned'],
+      priority: 4,
+      actionVerb: 'access',
     },
     {
       id: 'blog',
@@ -232,9 +234,9 @@ export function getSuggestedActions(journeyStage: JourneyStage): { label: string
       { label: 'Learn the Rituals', href: '/learn?action=step-by-step', description: 'Practice before you arrive' },
     ],
     in_makkah: [
-      { label: 'Check Crowds', href: '/explore?action=check-crowds', description: 'Best time for Tawaf now' },
       { label: 'Find Food', href: '/explore?action=find-food', description: 'Restaurants open near you' },
       { label: 'Navigate to Haram', href: '/explore?action=navigate', description: 'Fastest route from your hotel' },
+      { label: 'Local Tips', href: '/explore?action=local-tips', description: 'Insider knowledge for your visit' },
     ],
     returned: [
       { label: 'Share My Journey', href: '/learn', description: 'Create a shareable memory' },
@@ -317,8 +319,8 @@ export function getAISuggestions(context: string, journeyStage?: JourneyStage): 
     'explore': [
       'Hotels near King Fahd Gate',
       'Best restaurants for families',
-      'When is Haram least crowded?',
       'How to get to King Abdul Aziz Gate?',
+      'Local tips for visiting Haram',
     ],
     'find-hotels': [
       'Hotels with Haram view',
@@ -331,12 +333,6 @@ export function getAISuggestions(context: string, journeyStage?: JourneyStage): 
       'Best biryani near Haram',
       'Where to eat at 3am?',
       'Family-friendly restaurants',
-    ],
-    'check-crowds': [
-      'Best time for Tawaf today?',
-      'How crowded is it now?',
-      'Least crowded days of the week',
-      'Tips to avoid rush hours',
     ],
     'navigate': [
       'Shortest route to King Fahd Gate',
@@ -367,12 +363,12 @@ export function getAISuggestions(context: string, journeyStage?: JourneyStage): 
     'ramadan': [
       'Umrah during Ramadan tips',
       'Where to have Iftar near Haram?',
-      'How crowded is Ramadan?',
       'Last 10 nights guide',
+      'Taraweeh prayer at Haram',
     ],
     'shortcuts': [
       'Secret entrances to Haram',
-      'Fastest routes to avoid crowds',
+      'Best routes to the Haram',
       'Local tips only residents know',
       'Hidden gems in Makkah',
     ],
@@ -465,7 +461,7 @@ export const tipsTopics: TipTopic[] = [
     aiSuggestions: [
       'Umrah during Ramadan tips',
       'Where to have Iftar near Haram?',
-      'How crowded is Ramadan?',
+      'Last 10 nights guide',
     ],
   },
   {
@@ -474,7 +470,7 @@ export const tipsTopics: TipTopic[] = [
     description: 'Insider routes & hacks',
     aiSuggestions: [
       'Secret entrances to Haram',
-      'Fastest routes to avoid crowds',
+      'Best routes to the Haram',
       'Local tips only residents know',
     ],
   },

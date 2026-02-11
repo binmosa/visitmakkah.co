@@ -207,24 +207,6 @@ export const contextConfigs: Record<string, ContextConfig> = {
       'Where can I find international cuisine?',
     ],
   },
-  'check-crowds': {
-    page: 'explore',
-    action: 'check-crowds',
-    actionLabel: 'Crowd Checker',
-    vectorStoreId: process.env.VECTOR_STORE_TIPS || 'vs_tips',
-    primaryWidget: 'crowd',
-    systemPromptAddition: `
-      Provide guidance on crowd patterns and best times to visit.
-      Include prayer times, peak hours, and seasonal variations.
-      Suggest strategies for avoiding crowds.
-    `,
-    suggestedPrompts: [
-      'When is the best time to do Tawaf?',
-      'How crowded is it during Ramadan?',
-      'What are the quietest prayer times?',
-      'How do I avoid peak crowds?',
-    ],
-  },
   'navigate': {
     page: 'explore',
     action: 'navigate',

@@ -6,11 +6,13 @@
  * Dynamically renders the appropriate widget component based on type.
  * Uses dynamic imports for code splitting.
  * Normalizes data before passing to widgets for consistent structure.
+ * Includes save button for users to save widgets to their collection.
  */
 
 import dynamic from 'next/dynamic'
 import type { WidgetType } from '@/types/widgets'
 import { normalizeWidgetData, validateWidgetData } from '@/lib/widget-normalizer'
+import { SaveWidgetButton } from '@/components/Widgets/SaveWidgetButton'
 
 // Loading placeholder for widgets
 function WidgetLoading() {
@@ -34,7 +36,7 @@ function WidgetError({ type }: { type: string }) {
 }
 
 // Dynamic imports for each widget type
-const widgetComponents: Record<WidgetType, React.ComponentType<{ data: unknown }>> = {
+const widgetComponents: Record<WidgetType, React.ComponentType<{ data: unknown; contextAction?: string }>> = {
   itinerary: dynamic(() => import('../Widgets/ItineraryWidget').then(mod => mod.default), {
     loading: () => <WidgetLoading />,
   }),
@@ -56,9 +58,6 @@ const widgetComponents: Record<WidgetType, React.ComponentType<{ data: unknown }
   places: dynamic(() => import('../Widgets/PlacesWidget').then(mod => mod.default), {
     loading: () => <WidgetLoading />,
   }),
-  crowd: dynamic(() => import('../Widgets/CrowdWidget').then(mod => mod.default), {
-    loading: () => <WidgetLoading />,
-  }),
   navigation: dynamic(() => import('../Widgets/NavigationWidget').then(mod => mod.default), {
     loading: () => <WidgetLoading />,
   }),
@@ -71,9 +70,11 @@ interface WidgetRendererProps {
   type: WidgetType | string
   data: unknown
   className?: string
+  contextAction?: string
+  showSaveButton?: boolean // Show save button (default: true for chat, false for Saved page)
 }
 
-export function WidgetRenderer({ type, data, className = '' }: WidgetRendererProps) {
+export function WidgetRenderer({ type, data, className = '', contextAction, showSaveButton = true }: WidgetRendererProps) {
   // Normalize the data to ensure consistent structure
   const normalizedData = normalizeWidgetData(type as WidgetType, data)
 
@@ -89,9 +90,26 @@ export function WidgetRenderer({ type, data, className = '' }: WidgetRendererPro
     return <WidgetError type={type} />
   }
 
+  // Extract title for save button
+  const widgetTitle = (normalizedData as Record<string, unknown>).title as string || `${type} widget`
+  const widgetDescription = (normalizedData as Record<string, unknown>).description as string | undefined
+
   return (
     <div className={`my-4 ${className}`}>
-      <WidgetComponent data={normalizedData} />
+      {/* Save button header */}
+      {showSaveButton && (
+        <div className="mb-2 flex justify-end">
+          <SaveWidgetButton
+            widgetType={type}
+            title={widgetTitle}
+            description={widgetDescription}
+            widgetData={normalizedData as Record<string, unknown>}
+            sourceContext={contextAction}
+            size="sm"
+          />
+        </div>
+      )}
+      <WidgetComponent data={normalizedData} contextAction={contextAction} />
     </div>
   )
 }

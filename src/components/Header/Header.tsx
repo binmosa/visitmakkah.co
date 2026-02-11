@@ -5,7 +5,6 @@ import { FC } from 'react'
 import AvatarDropdown from './AvatarDropdown'
 import HamburgerBtnMenu from './HamburgerBtnMenu'
 import Navigation from './Navigation/Navigation'
-import NotifyDropdown from './NotifyDropdown'
 import SearchModal from './SearchModal'
 
 interface HeaderProps {
@@ -36,7 +35,6 @@ const Header: FC<HeaderProps> = async ({ bottomBorder, className }) => {
               <SearchModal type="type2" />
             </div>
             <div className="hidden h-8 border-l md:block mx-3" />
-            <NotifyDropdown className="me-1" />
             <AvatarDropdown />
             <div className="ms-2.5 flex lg:hidden">
               <HamburgerBtnMenu />

@@ -5,12 +5,9 @@ import Avatar from '@/shared/Avatar'
 import SocialsList from '@/shared/SocialsList'
 import Tag from '@/shared/Tag'
 import { Link } from '@/shared/link'
-import PostCardLikeBtn from '@/components/PostCardLikeBtn'
-import PostCardCommentBtn from '@/components/PostCardCommentBtn'
-import { ShareDropdown } from '../../post/SingleMetaAction'
 import SanityContent from '@/components/SanityContent'
 import useIntersectionObserver from '@/hooks/useIntersectionObserver'
-import { ArrowUp02Icon } from '@hugeicons/core-free-icons'
+import { ArrowUp02Icon, Share01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 
 interface PostDetail {
@@ -26,9 +23,6 @@ interface PostDetail {
         avatar: { src: string; alt: string }
         description?: string
     }
-    likeCount: number
-    liked: boolean
-    commentCount: number
 }
 
 interface Props {
@@ -42,7 +36,7 @@ const BlogPostContent: FC<Props> = ({ post, className }) => {
     const progressRef = useRef<HTMLButtonElement>(null)
     const [isShowScrollToTop, setIsShowScrollToTop] = useState<boolean>(false)
 
-    const { tags, author, content, likeCount, commentCount, liked, handle } = post
+    const { tags, author, content, handle } = post
 
     const endedAnchorEntry = useIntersectionObserver(endedAnchorRef, {
         threshold: 0,
@@ -90,6 +84,22 @@ const BlogPostContent: FC<Props> = ({ post, className }) => {
     const showLikeAndCommentSticky =
         !endedAnchorEntry?.intersectionRatio && (endedAnchorEntry?.boundingClientRect.top || 0) > 0
 
+    const handleShare = async () => {
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: post.title,
+                    url: window.location.href,
+                })
+            } catch (err) {
+                // User cancelled or error
+            }
+        } else {
+            // Fallback: copy to clipboard
+            navigator.clipboard.writeText(window.location.href)
+        }
+    }
+
     return (
         <div className={`relative ${className}`}>
             <div className="single-content space-y-10">
@@ -134,31 +144,33 @@ const BlogPostContent: FC<Props> = ({ post, className }) => {
                 {/* LOCAL INSIGHTS CTA */}
                 <div className="mx-auto max-w-(--breakpoint-md) rounded-2xl bg-emerald-50 p-6 dark:bg-emerald-900/20">
                     <h3 className="text-lg font-semibold text-emerald-800 dark:text-emerald-300">
-                        Share Your Experience
+                        Explore More
                     </h3>
                     <p className="mt-2 text-sm text-emerald-700 dark:text-emerald-400">
-                        Have a unique insight or experience from your visit to Makkah? We&apos;d love to hear from you.
-                        Local knowledge helps fellow pilgrims have a better journey.
+                        Discover more local insights and guides to help make your pilgrimage journey memorable.
                     </p>
                     <Link
-                        href="/contact"
+                        href="/blog"
                         className="mt-4 inline-block rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 transition-colors"
                     >
-                        Contribute a Story
+                        View All Articles
                     </Link>
                 </div>
 
                 <div ref={endedAnchorRef}></div>
             </div>
 
-            {/* LIKE AND SHARE STICKY */}
+            {/* PROGRESS AND SHARE STICKY */}
             <div className={`sticky bottom-8 z-11 mt-8 justify-center ${showLikeAndCommentSticky ? 'flex' : 'hidden'}`}>
                 <div className="flex items-center justify-center gap-x-2 rounded-full bg-white p-1.5 text-xs shadow-lg ring-1 ring-black/5 dark:bg-neutral-800 dark:ring-white/20">
-                    <PostCardLikeBtn likeCount={likeCount} liked={liked} />
-                    <div className="h-4 border-s border-neutral-200 dark:border-neutral-700"></div>
-                    <PostCardCommentBtn commentCount={commentCount} handle={handle} />
-                    <div className="h-4 border-s border-neutral-200 dark:border-neutral-700"></div>
-                    <ShareDropdown handle={handle} />
+                    <button
+                        onClick={handleShare}
+                        className="flex size-8.5 items-center justify-center rounded-full bg-neutral-50 hover:bg-neutral-100 dark:bg-white/10 dark:hover:bg-white/20"
+                        title="Share"
+                    >
+                        <HugeiconsIcon icon={Share01Icon} size={18} strokeWidth={1.75} />
+                    </button>
+
                     <div className="h-4 border-s border-neutral-200 dark:border-neutral-700"></div>
 
                     <button

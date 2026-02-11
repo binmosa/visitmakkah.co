@@ -7,7 +7,7 @@ import { FC, useState } from 'react'
 
 interface Props {
   className?: string
-  likeCount: number
+  likeCount?: number
   liked?: boolean
 }
 

@@ -39,12 +39,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     },
     {
-      url: `${BASE_URL}/contact`,
-      lastModified: now,
-      changeFrequency: 'monthly',
-      priority: 0.6,
-    },
-    {
       url: `${BASE_URL}/blog`,
       lastModified: now,
       changeFrequency: 'daily',
@@ -63,40 +57,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     },
     {
-      url: `${BASE_URL}/your-journey`,
-      lastModified: now,
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-    {
-      url: `${BASE_URL}/stay-and-food`,
-      lastModified: now,
-      changeFrequency: 'weekly',
-      priority: 0.7,
-    },
-    {
-      url: `${BASE_URL}/smart-tools`,
-      lastModified: now,
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-    {
-      url: `${BASE_URL}/local-tips`,
-      lastModified: now,
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-    {
       url: `${BASE_URL}/explore`,
       lastModified: now,
       changeFrequency: 'weekly',
       priority: 0.7,
     },
     {
-      url: `${BASE_URL}/search`,
+      url: `${BASE_URL}/saved`,
       lastModified: now,
       changeFrequency: 'weekly',
-      priority: 0.5,
+      priority: 0.6,
     },
     {
       url: `${BASE_URL}/prayer-times`,
