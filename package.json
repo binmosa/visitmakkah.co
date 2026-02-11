@@ -44,6 +44,7 @@
     "@types/node": "20.9.2",
     "@types/react": "19.2.7",
     "@types/react-dom": "19.2.3",
+    "@vercel/analytics": "^1.6.1",
     "ai": "^6.0.78",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -83,5 +84,13 @@
   "overrides": {
     "@types/react": "19.2.7",
     "@types/react-dom": "19.2.3"
-  }
+  },
+  "browserslist": [
+    "Chrome >= 100",
+    "Safari >= 15",
+    "iOS >= 15",
+    "Firefox >= 100",
+    "Edge >= 100",
+    "not dead"
+  ]
 }

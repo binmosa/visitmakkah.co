@@ -75,7 +75,7 @@ export function Aside({
                       </>
                     )}
 
-                    <button type="button" className="group -m-4 cursor-pointer p-4" onClick={onClose}>
+                    <button type="button" className="group -m-4 cursor-pointer p-4" onClick={onClose} aria-label="Close menu">
                       <HugeiconsIcon
                         className="transition-transform duration-200 group-hover:rotate-90"
                         icon={Cancel01Icon}

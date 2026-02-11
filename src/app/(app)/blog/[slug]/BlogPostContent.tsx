@@ -1,13 +1,12 @@
 'use client'
 
 import { FC, useEffect, useRef, useState } from 'react'
-import Avatar from '@/shared/Avatar'
-import SocialsList from '@/shared/SocialsList'
+import Image from 'next/image'
 import Tag from '@/shared/Tag'
 import { Link } from '@/shared/link'
 import SanityContent from '@/components/SanityContent'
 import useIntersectionObserver from '@/hooks/useIntersectionObserver'
-import { ArrowUp02Icon, Share01Icon } from '@hugeicons/core-free-icons'
+import { ArrowUp02Icon, Share01Icon, MessageMultiple02Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 
 interface PostDetail {
@@ -124,37 +123,46 @@ const BlogPostContent: FC<Props> = ({ post, className }) => {
                 )}
 
                 {/* AUTHOR */}
-                <div className="mx-auto max-w-(--breakpoint-md) border-t border-b border-neutral-100 dark:border-neutral-700"></div>
-                <div className="mx-auto flex max-w-(--breakpoint-md)" id="author">
-                    <Link href={`/blog?author=${author.handle}`}>
-                        <Avatar src={author.avatar.src} className="size-12 sm:size-24" />
-                    </Link>
-                    <div className="ms-3 flex max-w-lg flex-col gap-y-1 sm:ms-5">
-                        <p className="text-xs tracking-wider text-neutral-500 uppercase">WRITTEN BY</p>
-                        <Link className="text-lg font-semibold" href={`/blog?author=${author.handle}`}>
-                            {author.name}
-                        </Link>
-                        <p className="text-sm/relaxed dark:text-neutral-300">
-                            {author.description || 'Local contributor sharing authentic experiences and insights about Makkah.'}
-                        </p>
-                        <SocialsList className="mt-2" />
+                <div className="mx-auto max-w-(--breakpoint-md) border-t border-neutral-100 pt-6 dark:border-neutral-800">
+                    <div className="flex items-start gap-3">
+                        <Image
+                            src="/logos/icon.svg"
+                            alt="Visit Makkah"
+                            width={40}
+                            height={40}
+                            className="size-10 rounded-lg"
+                        />
+                        <div className="flex flex-col gap-0.5">
+                            <p className="text-[10px] uppercase tracking-wider text-neutral-400">Written by</p>
+                            <p className="text-sm font-semibold text-neutral-900 dark:text-white">Local Guide</p>
+                            <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                                {author.description || 'Local contributor sharing authentic experiences and insights about Makkah.'}
+                            </p>
+                        </div>
                     </div>
                 </div>
 
-                {/* LOCAL INSIGHTS CTA */}
-                <div className="mx-auto max-w-(--breakpoint-md) rounded-2xl bg-emerald-50 p-6 dark:bg-emerald-900/20">
-                    <h3 className="text-lg font-semibold text-emerald-800 dark:text-emerald-300">
-                        Explore More
-                    </h3>
-                    <p className="mt-2 text-sm text-emerald-700 dark:text-emerald-400">
-                        Discover more local insights and guides to help make your pilgrimage journey memorable.
-                    </p>
-                    <Link
-                        href="/blog"
-                        className="mt-4 inline-block rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 transition-colors"
-                    >
-                        View All Articles
-                    </Link>
+                {/* AI TRIP PLANNER CTA */}
+                <div className="mx-auto max-w-(--breakpoint-md) rounded-xl border border-primary-100 bg-primary-50/50 p-5 dark:border-primary-900/30 dark:bg-primary-900/10">
+                    <div className="flex items-start gap-3">
+                        <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary-100 dark:bg-primary-900/30">
+                            <HugeiconsIcon icon={MessageMultiple02Icon} className="size-5 text-primary-600 dark:text-primary-400" strokeWidth={1.5} />
+                        </div>
+                        <div className="flex-1">
+                            <h3 className="text-sm font-semibold text-neutral-900 dark:text-white">
+                                Plan Your Journey
+                            </h3>
+                            <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-400">
+                                Get personalized guidance for your pilgrimage with our AI trip planner.
+                            </p>
+                            <Link
+                                href="/prepare"
+                                className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-primary-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-primary-700"
+                            >
+                                Start Planning
+                            </Link>
+                        </div>
+                    </div>
                 </div>
 
                 <div ref={endedAnchorRef}></div>

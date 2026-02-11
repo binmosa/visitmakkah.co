@@ -7,6 +7,9 @@ import { urlFor } from './sanity'
 import { TPost } from '@/data/posts'
 import { TCategory } from '@/data/categories'
 
+// Default fallback image for blog posts
+const DEFAULT_BLOG_IMAGE = '/images/makkah-img-visit-makkah.jpg'
+
 // Types for Sanity data
 interface SanityImage {
     _type: 'image'
@@ -67,7 +70,7 @@ interface SanityPost {
 export function sanityPostToTPost(post: SanityPost, index = 0): TPost {
     const imageUrl = post.featuredImage
         ? urlFor(post.featuredImage).width(1920).height(1080).url()
-        : `/images/placeholder-${(index % 5) + 1}.jpg`
+        : DEFAULT_BLOG_IMAGE
 
     const authorImageUrl = post.author?.image
         ? urlFor(post.author.image).width(200).height(200).url()
@@ -115,10 +118,10 @@ export function sanityPostToTPost(post: SanityPost, index = 0): TPost {
                 height: 200,
             },
         },
-        categories: (post.categories || []).map(cat => ({
-            id: cat._id,
+        categories: (post.categories || []).map((cat, idx) => ({
+            id: cat._id || `cat-${idx}`,
             name: cat.title,
-            handle: cat.slug.current,
+            handle: cat.slug?.current || cat.title?.toLowerCase().replace(/\s+/g, '-') || `category-${idx}`,
             color: (cat.color || 'emerald') as any,
         })),
     }
@@ -175,7 +178,7 @@ export function createBlogCategory(posts: SanityPost[]): TCategory {
 export function sanityPostToPostDetail(post: SanityPost, index = 0) {
     const imageUrl = post.featuredImage
         ? urlFor(post.featuredImage).width(1920).height(1080).url()
-        : `/images/placeholder-${(index % 5) + 1}.jpg`
+        : DEFAULT_BLOG_IMAGE
 
     const authorImageUrl = post.author?.image
         ? urlFor(post.author.image).width(200).height(200).url()
@@ -225,16 +228,16 @@ export function sanityPostToPostDetail(post: SanityPost, index = 0) {
             },
             description: 'A local contributor sharing authentic experiences and insights about Makkah.',
         },
-        categories: (post.categories || []).map(cat => ({
-            id: cat._id,
+        categories: (post.categories || []).map((cat, idx) => ({
+            id: cat._id || `cat-${idx}`,
             name: cat.title,
-            handle: cat.slug.current,
+            handle: cat.slug?.current || cat.title?.toLowerCase().replace(/\s+/g, '-') || `category-${idx}`,
             color: (cat.color || 'emerald') as any,
         })),
-        tags: (post.tags || []).map(tag => ({
-            id: tag._id,
+        tags: (post.tags || []).map((tag, idx) => ({
+            id: tag._id || `tag-${idx}`,
             name: tag.title,
-            handle: tag.slug.current,
+            handle: tag.slug?.current || tag.title?.toLowerCase().replace(/\s+/g, '-') || `tag-${idx}`,
             color: 'neutral' as any,
         })),
         // Content is stored as Sanity Portable Text

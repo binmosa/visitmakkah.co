@@ -640,7 +640,7 @@ export default function JourneyOnboarding() {
                         <div
                             className="pointer-events-none absolute inset-0 z-0"
                             style={{
-                                backgroundImage: 'url(/images/islamic-pattern.png)',
+                                backgroundImage: 'url(/images/islamic-pattern.svg)',
                                 backgroundPosition: 'left top',
                                 backgroundRepeat: 'repeat-y',
                                 backgroundSize: 'auto 300px',

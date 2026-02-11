@@ -56,7 +56,7 @@ interface HubNavCardProps {
     onClick?: () => void
 }
 
-// Pill-style navigation item for horizontal scroll on mobile
+// Pill-style navigation item for horizontal scroll on mobile (light teal theme)
 const HubNavPill: FC<HubNavCardProps> = ({ item, isActive, isCurrentPage, onClick }) => {
     const hrefKey = item.href?.split('/').pop() || ''
     const IconComponent = iconMap[hrefKey] || ClipboardIcon
@@ -65,16 +65,16 @@ const HubNavPill: FC<HubNavCardProps> = ({ item, isActive, isCurrentPage, onClic
     return (
         <button
             onClick={onClick}
-            className={`flex shrink-0 items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-medium transition-all duration-200 ${isHighlighted
-                ? 'border-primary-500 bg-primary-50 text-primary-700 shadow-sm dark:border-primary-400 dark:bg-primary-900/30 dark:text-primary-300'
-                : 'border-neutral-200 bg-white text-neutral-700 hover:border-primary-300 hover:bg-primary-50/50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:border-primary-600'
+            className={`flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-all active:scale-95 ${isHighlighted
+                ? 'border-primary-500 bg-primary-50 text-primary-700 dark:border-primary-400 dark:bg-primary-900/30 dark:text-primary-300'
+                : 'border-neutral-200 bg-white text-neutral-600 hover:border-primary-300 hover:bg-primary-50/50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:border-primary-600'
                 }`}
         >
             <HugeiconsIcon
                 icon={IconComponent}
-                className={`size-4 ${isHighlighted
+                className={`size-3.5 ${isHighlighted
                     ? 'text-primary-600 dark:text-primary-400'
-                    : 'text-neutral-500 dark:text-neutral-400'
+                    : 'text-neutral-400 dark:text-neutral-500'
                     }`}
             />
             <span className="whitespace-nowrap">{item.name}</span>
@@ -100,7 +100,7 @@ const HubNavCard: FC<HubNavCardProps> = ({ item, isActive, isCurrentPage, onClic
             <div
                 className="pointer-events-none absolute inset-0 opacity-100"
                 style={{
-                    backgroundImage: 'url(/images/islamic-pattern.png)',
+                    backgroundImage: 'url(/images/islamic-pattern.svg)',
                     backgroundPosition: 'left center',
                     backgroundRepeat: 'no-repeat',
                     backgroundSize: 'auto 100%',
@@ -169,21 +169,32 @@ const HubNavMenu: FC<HubNavMenuProps> = ({ items, activeId, onItemClick, categor
 
     return (
         <div className="hub-nav-menu">
-            {/* Mobile: Horizontal scrolling pills */}
-            <div
-                ref={scrollContainerRef}
-                className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-2 hidden-scrollbar sm:hidden"
-            >
-                {items.map((item, index) => (
-                    <div key={item.id || index} data-id={item.id}>
-                        <HubNavPill
-                            item={item}
-                            isActive={activeId === item.id}
-                            isCurrentPage={pathname === item.href}
-                            onClick={() => onItemClick?.(item.id || '')}
-                        />
+            {/* Mobile: Horizontal scrolling pills with swipe indicator */}
+            <div className="relative sm:hidden">
+                {/* Left fade gradient */}
+                <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-6 bg-gradient-to-r from-white to-transparent dark:from-neutral-950" />
+                {/* Right fade gradient with swipe hint */}
+                <div className="pointer-events-none absolute right-0 top-0 z-10 flex h-full w-10 items-center justify-end bg-gradient-to-l from-white via-white/80 to-transparent pr-1 dark:from-neutral-950 dark:via-neutral-950/80">
+                    <div className="flex items-center gap-0.5 text-neutral-300 dark:text-neutral-600">
+                        <span className="text-[8px]">›</span>
+                        <span className="text-[10px]">›</span>
                     </div>
-                ))}
+                </div>
+                <div
+                    ref={scrollContainerRef}
+                    className="flex gap-1.5 overflow-x-auto px-6 py-1 hidden-scrollbar"
+                >
+                    {items.map((item, index) => (
+                        <div key={item.id || index} data-id={item.id}>
+                            <HubNavPill
+                                item={item}
+                                isActive={activeId === item.id}
+                                isCurrentPage={pathname === item.href}
+                                onClick={() => onItemClick?.(item.id || '')}
+                            />
+                        </div>
+                    ))}
+                </div>
             </div>
 
             {/* Desktop: Grid of cards */}

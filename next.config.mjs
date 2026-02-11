@@ -1,6 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // ============================================
+  // PERFORMANCE OPTIMIZATIONS
+  // ============================================
+  experimental: {
+    optimizeCss: true, // Enable CSS optimization
+  },
+
+  // ============================================
   // IMAGE OPTIMIZATION
   // ============================================
   images: {

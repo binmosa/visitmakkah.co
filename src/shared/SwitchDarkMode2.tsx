@@ -17,12 +17,12 @@ const SwitchDarkMode2: React.FC<SwitchDarkMode2Props> = ({ className }) => {
       <Switch
         checked={theme?.isDarkMode}
         onChange={theme?.toggleDarkMode}
-        className={`${theme?.isDarkMode ? 'bg-teal-900' : 'bg-teal-600'} relative inline-flex h-[22px] w-[42px] shrink-0 cursor-pointer rounded-full border-4 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden focus-visible:ring-2 focus-visible:ring-white/75`}
+        className={`${theme?.isDarkMode ? 'bg-teal-900' : 'bg-teal-600'} relative inline-flex h-[18px] w-[32px] shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden focus-visible:ring-2 focus-visible:ring-white/75`}
       >
         <span className="sr-only">Enable dark mode</span>
         <span
           aria-hidden="true"
-          className={`${theme?.isDarkMode ? 'translate-x-5 rtl:-translate-x-5' : 'translate-x-0'} pointer-events-none inline-block h-[14px] w-[14px] transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out`}
+          className={`${theme?.isDarkMode ? 'translate-x-3.5 rtl:-translate-x-3.5' : 'translate-x-0'} pointer-events-none inline-block h-[14px] w-[14px] transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out`}
         />
       </Switch>
     </div>

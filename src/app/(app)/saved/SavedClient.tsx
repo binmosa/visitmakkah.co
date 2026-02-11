@@ -131,45 +131,60 @@ export default function MyJourneyClient() {
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
       {/* Header & Tabs */}
-      <div className="container py-6 sm:py-8">
-        {/* Header */}
-        <div className="mb-4 sm:mb-6">
-          <div className="flex items-center gap-3">
-            <div className="rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 p-3 shadow-lg shadow-primary-500/20">
-              <HugeiconsIcon icon={FolderLibraryIcon} className="size-6 text-white" strokeWidth={1.5} />
+      <div className="container py-3 sm:py-6">
+        {/* Header - Compact like other pages */}
+        <div className="mb-3 sm:mb-6">
+          <div className="flex items-center gap-2.5">
+            <div className="rounded-lg bg-gradient-to-br from-primary-500 to-primary-600 p-2 shadow-md shadow-primary-500/20 sm:rounded-xl sm:p-3">
+              <HugeiconsIcon icon={FolderLibraryIcon} className="size-5 text-white sm:size-6" strokeWidth={1.5} />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-neutral-900 sm:text-2xl dark:text-white">
+              <h1 className="text-base font-bold text-neutral-900 sm:text-xl dark:text-white">
                 Saved
               </h1>
-              <p className="mt-0.5 text-sm text-neutral-500 dark:text-neutral-400">
-                Your saved guides, checklists, and history
+              <p className="text-xs text-neutral-500 sm:mt-0.5 sm:text-sm dark:text-neutral-400">
+                Your saved guides and history
               </p>
             </div>
           </div>
         </div>
 
-        {/* Tabs */}
-        <div className="relative mb-6">
-          <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-4 bg-gradient-to-r from-neutral-50 to-transparent dark:from-neutral-950" />
-          <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-4 bg-gradient-to-l from-neutral-50 to-transparent dark:from-neutral-950" />
-          <div className="hidden-scrollbar -mx-1 flex gap-1.5 overflow-x-auto px-1 py-1">
+        {/* Tabs - Light teal with dark teal border (matching sub-menu style) */}
+        <div className="relative mb-4 sm:mb-6">
+          {/* Left fade gradient */}
+          <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-6 bg-gradient-to-r from-neutral-50 to-transparent dark:from-neutral-950" />
+          {/* Right fade gradient with swipe hint */}
+          <div className="pointer-events-none absolute right-0 top-0 z-10 flex h-full w-10 items-center justify-end bg-gradient-to-l from-neutral-50 via-neutral-50/80 to-transparent pr-1 dark:from-neutral-950 dark:via-neutral-950/80">
+            <div className="flex items-center gap-0.5 text-neutral-300 dark:text-neutral-600">
+              <span className="text-[8px]">›</span>
+              <span className="text-[10px]">›</span>
+            </div>
+          </div>
+          <div className="hidden-scrollbar flex gap-1.5 overflow-x-auto px-6 py-1">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all active:scale-95 ${
+                className={`flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-all active:scale-95 ${
                   activeTab === tab.id
-                    ? 'bg-primary-600 text-white shadow-sm dark:bg-primary-700'
-                    : 'bg-white text-neutral-700 hover:bg-neutral-100 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700'
+                    ? 'border-primary-500 bg-primary-50 text-primary-700 dark:border-primary-400 dark:bg-primary-900/30 dark:text-primary-300'
+                    : 'border-neutral-200 bg-white text-neutral-600 hover:border-primary-300 hover:bg-primary-50/50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:border-primary-600'
                 }`}
               >
-                <HugeiconsIcon icon={tab.icon} className="size-4" strokeWidth={1.5} />
+                <HugeiconsIcon
+                  icon={tab.icon}
+                  className={`size-3.5 ${
+                    activeTab === tab.id
+                      ? 'text-primary-600 dark:text-primary-400'
+                      : 'text-neutral-400 dark:text-neutral-500'
+                  }`}
+                  strokeWidth={1.5}
+                />
                 <span>{tab.label}</span>
-                <span className={`rounded-full px-2 py-0.5 text-xs ${
+                <span className={`rounded-full px-1.5 py-0.5 text-[10px] ${
                   activeTab === tab.id
-                    ? 'bg-white/20'
-                    : 'bg-neutral-200 dark:bg-neutral-700'
+                    ? 'bg-primary-100 text-primary-600 dark:bg-primary-800/50 dark:text-primary-300'
+                    : 'bg-neutral-100 text-neutral-500 dark:bg-neutral-700 dark:text-neutral-400'
                 }`}>
                   {tab.count}
                 </span>
@@ -234,8 +249,16 @@ export default function MyJourneyClient() {
 
 // Strip widget markers from message for preview display
 function stripWidgetMarkers(text: string): string {
-  // Remove <<<WIDGET:type>>>...<<<END_WIDGET>>> blocks
-  const cleaned = text.replace(/<<<WIDGET:\w+>>>[\s\S]*?<<<END_WIDGET>>>/g, '').trim()
+  let cleaned = text
+  // Remove complete widget blocks: <<<WIDGET:type>>>...<<<END_WIDGET>>>
+  cleaned = cleaned.replace(/<<<WIDGET:\w+>>>[\s\S]*?<<<END_WIDGET>>>/g, '')
+  // Remove partial widget blocks (truncated before END_WIDGET): <<<WIDGET:type>>>...
+  cleaned = cleaned.replace(/<<<WIDGET:\w+>>>[\s\S]*/g, '')
+  // Remove any remaining partial markers: <<<WIDGET... or <<<END_WIDGET>>>
+  cleaned = cleaned.replace(/<<<WIDGET[^>]*>?>?/g, '')
+  cleaned = cleaned.replace(/<<<END_WIDGET>>>/g, '')
+  // Remove any standalone <<< or >>> markers
+  cleaned = cleaned.replace(/<<<|>>>/g, '')
   // Clean up multiple spaces/newlines
   return cleaned.replace(/\s+/g, ' ').trim()
 }
@@ -335,9 +358,12 @@ function SavedWidgetCard({
   return (
     <div className="overflow-hidden rounded-xl border border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-900">
       {/* Header */}
-      <button
+      <div
+        role="button"
+        tabIndex={0}
         onClick={onToggle}
-        className="flex w-full items-center justify-between p-4 text-left transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-800/50"
+        onKeyDown={(e) => e.key === 'Enter' && onToggle()}
+        className="flex w-full cursor-pointer items-center justify-between p-4 text-left transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-800/50"
       >
         <div className="flex items-center gap-3">
           <div className={`flex h-10 w-10 items-center justify-center rounded-lg bg-neutral-100 dark:bg-neutral-800 ${typeInfo.color}`}>
@@ -376,7 +402,7 @@ function SavedWidgetCard({
             strokeWidth={1.5}
           />
         </div>
-      </button>
+      </div>
 
       {/* Expanded Widget Content */}
       {isExpanded && (

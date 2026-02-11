@@ -7,8 +7,8 @@ import { Link } from '@/shared/link'
 import SwitchDarkMode2 from '@/shared/SwitchDarkMode2'
 import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react'
 import {
-  BulbChargingIcon,
-  Idea01Icon,
+  InformationCircleIcon,
+  Moon02Icon,
   Login01Icon,
   Logout01Icon,
   UserIcon,
@@ -40,7 +40,7 @@ export default function AvatarDropdown({ className }: Props) {
   if (isLoading) {
     return (
       <div className={className}>
-        <ButtonCircle className="relative" plain>
+        <ButtonCircle className="relative" plain aria-label="Loading user menu">
           <div className="size-8 animate-pulse rounded-full bg-neutral-200 dark:bg-neutral-700" />
         </ButtonCircle>
       </div>
@@ -52,7 +52,7 @@ export default function AvatarDropdown({ className }: Props) {
     return (
       <div className={className}>
         <Popover>
-          <PopoverButton as={ButtonCircle} className="relative" plain>
+          <PopoverButton as={ButtonCircle} className="relative" plain aria-label="Open user menu">
             <HugeiconsIcon
               icon={UserCircleIcon}
               className="size-8 text-neutral-400 transition-colors hover:text-neutral-600 dark:text-neutral-500 dark:hover:text-neutral-300"
@@ -69,13 +69,13 @@ export default function AvatarDropdown({ className }: Props) {
             className="z-40 w-72 rounded-3xl shadow-lg ring-1 ring-black/5 transition duration-200 ease-in-out data-closed:translate-y-1 data-closed:opacity-0"
           >
             <div className="relative flex flex-col gap-y-5 bg-white px-6 py-6 dark:bg-neutral-800">
-              {/* Dark theme toggle */}
+              {/* Dark mode toggle */}
               <div className="focus-visible:ring-opacity-50 -m-3 flex items-center justify-between rounded-lg p-2 hover:bg-neutral-100 focus:outline-none focus-visible:ring focus-visible:ring-orange-500 dark:hover:bg-neutral-700">
                 <div className="flex items-center">
                   <div className="flex flex-shrink-0 items-center justify-center text-neutral-500 dark:text-neutral-300">
-                    <HugeiconsIcon icon={Idea01Icon} size={24} strokeWidth={1.5} />
+                    <HugeiconsIcon icon={Moon02Icon} size={24} strokeWidth={1.5} />
                   </div>
-                  <p className="ms-4 text-sm font-medium">Dark theme</p>
+                  <p className="ms-4 text-sm font-medium">Dark mode</p>
                 </div>
                 <SwitchDarkMode2 />
               </div>
@@ -86,7 +86,7 @@ export default function AvatarDropdown({ className }: Props) {
                 className="-m-3 flex items-center rounded-lg p-2 transition duration-150 ease-in-out hover:bg-neutral-100 focus:outline-hidden focus-visible:ring-3 focus-visible:ring-orange-500/50 dark:hover:bg-neutral-700"
               >
                 <div className="flex shrink-0 items-center justify-center text-neutral-500 dark:text-neutral-300">
-                  <HugeiconsIcon icon={BulbChargingIcon} size={24} strokeWidth={1.5} />
+                  <HugeiconsIcon icon={InformationCircleIcon} size={24} strokeWidth={1.5} />
                 </div>
                 <p className="ms-4 text-sm font-medium">About</p>
               </Link>
@@ -114,7 +114,7 @@ export default function AvatarDropdown({ className }: Props) {
   return (
     <div className={className}>
       <Popover>
-        <PopoverButton as={ButtonCircle} className="relative" plain>
+        <PopoverButton as={ButtonCircle} className="relative" plain aria-label="Open user menu">
           {userAvatar ? (
             <Avatar alt={userName} src={userAvatar} width={32} height={32} className="size-8 rounded-full object-cover" />
           ) : (
@@ -156,26 +156,26 @@ export default function AvatarDropdown({ className }: Props) {
 
             <Divider />
 
-            {/* My Account */}
+            {/* Profile */}
             <Link
-              href={'/dashboard/edit-profile'}
+              href={'/profile'}
               className="-m-3 flex items-center gap-x-4 rounded-lg p-2 transition duration-150 ease-in-out hover:bg-neutral-100 focus:outline-hidden focus-visible:ring-3 focus-visible:ring-orange-500/50 dark:hover:bg-neutral-700"
             >
               <div className="flex shrink-0 items-center justify-center text-neutral-500 dark:text-neutral-300">
                 <HugeiconsIcon icon={UserIcon} size={24} strokeWidth={1.5} />
               </div>
-              <p className="text-sm font-medium">My Account</p>
+              <p className="text-sm font-medium">Profile</p>
             </Link>
 
             <Divider />
 
-            {/* Dark theme toggle */}
+            {/* Dark mode toggle */}
             <div className="focus-visible:ring-opacity-50 -m-3 flex items-center justify-between rounded-lg p-2 hover:bg-neutral-100 focus:outline-none focus-visible:ring focus-visible:ring-orange-500 dark:hover:bg-neutral-700">
               <div className="flex items-center">
                 <div className="flex flex-shrink-0 items-center justify-center text-neutral-500 dark:text-neutral-300">
-                  <HugeiconsIcon icon={Idea01Icon} size={24} strokeWidth={1.5} />
+                  <HugeiconsIcon icon={Moon02Icon} size={24} strokeWidth={1.5} />
                 </div>
-                <p className="ms-4 text-sm font-medium">Dark theme</p>
+                <p className="ms-4 text-sm font-medium">Dark mode</p>
               </div>
               <SwitchDarkMode2 />
             </div>
@@ -186,7 +186,7 @@ export default function AvatarDropdown({ className }: Props) {
               className="-m-3 flex items-center rounded-lg p-2 transition duration-150 ease-in-out hover:bg-neutral-100 focus:outline-hidden focus-visible:ring-3 focus-visible:ring-orange-500/50 dark:hover:bg-neutral-700"
             >
               <div className="flex shrink-0 items-center justify-center text-neutral-500 dark:text-neutral-300">
-                <HugeiconsIcon icon={BulbChargingIcon} size={24} strokeWidth={1.5} />
+                <HugeiconsIcon icon={InformationCircleIcon} size={24} strokeWidth={1.5} />
               </div>
               <p className="ms-4 text-sm font-medium">About</p>
             </Link>

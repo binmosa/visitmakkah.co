@@ -8,7 +8,7 @@
  */
 
 import { useState, useMemo } from 'react'
-import { CheckmarkSquare01Icon, Square01Icon, ArrowDown01Icon } from '@hugeicons/core-free-icons'
+import { CheckmarkSquare01Icon, ArrowDown01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useWidgetState } from '@/hooks/useWidgetState'
 import type { ChecklistWidgetData, ChecklistCategory, ChecklistItem } from '@/types/widgets'
@@ -191,13 +191,15 @@ function ChecklistItemRow({ item, isChecked, onToggle }: ChecklistItemRowProps) 
       onClick={onToggle}
       className="flex w-full items-start gap-3 rounded-lg px-2 py-2 text-left transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-800"
     >
-      <HugeiconsIcon
-        icon={isChecked ? CheckmarkSquare01Icon : Square01Icon}
-        className={`mt-0.5 size-5 shrink-0 ${
-          isChecked ? 'text-primary-600 dark:text-primary-400' : 'text-neutral-400'
-        }`}
-        strokeWidth={1.5}
-      />
+      {isChecked ? (
+        <HugeiconsIcon
+          icon={CheckmarkSquare01Icon}
+          className="mt-0.5 size-5 shrink-0 text-primary-600 dark:text-primary-400"
+          strokeWidth={1.5}
+        />
+      ) : (
+        <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded border-2 border-neutral-300 dark:border-neutral-600" />
+      )}
       <div className="flex-1">
         <span
           className={`text-sm ${

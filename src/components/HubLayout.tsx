@@ -152,64 +152,38 @@ const HubLayoutInner = ({
     const ActiveItemIcon = getActiveItemIcon()
 
     return (
-        <div className="container py-6 sm:py-8 lg:py-12">
-            {/* Header Card - With Journey Stage Context */}
-            <div className="mb-6 sm:mb-8">
-                <div className="relative z-10 flex items-center gap-3">
-                    <div className="rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 p-3 shadow-lg shadow-primary-500/20">
-                        <HugeiconsIcon icon={CategoryIcon} className="size-6 text-white" />
+        <div className="container py-3 sm:py-6 lg:py-10">
+            {/* Header - Compact */}
+            <div className="mb-3 sm:mb-6">
+                <div className="relative z-10 flex items-center gap-2.5">
+                    <div className="rounded-lg bg-gradient-to-br from-primary-500 to-primary-600 p-2 shadow-md shadow-primary-500/20 sm:rounded-xl sm:p-3">
+                        <HugeiconsIcon icon={CategoryIcon} className="size-5 text-white sm:size-6" />
                     </div>
                     <div>
-                        <h1 className="text-xl font-bold text-neutral-900 sm:text-2xl dark:text-white">
+                        <h1 className="text-base font-bold text-neutral-900 sm:text-xl dark:text-white">
                             {title}
                         </h1>
                         {subtitle && (
-                            <p className="mt-0.5 text-sm text-neutral-500 dark:text-neutral-400">
+                            <p className="text-xs text-neutral-500 sm:mt-0.5 sm:text-sm dark:text-neutral-400">
                                 {subtitle}
                             </p>
                         )}
                     </div>
                 </div>
-
-                {/* Journey Stage Indicator */}
-                {journeyStage && (
-                    <div className="mt-3 flex items-center gap-2">
-                        <span className="text-xs text-neutral-400 dark:text-neutral-500">Your stage:</span>
-                        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                            journeyStage === 'in_makkah'
-                                ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                                : journeyStage === 'booked'
-                                ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
-                                : journeyStage === 'returned'
-                                ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400'
-                                : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
-                        }`}>
-                            {journeyStage === 'planning' && 'Planning'}
-                            {journeyStage === 'booked' && 'Booked & Preparing'}
-                            {journeyStage === 'in_makkah' && 'In Makkah Now'}
-                            {journeyStage === 'returned' && 'Returned'}
-                        </span>
-                    </div>
-                )}
             </div>
 
-            {/* Nav Menu Card */}
-            <div className="islamic-pattern-bg mb-6 overflow-hidden rounded-2xl border border-neutral-200 bg-white p-4 sm:p-5 dark:border-neutral-700 dark:bg-neutral-900">
-                <p className="relative z-10 mb-3 text-xs font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
-                    What do you want to do?
-                </p>
-                <div className="relative z-10">
-                    <HubNavMenu
-                        items={navItems || []}
-                        activeId={activeItemId}
-                        onItemClick={handleItemClick}
-                        categoryId={categoryId}
-                    />
-                </div>
+            {/* Nav Menu - Compact */}
+            <div className="mb-3 sm:mb-6">
+                <HubNavMenu
+                    items={navItems || []}
+                    activeId={activeItemId}
+                    onItemClick={handleItemClick}
+                    categoryId={categoryId}
+                />
             </div>
 
             {/* AI Chat Panel - Full Width */}
-            <div className="h-[500px] sm:h-[550px] lg:h-[650px]">
+            <div className="h-[calc(100vh-220px)] min-h-[400px] sm:h-[500px] lg:h-[600px]">
                 <AIChatPanelV2
                     key={conversationId || activeItemId || context}
                     contextAction={subTopic || context}
@@ -236,26 +210,26 @@ const HubLayout = (props: HubLayoutProps) => {
 // Loading skeleton while search params are being read
 const HubLayoutSkeleton = ({ title, subtitle }: { title: string; subtitle?: string }) => {
     return (
-        <div className="container py-6 sm:py-8 lg:py-12">
-            <div className="mb-6 sm:mb-8">
-                <div className="relative z-10 flex items-center gap-3">
-                    <div className="rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 p-3 shadow-lg shadow-primary-500/20">
-                        <div className="size-6 animate-pulse rounded bg-white/30" />
+        <div className="container py-3 sm:py-6 lg:py-10">
+            <div className="mb-3 sm:mb-6">
+                <div className="relative z-10 flex items-center gap-2.5">
+                    <div className="rounded-lg bg-gradient-to-br from-primary-500 to-primary-600 p-2 shadow-md shadow-primary-500/20 sm:rounded-xl sm:p-3">
+                        <div className="size-5 animate-pulse rounded bg-white/30 sm:size-6" />
                     </div>
                     <div>
-                        <h1 className="text-xl font-bold text-neutral-900 sm:text-2xl dark:text-white">
+                        <h1 className="text-base font-bold text-neutral-900 sm:text-xl dark:text-white">
                             {title}
                         </h1>
                         {subtitle && (
-                            <p className="mt-0.5 text-sm text-neutral-500 dark:text-neutral-400">
+                            <p className="text-xs text-neutral-500 sm:mt-0.5 sm:text-sm dark:text-neutral-400">
                                 {subtitle}
                             </p>
                         )}
                     </div>
                 </div>
             </div>
-            <div className="mb-6 h-32 animate-pulse rounded-2xl bg-neutral-100 dark:bg-neutral-800" />
-            <div className="h-[500px] animate-pulse rounded-2xl bg-neutral-100 sm:h-[550px] lg:h-[650px] dark:bg-neutral-800" />
+            <div className="mb-3 h-12 animate-pulse rounded-full bg-neutral-100 sm:mb-6 dark:bg-neutral-800" />
+            <div className="h-[calc(100vh-220px)] min-h-[400px] animate-pulse rounded-2xl bg-neutral-100 sm:h-[500px] lg:h-[600px] dark:bg-neutral-800" />
         </div>
     )
 }

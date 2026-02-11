@@ -2,6 +2,7 @@ import '@/styles/tailwind.css'
 import { Metadata } from 'next'
 import { Inter, Noto_Sans_Arabic, Plus_Jakarta_Sans } from 'next/font/google'
 import Script from 'next/script'
+import { Analytics } from '@vercel/analytics/next'
 import ThemeProvider from './theme-provider'
 import { AuthProvider } from '@/context/AuthContext'
 import { SITE_CONFIG } from '@/data/site-config'
@@ -100,21 +101,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${inter.variable} ${plusJakartaSans.variable} ${notoSansArabic.variable}`}
     >
       <head>
-        {/* Preconnect to external domains for performance */}
-        <link rel="preconnect" href="https://www.googletagmanager.com" />
-        <link rel="preconnect" href="https://www.google-analytics.com" />
+        {/* DNS prefetch for external domains - improves connection time */}
+        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+        <link rel="dns-prefetch" href="https://www.google-analytics.com" />
         <link rel="dns-prefetch" href="https://cdn.sanity.io" />
+        {/* Preload critical assets */}
+        <link rel="preload" href="/images/islamic-pattern.svg" as="image" type="image/svg+xml" />
       </head>
       <body className="font-body bg-white text-base text-neutral-900 dark:bg-neutral-900 dark:text-neutral-200">
         {/* ============================================
-            Google Analytics 4 (GA4)
+            Google Analytics 4 (GA4) - Deferred for performance
             Measurement ID: G-W8M2508LHE
             ============================================ */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-W8M2508LHE"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
         />
-        <Script id="google-analytics" strategy="afterInteractive">
+        <Script id="google-analytics" strategy="lazyOnload">
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
@@ -126,10 +129,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           `}
         </Script>
 
-        {/* OpenAI ChatKit Script - Required for AI chat widgets */}
+        {/* OpenAI ChatKit Script - Lazy loaded for performance */}
         <Script
           src="https://cdn.platform.openai.com/deployments/chatkit/chatkit.js"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
         />
 
         {/* ============================================
@@ -189,6 +192,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <div>{children}</div>
           </AuthProvider>
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   )

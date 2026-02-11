@@ -11,6 +11,7 @@ export type ShowIfCondition = {
   gender?: 'male' | 'female'
   countries?: string[]  // ISO country codes
   journeyStages?: JourneyStage[]
+  journeyType?: ('hajj' | 'umrah' | 'both')[]  // Filter by trip type
 }
 
 export type TNavigationItem = {
@@ -100,6 +101,7 @@ export async function getNavigation(): Promise<TNavigationItem[]> {
           description: 'Complete Umrah walkthrough',
           icon: 'FaKaaba',
           actionVerb: 'perform',
+          showIf: { journeyType: ['umrah', 'both'] },
         },
         {
           id: 'learn-hajj',
@@ -108,6 +110,7 @@ export async function getNavigation(): Promise<TNavigationItem[]> {
           description: 'Day-by-day Hajj guide',
           icon: 'FaMosque',
           actionVerb: 'perform',
+          showIf: { journeyType: ['hajj', 'both'] },
         },
         {
           id: 'learn-rituals',
@@ -503,6 +506,18 @@ function matchesShowIfCondition(showIf: ShowIfCondition | undefined, profile: Us
   // Check journey stage condition
   if (showIf.journeyStages && profile.journeyStage && !showIf.journeyStages.includes(profile.journeyStage)) {
     return false
+  }
+
+  // Check journey type condition (umrah, hajj, both)
+  if (showIf.journeyType && profile.journeyType) {
+    // 'both' matches everything, otherwise check if user's type is in the allowed list
+    if (profile.journeyType === 'both') {
+      // User doing both - show all items
+      return true
+    }
+    if (!showIf.journeyType.includes(profile.journeyType)) {
+      return false
+    }
   }
 
   return true

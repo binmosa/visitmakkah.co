@@ -169,13 +169,18 @@ export function filterCountries(searchTerm: string): Country[] {
 // Detect country from IP address using free API
 export async function detectCountryFromIP(): Promise<string | null> {
     try {
-        const response = await fetch('https://ip-api.com/json/?fields=countryCode', {
+        // Using ipapi.co which has better HTTPS/CORS support
+        const response = await fetch('https://ipapi.co/country_code/', {
             // Short timeout to not block the UI
             signal: AbortSignal.timeout(3000),
         })
         if (!response.ok) return null
-        const data = await response.json()
-        return data.countryCode || null
+        const countryCode = await response.text()
+        // Validate it's a 2-letter country code
+        if (countryCode && /^[A-Z]{2}$/.test(countryCode.trim())) {
+            return countryCode.trim()
+        }
+        return null
     } catch {
         // Silently fail - IP detection is optional
         return null

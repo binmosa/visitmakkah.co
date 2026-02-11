@@ -1,10 +1,9 @@
 import { Metadata } from 'next'
-import { getAllPosts, getAllCategories, getAllTags } from '@/lib/sanity'
+import { getAllPosts, getAllTags } from '@/lib/sanity'
 import { createBlogCategory, sanityPostToTPost } from '@/lib/sanity-adapters'
 import { TPost } from '@/data/posts'
 import BlogPageHeader from './BlogPageHeader'
 import ArchiveSortByListBox from '@/components/ArchiveSortByListBox'
-import ModalCategories from '@/components/ModalCategories'
 import ModalTags from '@/components/ModalTags'
 import PaginationWrapper from '@/components/PaginationWrapper'
 import BlogCard from './BlogCard'
@@ -25,31 +24,14 @@ export const revalidate = 3600
 
 const BlogPage = async () => {
     // Fetch data from Sanity
-    const [sanityPosts, sanityCategories, sanityTags] = await Promise.all([
+    const [sanityPosts, sanityTags] = await Promise.all([
         getAllPosts(),
-        getAllCategories(),
         getAllTags(),
     ])
 
     // Transform to existing component format
     const blogCategory = createBlogCategory(sanityPosts || [])
     const posts: TPost[] = (sanityPosts || []).map((post: any, index: number) => sanityPostToTPost(post, index))
-
-    // Transform categories and tags for filter modals
-    const categories = (sanityCategories || []).map((cat: any) => ({
-        id: cat._id,
-        name: cat.title,
-        handle: cat.slug?.current || 'uncategorized',
-        color: cat.color || 'emerald',
-        count: 0,
-        description: cat.description || '',
-        thumbnail: {
-            src: '/images/placeholder.jpg',
-            alt: cat.title,
-            width: 400,
-            height: 400,
-        },
-    }))
 
     const tags = (sanityTags || []).map((tag: any) => ({
         id: tag._id,
@@ -70,17 +52,17 @@ const BlogPage = async () => {
             <BlogPageHeader category={blogCategory} />
 
             <div className="container pb-10 lg:pb-16">
+                {/* Filters - Tags only on mobile, sort hidden on mobile */}
                 <div className="flex flex-wrap gap-x-2 gap-y-4">
-                    {categories.length > 0 && <ModalCategories categories={categories} />}
                     {tags.length > 0 && <ModalTags tags={tags} />}
-                    <div className="ms-auto">
+                    <div className="ms-auto hidden sm:block">
                         <ArchiveSortByListBox filterOptions={filterOptions} />
                     </div>
                 </div>
 
-                {/* POSTS GRID */}
+                {/* POSTS GRID - 2 columns on mobile */}
                 {posts.length > 0 ? (
-                    <div className="mt-8 grid gap-6 sm:grid-cols-2 md:gap-7 lg:mt-10 lg:grid-cols-3 xl:grid-cols-4">
+                    <div className="mt-6 grid grid-cols-2 gap-3 sm:mt-8 sm:gap-6 lg:mt-10 lg:grid-cols-3 xl:grid-cols-4">
                         {posts.map((post) => (
                             <BlogCard key={post.id} post={post} />
                         ))}

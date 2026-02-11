@@ -99,41 +99,41 @@ function WelcomeScreen({
     <div className="relative flex h-full flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-900">
       <ChatHeader contextLabel={contextLabel} contextIcon={contextIcon} />
 
-      <div className="relative flex flex-1 flex-col items-center justify-center p-6">
-        {/* Icon */}
-        <div className="relative z-10 rounded-2xl bg-primary-100 p-5 dark:bg-primary-900/30">
+      <div className="relative flex flex-1 flex-col items-center justify-center p-4 sm:p-6">
+        {/* Icon - Smaller on mobile */}
+        <div className="relative z-10 rounded-xl bg-primary-100 p-3 sm:rounded-2xl sm:p-4 dark:bg-primary-900/30">
           <HugeiconsIcon
             icon={IconComponent}
-            className="size-10 text-primary-600 dark:text-primary-400"
+            className="size-6 text-primary-600 sm:size-8 dark:text-primary-400"
             strokeWidth={1.5}
           />
         </div>
 
-        {/* Title */}
-        <h3 className="relative z-10 mt-5 text-xl font-bold text-neutral-900 dark:text-white">
+        {/* Title - Smaller on mobile */}
+        <h3 className="relative z-10 mt-3 text-base font-bold text-neutral-900 sm:mt-4 sm:text-lg dark:text-white">
           {contextLabel}
         </h3>
 
-        {/* Description */}
-        <p className="relative z-10 mt-2 max-w-md text-center text-sm leading-relaxed text-neutral-500 dark:text-neutral-400">
+        {/* Description - Hidden on mobile to save space */}
+        <p className="relative z-10 mt-1 hidden max-w-md text-center text-xs leading-relaxed text-neutral-500 sm:mt-2 sm:block sm:text-sm dark:text-neutral-400">
           {contextDescription}
         </p>
 
-        {/* Suggested Questions */}
+        {/* Suggested Questions - Compact */}
         {suggestedQuestions.length > 0 && (
-          <div className="relative z-10 mt-8 w-full max-w-lg">
-            <p className="mb-3 text-center text-xs font-semibold uppercase tracking-wide text-neutral-400 dark:text-neutral-500">
+          <div className="relative z-10 mt-4 w-full max-w-lg sm:mt-6">
+            <p className="mb-2 text-center text-[10px] font-semibold uppercase tracking-wide text-neutral-400 sm:mb-3 sm:text-xs dark:text-neutral-500">
               Quick Actions
             </p>
-            <div className="grid gap-2 sm:grid-cols-2">
+            <div className="grid gap-1.5 sm:grid-cols-2 sm:gap-2">
               {suggestedQuestions.slice(0, 4).map((question, index) => (
                 <button
                   key={index}
                   onClick={() => onStartChat(question)}
-                  className="group flex items-center gap-3 rounded-xl border border-neutral-200 bg-white px-4 py-3 text-left text-sm text-neutral-700 transition-all hover:border-primary-300 hover:bg-primary-50 hover:shadow-sm dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:border-primary-600 dark:hover:bg-primary-900/20"
+                  className="group flex items-center gap-2 rounded-lg border border-neutral-200 bg-white px-3 py-2 text-left text-xs text-neutral-700 transition-all hover:border-primary-300 hover:bg-primary-50 sm:gap-3 sm:rounded-xl sm:px-4 sm:py-2.5 sm:text-sm dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:border-primary-600 dark:hover:bg-primary-900/20"
                 >
-                  <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-neutral-100 text-neutral-500 transition-colors group-hover:bg-primary-100 group-hover:text-primary-600 dark:bg-neutral-700 dark:group-hover:bg-primary-900/30 dark:group-hover:text-primary-400">
-                    <HugeiconsIcon icon={SparklesIcon} className="size-4" strokeWidth={1.5} />
+                  <span className="flex size-6 shrink-0 items-center justify-center rounded-md bg-neutral-100 text-neutral-500 transition-colors group-hover:bg-primary-100 group-hover:text-primary-600 sm:size-7 sm:rounded-lg dark:bg-neutral-700 dark:group-hover:bg-primary-900/30 dark:group-hover:text-primary-400">
+                    <HugeiconsIcon icon={SparklesIcon} className="size-3 sm:size-3.5" strokeWidth={1.5} />
                   </span>
                   <span className="line-clamp-2">{question}</span>
                 </button>
@@ -142,19 +142,19 @@ function WelcomeScreen({
           </div>
         )}
 
-        {/* Start Button */}
+        {/* Start Button - Compact on mobile */}
         <button
           onClick={() => onStartChat()}
-          className="relative z-10 mt-8 rounded-xl bg-primary-600 px-8 py-3 text-sm font-semibold text-white transition-all hover:bg-primary-700 hover:shadow-lg hover:shadow-primary-500/25"
+          className="relative z-10 mt-4 rounded-lg bg-primary-600 px-6 py-2 text-xs font-semibold text-white transition-all hover:bg-primary-700 hover:shadow-lg hover:shadow-primary-500/25 sm:mt-6 sm:rounded-xl sm:px-8 sm:py-2.5 sm:text-sm"
         >
           Start Conversation
         </button>
 
-        {/* Background Pattern */}
+        {/* Background Pattern - Hidden on mobile */}
         <div
-          className="pointer-events-none absolute inset-0 z-0 opacity-30"
+          className="pointer-events-none absolute inset-0 z-0 hidden opacity-30 sm:block"
           style={{
-            backgroundImage: 'url(/images/islamic-pattern.png)',
+            backgroundImage: 'url(/images/islamic-pattern.svg)',
             backgroundPosition: 'left center',
             backgroundRepeat: 'no-repeat',
             backgroundSize: 'auto 100%',
@@ -362,7 +362,7 @@ function EmptyState({ suggestions, onSuggestionClick }: EmptyStateProps) {
   )
 }
 
-// Shared Header Component
+// Shared Header Component - Compact
 interface ChatHeaderProps {
   contextLabel: string
   contextIcon?: HugeiconsProps['icon']
@@ -372,22 +372,17 @@ function ChatHeader({ contextLabel, contextIcon }: ChatHeaderProps) {
   const IconComponent = contextIcon || SparklesIcon
 
   return (
-    <div className="relative z-10 flex items-center gap-3 border-b border-neutral-200 px-4 py-3 dark:border-neutral-700">
-      <div className="rounded-lg bg-primary-100 p-2 dark:bg-primary-900/30">
+    <div className="relative z-10 flex items-center gap-2 border-b border-neutral-200 px-3 py-2 sm:gap-3 sm:px-4 sm:py-2.5 dark:border-neutral-700">
+      <div className="rounded-md bg-primary-100 p-1.5 sm:rounded-lg sm:p-2 dark:bg-primary-900/30">
         <HugeiconsIcon
           icon={IconComponent}
-          className="size-4 text-primary-600 dark:text-primary-400"
+          className="size-3.5 text-primary-600 sm:size-4 dark:text-primary-400"
           strokeWidth={1.5}
         />
       </div>
-      <div>
-        <p className="text-sm font-semibold text-neutral-900 dark:text-white">
-          {contextLabel}
-        </p>
-        <p className="text-xs text-neutral-500 dark:text-neutral-400">
-          AI-Powered Guide
-        </p>
-      </div>
+      <p className="text-xs font-semibold text-neutral-900 sm:text-sm dark:text-white">
+        {contextLabel}
+      </p>
     </div>
   )
 }

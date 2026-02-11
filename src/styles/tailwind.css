@@ -428,7 +428,7 @@
   @apply hidden;
 }
 
-/* Islamic Pattern Backgrounds */
+/* Islamic Pattern Backgrounds - Using SVG for better performance */
 @utility islamic-pattern-bg {
   position: relative;
 
@@ -436,7 +436,7 @@
     content: '';
     position: absolute;
     inset: 0;
-    background-image: url('/images/islamic-pattern.png');
+    background-image: url('/images/islamic-pattern.svg');
     background-position: left center;
     background-repeat: no-repeat;
     background-size: auto 100%;
@@ -456,7 +456,7 @@
     left: 0;
     width: 50%;
     height: 100%;
-    background-image: url('/images/islamic-pattern.png');
+    background-image: url('/images/islamic-pattern.svg');
     background-position: left top;
     background-repeat: repeat-y;
     background-size: auto 400px;

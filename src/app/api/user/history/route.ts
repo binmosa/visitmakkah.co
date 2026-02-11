@@ -31,6 +31,17 @@ export interface ConversationPreview {
   lastMessageAt: string | null
 }
 
+// Strip widget markers from message content for preview
+function stripWidgetMarkers(text: string): string {
+  let cleaned = text
+  // Remove complete widget blocks: <<<WIDGET:type>>>...<<<END_WIDGET>>>
+  cleaned = cleaned.replace(/<<<WIDGET:\w+>>>[\s\S]*?<<<END_WIDGET>>>/g, '')
+  // Remove any remaining markers
+  cleaned = cleaned.replace(/<<<[^>]*>>>/g, '')
+  // Clean up multiple spaces/newlines
+  return cleaned.replace(/\s+/g, ' ').trim()
+}
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const deviceId = searchParams.get('deviceId')
@@ -93,13 +104,16 @@ export async function GET(request: NextRequest) {
           .limit(1)
           .single()
 
+        // Strip widget markers before truncating for clean preview
+        const cleanContent = lastMsg?.content ? stripWidgetMarkers(lastMsg.content) : null
+
         return {
           id: topic.id,
           context: topic.context,
           contextLabel: topic.context_label,
           startedAt: topic.started_at,
           messageCount: topic.message_count,
-          lastMessage: lastMsg?.content?.substring(0, 100) || null,
+          lastMessage: cleanContent?.substring(0, 150) || null,
           lastMessageAt: lastMsg?.created_at || null,
         }
       })

@@ -159,7 +159,7 @@ function ChatWelcomeScreen({
                 <div
                     className="pointer-events-none absolute inset-0 z-0 opacity-30"
                     style={{
-                        backgroundImage: 'url(/images/islamic-pattern.png)',
+                        backgroundImage: 'url(/images/islamic-pattern.svg)',
                         backgroundPosition: 'left center',
                         backgroundRepeat: 'no-repeat',
                         backgroundSize: 'auto 100%',
