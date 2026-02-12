@@ -118,6 +118,24 @@ export default function PageAbout() {
         </div>
       </section>
 
+      {/* Contact CTA */}
+      <section className="container py-8 sm:py-12">
+        <div className="mx-auto max-w-3xl">
+          <div className="rounded-xl bg-gradient-to-br from-primary-50 to-teal-50 p-6 text-center dark:from-primary-900/20 dark:to-teal-900/20">
+            <h3 className="font-semibold text-neutral-900 dark:text-white">Have questions or feedback?</h3>
+            <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+              We&apos;d love to hear from you
+            </p>
+            <a
+              href="/contact"
+              className="mt-4 inline-block rounded-lg bg-primary-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-primary-700 transition-colors"
+            >
+              Contact Us
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="container py-8 sm:py-12">
         <div className="mx-auto max-w-3xl">

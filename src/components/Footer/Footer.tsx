@@ -21,12 +21,12 @@ const Footer: React.FC = () => {
             Privacy
           </Link>
           <span className="text-neutral-300 dark:text-neutral-600">·</span>
-          <a
-            href="mailto:info@visitmakkah.co"
+          <Link
+            href="/contact"
             className="hover:text-neutral-600 dark:hover:text-neutral-300"
           >
             Contact
-          </a>
+          </Link>
         </div>
       </div>
     </footer>
