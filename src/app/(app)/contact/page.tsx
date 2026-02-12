@@ -299,7 +299,7 @@ export default function ContactPage() {
                 {/* Submit */}
                 <button
                   type="submit"
-                  disabled={isSubmitting || (TURNSTILE_SITE_KEY && turnstileStatus !== 'ready')}
+                  disabled={isSubmitting || (!!TURNSTILE_SITE_KEY && turnstileStatus !== 'ready')}
                   className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary-600 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {isSubmitting ? (
