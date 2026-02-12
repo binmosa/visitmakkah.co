@@ -10,8 +10,8 @@ export const SITE_CONFIG = {
   subtagline: 'Your AI-powered guide for Hajj and Umrah',
   
   // URLs
-  url: 'https://visitmakkah.co',
-  ogImage: 'https://visitmakkah.co/og/default.png',
+  url: 'https://www.visitmakkah.co',
+  ogImage: 'https://www.visitmakkah.co/og/default.png',
   
   // SEO
   description:
