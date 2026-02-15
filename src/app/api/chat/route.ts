@@ -1,22 +1,24 @@
 /**
  * Chat API Route v2
  *
- * Main chat endpoint using Vercel AI SDK with OpenAI.
+ * Main chat endpoint using OpenAI Responses API directly.
  * Features:
  * - Context-aware responses based on navigation action
  * - User profile personalization
  * - Two-stage flow: refinement check + main response
  * - Widget markers for rich UI rendering
  * - Supabase conversation persistence
+ * - File search (RAG) + Skill via shell tool
  *
  * Required packages:
- *   npm install ai @ai-sdk/openai zod
+ *   npm install openai
  */
 
-import { streamText } from 'ai'
-import { openai } from '@ai-sdk/openai'
+import OpenAI from 'openai'
 import { getContextConfig } from '@/config/ai-context'
 import { saveMessage, getConversationHistory } from '@/lib/chat-service'
+
+const client = new OpenAI()
 
 // User profile from onboarding
 interface UserProfile {
@@ -270,37 +272,87 @@ export async function POST(request: Request) {
     // Build system prompt
     const systemPrompt = buildSystemPrompt(contextAction, userProfile)
 
-    // Stage 2: Main AI response with streaming (with RAG via file_search)
-    const result = streamText({
-      model: openai.responses('gpt-4o'),
-      system: systemPrompt,
-      messages: conversationHistory,
-      temperature: 0.7,
-      maxOutputTokens: 4000,
-      tools: {
-        knowledge: openai.tools.fileSearch({
-          vectorStoreIds: [process.env.OPENAI_VECTOR_STORE_MAIN!],
-          maxNumResults: 10,
-        }),
+    // Build tools array
+    const tools: OpenAI.Responses.Tool[] = [
+      {
+        type: 'file_search',
+        vector_store_ids: [process.env.OPENAI_VECTOR_STORE_MAIN!],
+        max_num_results: 10,
       },
-      toolChoice: 'auto',
-      onFinish: async ({ text }) => {
-        // Save to Supabase (non-blocking)
-        if (topicId) {
-          const lastUserMessage = messages[messages.length - 1]
-          if (lastUserMessage?.role === 'user') {
-            try {
-              await saveMessage(topicId, 'user', lastUserMessage.content)
-              await saveMessage(topicId, 'assistant', text)
-            } catch (e) {
-              console.error('Failed to save messages:', e)
+    ]
+
+    // Add skill via shell tool if SKILL_ID is configured
+    if (process.env.OPENAI_SKILL_ID) {
+      tools.push({
+        type: 'shell',
+        environment: {
+          type: 'container_auto',
+          skills: [
+            {
+              type: 'skill_reference',
+              skill_id: process.env.OPENAI_SKILL_ID,
+            },
+          ],
+        },
+      })
+    }
+
+    // Stage 2: Main AI response with streaming via OpenAI Responses API
+    const stream = await client.responses.create({
+      model: 'gpt-5.2',
+      instructions: systemPrompt,
+      input: conversationHistory.map((m) => ({
+        role: m.role as 'user' | 'assistant',
+        content: m.content,
+      })),
+      temperature: 0.7,
+      max_output_tokens: 4000,
+      tools,
+      tool_choice: 'auto',
+      stream: true,
+    })
+
+    // Stream text deltas back as plain text (matches client expectations)
+    const encoder = new TextEncoder()
+    let fullText = ''
+
+    const readableStream = new ReadableStream({
+      async start(controller) {
+        try {
+          for await (const event of stream) {
+            if (event.type === 'response.output_text.delta') {
+              const delta = event.delta
+              fullText += delta
+              controller.enqueue(encoder.encode(delta))
             }
           }
+          controller.close()
+
+          // Save to Supabase after streaming completes (non-blocking)
+          if (topicId) {
+            const lastUserMessage = messages[messages.length - 1]
+            if (lastUserMessage?.role === 'user') {
+              try {
+                await saveMessage(topicId, 'user', lastUserMessage.content)
+                await saveMessage(topicId, 'assistant', fullText)
+              } catch (e) {
+                console.error('Failed to save messages:', e)
+              }
+            }
+          }
+        } catch (e) {
+          console.error('Streaming error:', e)
+          controller.error(e)
         }
       },
     })
 
-    return result.toTextStreamResponse()
+    return new Response(readableStream, {
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'Transfer-Encoding': 'chunked',
+      },
+    })
   } catch (error) {
     console.error('Chat API error:', error)
     return new Response(
@@ -321,7 +373,7 @@ export async function GET() {
     JSON.stringify({
       status: 'ok',
       version: '2.0',
-      features: ['streaming', 'widgets', 'refinement', 'personalization'],
+      features: ['streaming', 'widgets', 'refinement', 'personalization', 'skill'],
     }),
     {
       headers: { 'Content-Type': 'application/json' },
