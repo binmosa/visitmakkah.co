@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { SITE_CONFIG } from '@/data/site-config'
 import { countries } from '@/data/countries'
+import { getUmrahFromCountryIndexingPolicy } from '@/lib/pseoIndexing'
 import { FAQSchema, BreadcrumbSchema } from '@/components/SEO/JsonLd'
 
 // ============================================
@@ -91,8 +92,8 @@ const DEFAULT_COUNTRY_DATA = {
 }
 
 export async function generateStaticParams() {
-  // Generate pages for top 50 pilgrim-origin countries
-  return countries.slice(0, 50).map((country) => ({
+  // Generate pages for all countries (staged indexing via robots meta)
+  return countries.map((country) => ({
     country: toSlug(country.name),
   }))
 }
@@ -108,9 +109,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const title = `Umrah from ${country.name}: Complete Guide ${new Date().getFullYear()}`
   const description = `Planning Umrah from ${country.name}? Complete guide including visa requirements, flights, costs, and tips for ${country.name} pilgrims visiting Makkah.`
 
+  const countryRank = countries.findIndex((c) => c.code === country.code)
+  const indexing = getUmrahFromCountryIndexingPolicy(countryRank === -1 ? null : countryRank)
+
   return {
     title,
     description,
+    robots: indexing.allowIndex
+      ? { index: true, follow: true }
+      : { index: false, follow: true, nocache: true },
     keywords: [
       `Umrah from ${country.name}`,
       `${country.name} Umrah visa`,
@@ -170,8 +177,8 @@ export default async function UmrahFromCountryPage({ params }: PageProps) {
       <BreadcrumbSchema
         items={[
           { name: 'Home', url: SITE_CONFIG.url },
-          { name: 'Umrah', url: `${SITE_CONFIG.url}/umrah` },
-          { name: `From ${country.name}`, url: `${SITE_CONFIG.url}/umrah/from/${countrySlug}` },
+          { name: 'Umrah from', url: `${SITE_CONFIG.url}/umrah/from` },
+          { name: country.name, url: `${SITE_CONFIG.url}/umrah/from/${countrySlug}` },
         ]}
       />
 
@@ -180,9 +187,9 @@ export default async function UmrahFromCountryPage({ params }: PageProps) {
         <nav className="text-sm text-neutral-500 mb-6">
           <Link href="/" className="hover:text-emerald-600">Home</Link>
           <span className="mx-2">/</span>
-          <Link href="/learn" className="hover:text-emerald-600">Umrah</Link>
+          <Link href="/umrah/from" className="hover:text-emerald-600">Umrah from</Link>
           <span className="mx-2">/</span>
-          <span className="text-neutral-900 dark:text-white">From {country.name}</span>
+          <span className="text-neutral-900 dark:text-white">{country.name}</span>
         </nav>
 
         {/* Hero */}
@@ -209,6 +216,34 @@ export default async function UmrahFromCountryPage({ params }: PageProps) {
           <div className="p-4 bg-neutral-50 dark:bg-neutral-800 rounded-xl">
             <h3 className="font-semibold text-neutral-900 dark:text-white mb-2">💵 Currency</h3>
             <p className="text-neutral-600 dark:text-neutral-400">{data.currency} → SAR</p>
+          </div>
+        </section>
+
+        {/* Related links (internal linking) */}
+        <section className="mb-10 border border-neutral-200 dark:border-neutral-700 rounded-2xl p-6 bg-white dark:bg-neutral-900">
+          <h2 className="text-xl font-semibold text-neutral-900 dark:text-white">Explore other countries</h2>
+          <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-2">
+            Looking for a different departure country? Browse the Umrah-from index or jump to other popular origins.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {countries
+              .filter((c) => c.code !== country.code)
+              .slice(0, 10)
+              .map((c) => (
+                <Link
+                  key={c.code}
+                  href={`/umrah/from/${toSlug(c.name)}`}
+                  className="inline-flex items-center gap-2 px-3 py-2 rounded-full border border-neutral-300 dark:border-neutral-700 text-sm text-neutral-800 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-800"
+                >
+                  <span>{c.flag}</span>
+                  <span>{c.name}</span>
+                </Link>
+              ))}
+          </div>
+          <div className="mt-4">
+            <Link href="/umrah/from" className="text-emerald-700 dark:text-emerald-400 hover:underline">
+              Browse all countries →
+            </Link>
           </div>
         </section>
 
