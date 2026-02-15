@@ -116,14 +116,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // PROGRAMMATIC SEO: Country-specific Umrah pages
   // Generates /umrah/from/[country] for all countries
   // ============================================
-  const countryPages: MetadataRoute.Sitemap = countries.slice(0, 50).map(
-    (country) => ({
-      url: `${BASE_URL}/umrah/from/${country.name.toLowerCase().replace(/\s+/g, '-')}`,
+  const countryIndexPage: MetadataRoute.Sitemap = [
+    {
+      url: `${BASE_URL}/umrah/from`,
       lastModified: now,
-      changeFrequency: 'monthly' as const,
-      priority: 0.7,
-    })
-  )
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+  ]
+
+  const countryPages: MetadataRoute.Sitemap = countries.map((country) => ({
+    url: `${BASE_URL}/umrah/from/${country.name.toLowerCase().replace(/\s+/g, '-')}`,
+    lastModified: now,
+    changeFrequency: 'monthly' as const,
+    priority: 0.7,
+  }))
 
   // ============================================
   // PROGRAMMATIC SEO: Ramadan pages
@@ -171,6 +178,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...blogPosts,
     ...guides,
     ...categoryPages,
+    ...countryIndexPage,
     ...countryPages,
   ]
 }
