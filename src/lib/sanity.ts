@@ -244,12 +244,34 @@ export async function getAuthorBySlug(slug: string) {
 // SITEMAP HELPERS
 // ============================================
 
+export type SitemapSanityItem = {
+    slug: string
+    updatedAt?: string
+    publishedAt?: string
+}
+
 export async function getAllSlugsForSitemap() {
     const query = `{
-        "posts": *[_type == "post" && defined(slug.current)].slug.current,
-        "guides": *[_type == "guide" && defined(slug.current)].slug.current,
-        "faqs": *[_type == "faq" && defined(slug.current)].slug.current,
-        "categories": *[_type == "category" && defined(slug.current)].slug.current
+        "posts": *[_type == "post" && defined(slug.current)]{
+          "slug": slug.current,
+          "updatedAt": coalesce(updatedAt, _updatedAt),
+          "publishedAt": coalesce(publishedAt, _createdAt)
+        },
+        "guides": *[_type == "guide" && defined(slug.current)]{
+          "slug": slug.current,
+          "updatedAt": coalesce(updatedAt, _updatedAt),
+          "publishedAt": coalesce(publishedAt, _createdAt)
+        },
+        "faqs": *[_type == "faq" && defined(slug.current)]{
+          "slug": slug.current,
+          "updatedAt": coalesce(_updatedAt, _createdAt),
+          "publishedAt": coalesce(_createdAt, _createdAt)
+        },
+        "categories": *[_type == "category" && defined(slug.current)]{
+          "slug": slug.current,
+          "updatedAt": coalesce(_updatedAt, _createdAt),
+          "publishedAt": coalesce(_createdAt, _createdAt)
+        }
     }`
     return sanityClient.fetch(query)
 }
