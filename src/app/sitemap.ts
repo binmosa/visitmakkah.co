@@ -1,6 +1,6 @@
 import { MetadataRoute } from 'next'
 import { getAllSlugsForSitemap } from '@/lib/sanity'
-import { countries } from '@/data/countries'
+import { getPriorityUmrahCountries } from '@/lib/seo/umrahPriorityCountries'
 
 const BASE_URL = 'https://visitmakkah.co'
 
@@ -113,17 +113,35 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   )
 
   // ============================================
-  // PROGRAMMATIC SEO: Country-specific Umrah pages
-  // Generates /umrah/from/[country] for all countries
+  // PROGRAMMATIC SEO: Country-specific Umrah pages (Option B rollout)
+  // Generates /umrah/from/[country] for priority countries first
   // ============================================
-  const countryPages: MetadataRoute.Sitemap = countries.slice(0, 50).map(
-    (country) => ({
-      url: `${BASE_URL}/umrah/from/${country.name.toLowerCase().replace(/\s+/g, '-')}`,
+  const priorityCountries = getPriorityUmrahCountries(50)
+
+  const UMRAH_FROM_PAGE_SIZE = 25
+  const umrahFromPageCount = Math.ceil(priorityCountries.length / UMRAH_FROM_PAGE_SIZE)
+
+  const umrahFromHubPages: MetadataRoute.Sitemap = [
+    {
+      url: `${BASE_URL}/umrah/from`,
       lastModified: now,
-      changeFrequency: 'monthly' as const,
-      priority: 0.7,
-    })
-  )
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+    ...Array.from({ length: Math.max(0, umrahFromPageCount - 1) }).map((_, i) => ({
+      url: `${BASE_URL}/umrah/from/page/${i + 2}`,
+      lastModified: now,
+      changeFrequency: 'weekly' as const,
+      priority: 0.6,
+    })),
+  ]
+
+  const countryPages: MetadataRoute.Sitemap = priorityCountries.map((country) => ({
+    url: `${BASE_URL}/umrah/from/${country.name.toLowerCase().replace(/\s+/g, '-')}`,
+    lastModified: now,
+    changeFrequency: 'monthly' as const,
+    priority: 0.7,
+  }))
 
   // ============================================
   // PROGRAMMATIC SEO: Ramadan pages
@@ -171,6 +189,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...blogPosts,
     ...guides,
     ...categoryPages,
+    ...umrahFromHubPages,
     ...countryPages,
   ]
 }

@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { SITE_CONFIG } from '@/data/site-config'
 import { countries } from '@/data/countries'
+import { getPriorityUmrahCountries } from '@/lib/seo/umrahPriorityCountries'
 import { FAQSchema, BreadcrumbSchema } from '@/components/SEO/JsonLd'
 
 // ============================================
@@ -91,8 +92,8 @@ const DEFAULT_COUNTRY_DATA = {
 }
 
 export async function generateStaticParams() {
-  // Generate pages for top 50 pilgrim-origin countries
-  return countries.slice(0, 50).map((country) => ({
+  // Option B rollout: generate static params only for priority countries
+  return getPriorityUmrahCountries(50).map((country) => ({
     country: toSlug(country.name),
   }))
 }
