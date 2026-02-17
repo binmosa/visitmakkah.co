@@ -3,13 +3,13 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { SITE_CONFIG } from '@/data/site-config'
 import { countries } from '@/data/countries'
+import { getPriorityUmrahCountries } from '@/lib/seo/umrahPriorityCountries'
 import { getUmrahFromCountryIndexingPolicy } from '@/lib/pseoIndexing'
 import { FAQSchema, BreadcrumbSchema } from '@/components/SEO/JsonLd'
 
 // ============================================
 // COUNTRY-SPECIFIC UMRAH PAGE - Programmatic SEO
 // /umrah/from/united-kingdom, /umrah/from/pakistan, etc.
-// Generates 195+ pages automatically
 // ============================================
 
 interface PageProps {
@@ -27,18 +27,25 @@ function findCountryBySlug(slug: string) {
 }
 
 // Country-specific data (expandable)
-const COUNTRY_DATA: Record<string, {
-  visaRequired: boolean
-  visaInfo: string
-  directFlights: string[]
-  currency: string
-  avgCost: string
-  embassy?: string
-}> = {
+const COUNTRY_DATA: Record<
+  string,
+  {
+    visaRequired: boolean
+    visaInfo: string
+    directFlights: string[]
+    currency: string
+    avgCost: string
+    embassy?: string
+  }
+> = {
   GB: {
     visaRequired: true,
     visaInfo: 'UK citizens can apply for Umrah e-visa online or through authorized travel agents.',
-    directFlights: ['London Heathrow (LHR) to Jeddah', 'Manchester (MAN) to Jeddah', 'Birmingham (BHX) to Jeddah'],
+    directFlights: [
+      'London Heathrow (LHR) to Jeddah',
+      'Manchester (MAN) to Jeddah',
+      'Birmingham (BHX) to Jeddah',
+    ],
     currency: 'GBP',
     avgCost: '£1,500 - £3,500',
     embassy: 'Royal Embassy of Saudi Arabia, London',
@@ -60,7 +67,8 @@ const COUNTRY_DATA: Record<string, {
   },
   IN: {
     visaRequired: true,
-    visaInfo: 'Indian citizens apply through authorized Umrah tour operators registered with the Hajj Committee of India.',
+    visaInfo:
+      'Indian citizens apply through authorized Umrah tour operators registered with the Hajj Committee of India.',
     directFlights: ['Mumbai to Jeddah', 'Delhi to Jeddah', 'Hyderabad to Jeddah', 'Chennai to Jeddah'],
     currency: 'INR',
     avgCost: '₹1,50,000 - ₹3,00,000',
@@ -79,7 +87,6 @@ const COUNTRY_DATA: Record<string, {
     currency: 'IDR',
     avgCost: 'IDR 35,000,000 - 60,000,000',
   },
-  // Add more countries as needed
 }
 
 // Default data for countries without specific info
@@ -92,8 +99,8 @@ const DEFAULT_COUNTRY_DATA = {
 }
 
 export async function generateStaticParams() {
-  // Generate pages for all countries (staged indexing via robots meta)
-  return countries.map((country) => ({
+  // Option B rollout: pre-render only priority countries, but keep dynamic params enabled.
+  return getPriorityUmrahCountries(50).map((country) => ({
     country: toSlug(country.name),
   }))
 }
@@ -102,9 +109,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { country: countrySlug } = await params
   const country = findCountryBySlug(countrySlug)
 
-  if (!country) {
-    return { title: 'Not Found' }
-  }
+  if (!country) return { title: 'Not Found' }
 
   const title = `Umrah from ${country.name}: Complete Guide ${new Date().getFullYear()}`
   const description = `Planning Umrah from ${country.name}? Complete guide including visa requirements, flights, costs, and tips for ${country.name} pilgrims visiting Makkah.`
@@ -142,13 +147,10 @@ export default async function UmrahFromCountryPage({ params }: PageProps) {
   const { country: countrySlug } = await params
   const country = findCountryBySlug(countrySlug)
 
-  if (!country) {
-    notFound()
-  }
+  if (!country) notFound()
 
   const data = COUNTRY_DATA[country.code] || DEFAULT_COUNTRY_DATA
 
-  // FAQs for schema
   const faqs = [
     {
       question: `Do ${country.name} citizens need a visa for Umrah?`,
@@ -172,7 +174,6 @@ export default async function UmrahFromCountryPage({ params }: PageProps) {
 
   return (
     <>
-      {/* Structured Data */}
       <FAQSchema faqs={faqs} />
       <BreadcrumbSchema
         items={[
@@ -183,16 +184,18 @@ export default async function UmrahFromCountryPage({ params }: PageProps) {
       />
 
       <div className="container mx-auto px-4 py-8 max-w-4xl">
-        {/* Breadcrumb */}
         <nav className="text-sm text-neutral-500 mb-6">
-          <Link href="/" className="hover:text-emerald-600">Home</Link>
+          <Link href="/" className="hover:text-emerald-600">
+            Home
+          </Link>
           <span className="mx-2">/</span>
-          <Link href="/umrah/from" className="hover:text-emerald-600">Umrah from</Link>
+          <Link href="/umrah/from" className="hover:text-emerald-600">
+            Umrah from
+          </Link>
           <span className="mx-2">/</span>
           <span className="text-neutral-900 dark:text-white">{country.name}</span>
         </nav>
 
-        {/* Hero */}
         <header className="mb-12">
           <div className="text-6xl mb-4">{country.flag}</div>
           <h1 className="text-4xl md:text-5xl font-bold text-neutral-900 dark:text-white mb-4">
@@ -203,7 +206,6 @@ export default async function UmrahFromCountryPage({ params }: PageProps) {
           </p>
         </header>
 
-        {/* Quick Info Cards */}
         <section className="grid md:grid-cols-3 gap-4 mb-12">
           <div className="p-4 bg-neutral-50 dark:bg-neutral-800 rounded-xl">
             <h3 className="font-semibold text-neutral-900 dark:text-white mb-2">💰 Estimated Cost</h3>
@@ -211,7 +213,9 @@ export default async function UmrahFromCountryPage({ params }: PageProps) {
           </div>
           <div className="p-4 bg-neutral-50 dark:bg-neutral-800 rounded-xl">
             <h3 className="font-semibold text-neutral-900 dark:text-white mb-2">🛂 Visa Required</h3>
-            <p className="text-neutral-600 dark:text-neutral-400">{data.visaRequired ? 'Yes' : 'Check requirements'}</p>
+            <p className="text-neutral-600 dark:text-neutral-400">
+              {data.visaRequired ? 'Yes' : 'Check requirements'}
+            </p>
           </div>
           <div className="p-4 bg-neutral-50 dark:bg-neutral-800 rounded-xl">
             <h3 className="font-semibold text-neutral-900 dark:text-white mb-2">💵 Currency</h3>
@@ -219,7 +223,6 @@ export default async function UmrahFromCountryPage({ params }: PageProps) {
           </div>
         </section>
 
-        {/* Related links (internal linking) */}
         <section className="mb-10 border border-neutral-200 dark:border-neutral-700 rounded-2xl p-6 bg-white dark:bg-neutral-900">
           <h2 className="text-xl font-semibold text-neutral-900 dark:text-white">Explore other countries</h2>
           <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-2">
@@ -247,7 +250,6 @@ export default async function UmrahFromCountryPage({ params }: PageProps) {
           </div>
         </section>
 
-        {/* Main Content */}
         <article className="prose prose-lg dark:prose-invert max-w-none">
           <h2>Umrah Visa for {country.name} Citizens</h2>
           <p>{data.visaInfo}</p>
@@ -271,8 +273,8 @@ export default async function UmrahFromCountryPage({ params }: PageProps) {
             ))}
           </ul>
           <p>
-            <strong>Tip:</strong> Fly into Jeddah for the closest airport to Makkah (80km), 
-            or Madinah if you want to visit the Prophet's Mosque first.
+            <strong>Tip:</strong> Fly into Jeddah for the closest airport to Makkah (80km), or Madinah if you want
+            to visit the Prophet&apos;s Mosque first.
           </p>
 
           <h2>Estimated Costs from {country.name}</h2>
@@ -290,13 +292,27 @@ export default async function UmrahFromCountryPage({ params }: PageProps) {
 
           <h2>Step-by-Step: Umrah from {country.name}</h2>
           <ol>
-            <li><strong>Choose your dates</strong> — Consider Ramadan for extra blessings, or off-peak for fewer crowds</li>
-            <li><strong>Book with an authorized agent</strong> — Use registered Umrah operators</li>
-            <li><strong>Apply for visa</strong> — Through your operator or Saudi eVisa portal</li>
-            <li><strong>Get vaccinated</strong> — Meningitis ACWY is mandatory</li>
-            <li><strong>Book flights</strong> — To Jeddah or Madinah</li>
-            <li><strong>Prepare spiritually</strong> — Learn the rituals, duas, and etiquette</li>
-            <li><strong>Pack appropriately</strong> — Ihram, comfortable shoes, essentials</li>
+            <li>
+              <strong>Choose your dates</strong> — Consider Ramadan for extra blessings, or off-peak for fewer crowds
+            </li>
+            <li>
+              <strong>Book with an authorized agent</strong> — Use registered Umrah operators
+            </li>
+            <li>
+              <strong>Apply for visa</strong> — Through your operator or Saudi eVisa portal
+            </li>
+            <li>
+              <strong>Get vaccinated</strong> — Meningitis ACWY is mandatory
+            </li>
+            <li>
+              <strong>Book flights</strong> — To Jeddah or Madinah
+            </li>
+            <li>
+              <strong>Prepare spiritually</strong> — Learn the rituals, duas, and etiquette
+            </li>
+            <li>
+              <strong>Pack appropriately</strong> — Ihram, comfortable shoes, essentials
+            </li>
           </ol>
 
           <h2>Frequently Asked Questions</h2>
@@ -308,29 +324,11 @@ export default async function UmrahFromCountryPage({ params }: PageProps) {
           ))}
         </article>
 
-        {/* Related Countries */}
-        <section className="mt-12 p-6 bg-neutral-50 dark:bg-neutral-800 rounded-xl">
-          <h2 className="text-xl font-bold text-neutral-900 dark:text-white mb-4">
-            Umrah Guides for Other Countries
-          </h2>
-          <div className="flex flex-wrap gap-2">
-            {countries.slice(0, 20).filter(c => c.code !== country.code).map((c) => (
-              <Link
-                key={c.code}
-                href={`/umrah/from/${toSlug(c.name)}`}
-                className="text-sm px-3 py-1 bg-white dark:bg-neutral-700 rounded-full hover:bg-emerald-100 dark:hover:bg-emerald-900 transition-colors"
-              >
-                {c.flag} {c.name}
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        {/* CTA */}
         <div className="mt-12 p-8 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl text-white text-center">
           <h2 className="text-2xl font-bold mb-4">Plan Your Umrah from {country.name}</h2>
           <p className="mb-6 opacity-90">
-            Get personalized guidance from our AI assistant. Visa help, itinerary planning, budget tips — all tailored for {country.name} pilgrims.
+            Get personalized guidance from our AI assistant. Visa help, itinerary planning, budget tips — all tailored for
+            {country.name} pilgrims.
           </p>
           <Link
             href={`/?from=${countrySlug}`}
@@ -340,9 +338,9 @@ export default async function UmrahFromCountryPage({ params }: PageProps) {
           </Link>
         </div>
 
-        {/* Last Updated */}
         <p className="text-sm text-neutral-500 mt-8">
-          Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+          Last updated:{' '}
+          {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
         </p>
       </div>
     </>
